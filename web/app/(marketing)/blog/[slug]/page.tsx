@@ -5,14 +5,15 @@ import { PostBody } from '@/components/mdx/post-body';
 import { Button } from '@/components/ui/button';
 import { getPost } from '@/lib/get-posts';
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const { slug } = params;
+type BlogPostPageParams = Promise<{
+  slug: string;
+}>;
 
-  const post = await getPost(slug);
+export default async function BlogPostPage(props: {
+  params: BlogPostPageParams;
+}) {
+  const params = await props.params;
+  const post = await getPost(params.slug);
   if (!post) return notFound();
 
   return (
