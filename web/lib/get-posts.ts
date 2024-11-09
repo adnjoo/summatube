@@ -24,7 +24,9 @@ export type Post = Base & {
 // this means getPosts() will only be called once per page build, even though we may call it multiple times
 // when rendering the page.
 export const getPosts = cache(async () => {
-  const posts = await fs.readdir('./posts/');
+  // Use `path.join(process.cwd(), 'posts')` to ensure an absolute path
+  const postsDir = path.join(process.cwd(), 'posts');
+  const posts = await fs.readdir(postsDir);
 
   return Promise.all(
     posts
