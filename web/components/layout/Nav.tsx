@@ -65,7 +65,7 @@ export const Nav = async () => {
                   Home
                 </Link>
               </SheetClose>
-              {user ? (
+              {user && (
                 <SheetClose asChild>
                   <Link
                     href={AppConfig.SITE_MAP.HISTORY}
@@ -75,21 +75,33 @@ export const Nav = async () => {
                     History
                   </Link>
                 </SheetClose>
-              ) : null}
+              )}
+              <Link
+                href='/blog'
+                className='flex items-center py-2 text-lg font-semibold'
+              >
+                Blog
+              </Link>
             </div>
           </SheetContent>
         </Sheet>
 
         {/* Desktop Navigation */}
         <nav className='hidden gap-6 lg:flex'>
-          {user ? (
+          {user && (
             <Link
               href={AppConfig.SITE_MAP.HISTORY}
               className='flex items-center text-sm font-medium transition-colors hover:underline'
             >
               History
             </Link>
-          ) : null}
+          )}
+          <Link
+            href='/blog'
+          className='flex items-center text-sm font-medium transition-colors hover:underline'
+          >
+            Blog
+          </Link>
         </nav>
 
         {/* Authentication Button */}
