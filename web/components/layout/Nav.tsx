@@ -77,7 +77,7 @@ export const Nav = async () => {
                 </SheetClose>
               )}
               <Link
-                href='/blog'
+                href={AppConfig.SITE_MAP.BLOG}
                 className='flex items-center py-2 text-lg font-semibold'
               >
                 Blog
@@ -97,7 +97,7 @@ export const Nav = async () => {
             </Link>
           )}
           <Link
-            href='/blog'
+            href={AppConfig.SITE_MAP.BLOG}
           className='flex items-center text-sm font-medium transition-colors hover:underline'
           >
             Blog

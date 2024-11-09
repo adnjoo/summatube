@@ -8,6 +8,7 @@ export const AppConfig = {
     PRIVACY: '/policies/privacy',
     TERMS: '/policies/terms',
     HISTORY: '/history',
+    BLOG: '/blog',
   },
   SOCIAL: {
     GITHUB: 'https://github.com/adnjoo/summatube',

@@ -17,6 +17,7 @@ export type Post = Base & {
   lastModified?: number;
   views?: number;
   type: 'post';
+  image?: string;
 };
 
 // `cache` is a React 18 feature that allows you to cache a function for the lifetime of a request.
