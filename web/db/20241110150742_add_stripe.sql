@@ -45,5 +45,5 @@ ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Can view own subs data" ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
 
 -- Minimal real-time publication for products and prices
-DROP PUBLICATION IF EXISTS supabase_realtime;
-CREATE PUBLICATION supabase_realtime FOR TABLE public.products, public.prices;
+-- DROP PUBLICATION IF EXISTS supabase_realtime;
+-- CREATE PUBLICATION supabase_realtime FOR TABLE public.products, public.prices;
