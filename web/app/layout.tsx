@@ -13,8 +13,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: AppConfig.APP_NAME,
-  description: AppConfig.APP_DESCRIPTION,
+  title: AppConfig.META.TITLE,
+  description: AppConfig.META.DESCRIPTION,
   twitter: {
     card: 'summary_large_image',
     site: AppConfig.SOCIAL.X,
