@@ -1,3 +1,4 @@
+export * from './copyURL';
 export * from './formatISOToHumanReadable';
 export * from './getThumbnail';
 export * from './getTitle';

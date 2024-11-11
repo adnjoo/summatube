@@ -29,7 +29,9 @@ async function getData(): Promise<any> {
   }
   // Map the data to include URLs and thumbnails
   const mappedData = data.map(({ video_id, title }) => ({
-    url: getYouTubeURL(video_id),
+    url: getYouTubeURL({
+      video_id
+    }),
     thumbnail: getThumbnail(video_id),
     title,
     video_id,

@@ -11,7 +11,6 @@ import { SummaryCard } from '@/components/SummaryCard';
 import { Button, Input, Switch } from '@/components/ui';
 import {
   extractVideoId,
-  getThumbnail,
   getTitle,
   getYouTubeURL,
   isValidYouTubeUrl,
@@ -27,7 +26,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
   const [url, setUrl] = useState('');
   const [video_id, setVideoId] = useState(initialVideoId);
   const [summary, setSummary] = useState('');
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [embedUrl, setEmbedUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [showExamples, setShowExamples] = useState<boolean | undefined>(
     undefined
@@ -57,9 +56,11 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
 
   useEffect(() => {
     if (!video_id) return;
-    const url =getYouTubeURL(video_id);
+    const url = getYouTubeURL({
+      video_id,
+    });
     if (isValidYouTubeUrl(url)) {
-      fetchThumbnail(video_id);
+      fetchEmbed(video_id);
       getTitle(url).then((title) => {
         setThumbnailTitle(title);
       });
@@ -82,18 +83,21 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     setVideoId(extractedVideoId);
 
     if (isValidYouTubeUrl(videoURL)) {
-      fetchThumbnail(extractedVideoId);
+      fetchEmbed(extractedVideoId);
       const title = await getTitle(videoURL);
       setThumbnailTitle(title);
     } else {
-      setThumbnailUrl('');
+      setEmbedUrl('');
       setThumbnailTitle('');
     }
   };
 
-  const fetchThumbnail = (video_id: string) => {
-    const thumbnail = getThumbnail(video_id);
-    setThumbnailUrl(thumbnail);
+  const fetchEmbed = (video_id: string) => {
+    const embed = getYouTubeURL({
+      video_id,
+      embed: true,
+    });
+    setEmbedUrl(embed);
   };
 
   const handleSummarize = async (video_id: string) => {
@@ -116,7 +120,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     exampleVideoTitle: string
   ) => {
     setVideoId(exampleVideoId);
-    fetchThumbnail(exampleVideoId);
+    fetchEmbed(exampleVideoId);
     setThumbnailTitle(exampleVideoTitle);
 
     handleSummarize(exampleVideoId);
@@ -162,7 +166,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
       )}
 
       <form
-        onSubmit={(e)=>{
+        onSubmit={(e) => {
           e.preventDefault();
           handleSummarize(video_id);
         }}
@@ -180,13 +184,14 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           Summarize
         </Button>
       </form>
-      {thumbnailUrl && (
-        <div className='mx-auto mt-4 max-w-md'>
-          <h3 className='sr-only mb-2 text-lg'>Thumbnail</h3>
-          <img
-            src={thumbnailUrl}
-            alt='YouTube Thumbnail'
-            className='h-auto w-full rounded'
+      {embedUrl && (
+        <div className='mx-auto mt-4 flex h-full w-full flex-col items-center sm:max-w-xl'>
+          <h3 className='sr-only mb-2 text-lg'>Embed</h3>
+          <iframe
+            src={embedUrl}
+            title='YouTube Embed'
+            className='aspect-video h-auto w-full rounded'
+            allowFullScreen
           />
           {thumbnailTitle && (
             <div className='mt-1 text-center text-xs'>{thumbnailTitle}</div>
