@@ -1,9 +1,8 @@
 import { NextRequest } from 'next/server';
 
+import { fetchTranscript } from '@/app/(api)/summarize/fetchTranscript';
+import { summarizeTranscript } from '@/app/(api)/summarize/summarizeTranscript';
 import { createClient } from '@/utils/supabase/server';
-
-import { fetchTranscript } from './fetchTranscript';
-import { summarizeTranscript } from './summarizeTranscript';
 
 async function getYouTubeTranscript(video_id: string) {
   if (!video_id) {
@@ -21,7 +20,7 @@ async function getYouTubeTranscript(video_id: string) {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const video_id = searchParams.get('video_id') as string;
-  const save = searchParams.get('save') === 'true'; // Check if 'save' is set to 'true'
+  const save = searchParams.get('save') === 'true';
   const supabase = await createClient();
 
   // Fetch the authenticated user
@@ -32,72 +31,81 @@ export async function GET(request: NextRequest) {
   const userId = user ? user.id : null;
 
   try {
-    // Step 1: Check if a summary already exists
-    let existingSummary;
-
-    // Check by video id
-    const { data, error } = await supabase
-      .from('history')
-      .select('title, summary')
+    // Step 1: Check if the video exists in `videos`; insert if it doesn’t
+    const { data: videoData, error: videoError } = await supabase
+      .from('videos')
+      .select('id, title')
       .eq('video_id', video_id)
-      .limit(1) // Limit to 1 row
-      .maybeSingle();
-    if (error) throw error;
-    existingSummary = data;
+      .single();
 
-    // If a summary exists, return it immediately
+    let videoIdInDb = videoData?.id;
+
+    if (!videoIdInDb) {
+      const { title } = await getYouTubeTranscript(video_id);
+      const { data: newVideo, error: insertVideoError } = await supabase
+        .from('videos')
+        .insert({ video_id, title })
+        .select()
+        .single();
+
+      if (insertVideoError) throw insertVideoError;
+      videoIdInDb = newVideo.id;
+    }
+
+    // Step 2: Check if a summary already exists for this video
+    const { data: existingSummary, error: summaryError } = await supabase
+      .from('summaries')
+      .select('content, created_at')
+      .eq('video_id', videoIdInDb)
+      .eq('user_id', userId) // Ensures user-specific summaries are checked
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (summaryError) throw summaryError;
+
+    // Return existing summary if found
     if (existingSummary) {
       return new Response(
         JSON.stringify({
-          title: existingSummary.title,
-          summary: existingSummary.summary,
+          title: videoData?.title,
+          summary: existingSummary.content,
         }),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
+        { headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Step 2: Generate a new summary if not found
+    // Step 3: Generate a new summary if not found
     const { title, transcript } = await getYouTubeTranscript(video_id);
-    const summary = await summarizeTranscript(transcript);
-    
+    const summaryContent = await summarizeTranscript(transcript);
 
-    // Step 3: Save the new summary to history (if save)
-    if (save) {
-      const insertData: any = { video_id, title, summary };
-      if (userId) insertData.user_id = userId;
+    // Step 4: Save the new summary in `summaries` if `save` is true
+    if (save && userId) {
+      const insertData = {
+        video_id: videoIdInDb,
+        user_id: userId,
+        content: summaryContent,
+      };
 
       const { error: insertError } = await supabase
-        .from('history')
+        .from('summaries')
         .insert(insertData);
+
       if (insertError) {
-        console.error('Error saving to history:', insertError);
+        console.error('Error saving to summaries:', insertError);
       }
     }
 
     // Return the newly generated summary
-    return new Response(
-      JSON.stringify({
-        title,
-        summary,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    return new Response(JSON.stringify({ title, summary: summaryContent }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
     console.error('Error processing summary:', err);
     return new Response(
       JSON.stringify({ error: 'Failed to process summary' }),
       {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         status: 500,
       }
     );

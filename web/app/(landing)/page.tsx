@@ -8,6 +8,7 @@ export type Example = {
   thumbnail: string;
   title: string;
   video_id: string;
+  id: string;
 };
 
 async function getData(): Promise<any> {
@@ -16,10 +17,10 @@ async function getData(): Promise<any> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch the latest 5 summaries (only URLs) from Supabase
+  // Fetch the latest 7 summaries with related video details
   const { data, error } = await supabase
-    .from('history')
-    .select('video_id, title')
+    .from('summaries')
+    .select('id, videos (video_id, title)')
     .order('created_at', { ascending: false })
     .limit(7);
 
@@ -27,14 +28,14 @@ async function getData(): Promise<any> {
     console.error('Error fetching summaries:', error);
     return [];
   }
+
   // Map the data to include URLs and thumbnails
-  const mappedData = data.map(({ video_id, title }) => ({
-    url: getYouTubeURL({
-      video_id
-    }),
-    thumbnail: getThumbnail(video_id),
-    title,
-    video_id,
+  const mappedData = data.map(({ videos, id }: { videos: any, id: Number }) => ({
+    url: getYouTubeURL({ video_id: videos.video_id }),
+    thumbnail: getThumbnail(videos.video_id),
+    title: videos?.title || 'Title not available',
+    video_id: videos.video_id,
+    id: id,
   }));
 
   return {
