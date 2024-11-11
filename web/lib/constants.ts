@@ -1,6 +1,6 @@
 export const AppConfig = {
   APP_NAME: 'SummaTube',
-  APP_DESCRIPTION: 'Summarize YouTube videos for free',
+  APP_DESCRIPTION: 'Summarize YouTube videos for free with summa.tube. Quickly generate summaries for any video, saving you time and helping you capture key points instantly.',
   CONTACT_EMAIL: 'support@summa.tube',
   SITE_URL: 'https://summa.tube',
   SITE_MAP: {
