@@ -1,9 +1,21 @@
-export type History = {
+export type Video = {
   id: number;
-  user_id: string | null;
-  url: string;
-  title: string;
-  summary: string;
-  created_at: string | null;
-  video_id: string;
+  videoId: string; // YouTube video ID
+  title: string | null;
+};
+
+export type Summary = {
+  id: number;
+  videoId: number;
+  userId: string | null; // UUID
+  content: string;
+  version: number;
+  created_at: string;
+};
+
+export type SummaryLike = {
+  id: number;
+  userId: string; // UUID
+  summaryId: number;
+  likedAt: string;
 };

@@ -19,9 +19,10 @@ export default function Page() {
     const start = (page - 1) * pageSize;
     const end = start + pageSize - 1;
 
+    // Fetch data from summaries and join with videos to get title and video_id
     const { data, error, count } = await supabase
-      .from('history')
-      .select('*', { count: 'exact' }) // Get total count for pagination
+      .from('summaries')
+      .select('id, content, created_at, videos (video_id, title)', { count: 'exact' })
       .eq('user_id', user?.id)
       .order('created_at', { ascending: false })
       .range(start, end);
@@ -44,7 +45,7 @@ export default function Page() {
 
   const deleteMutation = useMutation<void, Error, number>({
     mutationFn: async (id: number) => {
-      const { error } = await supabase.from('history').delete().eq('id', id);
+      const { error } = await supabase.from('summaries').delete().eq('id', id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
