@@ -31,7 +31,9 @@ export function HistoryCard({ item, onDelete }: HistoryCardProps) {
     <Card className='flex w-full flex-col rounded-lg border border-gray-100 px-2 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md sm:px-4 md:flex-row'>
       <div className='flex w-full flex-col md:w-64'>
         <Link
-          href={getYouTubeURL(item.video_id)}
+          href={getYouTubeURL({
+            video_id: item.video_id
+          })}
           className='text-sm font-semibold hover:underline'
           target='_blank'
         >
