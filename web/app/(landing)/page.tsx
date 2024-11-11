@@ -16,10 +16,10 @@ async function getData(): Promise<any> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch the latest 5 summaries (only URLs) from Supabase
+  // Fetch the latest 7 summaries with related video details
   const { data, error } = await supabase
-    .from('history')
-    .select('video_id, title')
+    .from('summaries')
+    .select('id, videos (video_id, title)')
     .order('created_at', { ascending: false })
     .limit(7);
 
@@ -27,14 +27,13 @@ async function getData(): Promise<any> {
     console.error('Error fetching summaries:', error);
     return [];
   }
+
   // Map the data to include URLs and thumbnails
-  const mappedData = data.map(({ video_id, title }) => ({
-    url: getYouTubeURL({
-      video_id
-    }),
-    thumbnail: getThumbnail(video_id),
-    title,
-    video_id,
+  const mappedData = data.map(({ videos }: { videos: any }) => ({
+    url: getYouTubeURL({ video_id: videos.video_id }),
+    thumbnail: getThumbnail(videos.video_id),
+    title: videos?.title || 'Title not available',
+    video_id: videos.video_id,
   }));
 
   return {
