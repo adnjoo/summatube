@@ -1,7 +1,7 @@
 import { FiExternalLink, FiShare2 } from 'react-icons/fi';
 
-import { copyUrl } from '@/components/HistoryCard';
 import { Notification } from '@/components/layout/Notification';
+import { copyUrl } from '@/lib/helpers';
 import { useCopyToClipboard } from '@/lib/hooks';
 
 export const SummaryCard = ({ summary, loading, video_id }) => {
@@ -16,16 +16,16 @@ export const SummaryCard = ({ summary, loading, video_id }) => {
         <div className='flex flex-row items-center'>
           <button
             onClick={() => handleCopyClick(copyUrl(video_id))}
-            className='text-blue-500 hover:text-blue-700 my-2'
+            className='my-2 text-blue-500 hover:text-blue-700'
             aria-label='Copy URL'
           >
             <FiShare2 size={18} />
           </button>
           <a
             href={`https://www.youtube.com/watch?v=${video_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className='text-blue-500 hover:text-blue-700 ml-2'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='ml-2 text-blue-500 hover:text-blue-700'
           >
             <FiExternalLink size={18} />
           </a>
