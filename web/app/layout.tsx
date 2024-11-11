@@ -25,6 +25,22 @@ export const metadata: Metadata = {
       alt: AppConfig.APP_NAME,
     },
   },
+  openGraph: {
+    title: AppConfig.META.TITLE,
+    description: AppConfig.META.DESCRIPTION,
+    url: AppConfig.SITE_URL,
+    type: 'website',
+    images: [
+      {
+        url: `${AppConfig.SITE_URL}/x-image.png`,
+        width: 1200,
+        height: 630,
+        alt: AppConfig.APP_NAME,
+      },
+    ],
+    locale: 'en_US',
+    siteName: AppConfig.APP_NAME,
+  },
 };
 
 export default function RootLayout({ children }) {
