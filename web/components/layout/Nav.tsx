@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { FaBars } from 'react-icons/fa6';
@@ -76,12 +75,14 @@ export const Nav = async () => {
                   </Link>
                 </SheetClose>
               )}
-              <Link
-                href={AppConfig.SITE_MAP.BLOG}
-                className='flex items-center py-2 text-lg font-semibold'
-              >
-                Blog
-              </Link>
+              <SheetClose asChild>
+                <Link
+                  href={AppConfig.SITE_MAP.BLOG}
+                  className='flex items-center py-2 text-lg font-semibold'
+                >
+                  Blog
+                </Link>
+              </SheetClose>
             </div>
           </SheetContent>
         </Sheet>
@@ -98,7 +99,7 @@ export const Nav = async () => {
           )}
           <Link
             href={AppConfig.SITE_MAP.BLOG}
-          className='flex items-center text-sm font-medium transition-colors hover:underline'
+            className='flex items-center text-sm font-medium transition-colors hover:underline'
           >
             Blog
           </Link>
