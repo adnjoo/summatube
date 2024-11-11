@@ -8,6 +8,7 @@ export type Example = {
   thumbnail: string;
   title: string;
   video_id: string;
+  id: string;
 };
 
 async function getData(): Promise<any> {
@@ -29,11 +30,12 @@ async function getData(): Promise<any> {
   }
 
   // Map the data to include URLs and thumbnails
-  const mappedData = data.map(({ videos }: { videos: any }) => ({
+  const mappedData = data.map(({ videos, id }: { videos: any, id: Number }) => ({
     url: getYouTubeURL({ video_id: videos.video_id }),
     thumbnail: getThumbnail(videos.video_id),
     title: videos?.title || 'Title not available',
     video_id: videos.video_id,
+    id: id,
   }));
 
   return {
