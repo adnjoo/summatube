@@ -25,7 +25,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
 
   const [url, setUrl] = useState('');
   const [video_id, setVideoId] = useState(initialVideoId);
-  const [summary, setSummary] = useState('');
+  const [summary, setSummary] = useState<any>(null);
   const [embedUrl, setEmbedUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [showExamples, setShowExamples] = useState<boolean | undefined>(
@@ -106,7 +106,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
       const response = await fetch(
         `/summarize?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
       );
-      const { summary } = await response.json();
+      const summary = await response.json();
       setSummary(summary);
     } catch (error) {
       console.error('Error processing summary:', error);
@@ -199,7 +199,14 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
         </div>
       )}
       {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
-      <SummaryCard summary={summary} loading={loading} video_id={video_id} />
+      {(
+        <SummaryCard
+          summary={summary}
+          loading={loading}
+          video_id={video_id}
+          user_id={user?.id}
+        />
+      )}
     </main>
   );
 }

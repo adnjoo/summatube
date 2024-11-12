@@ -1,7 +1,8 @@
 CREATE TABLE videos (
     id SERIAL PRIMARY KEY,
     video_id VARCHAR(11) UNIQUE NOT NULL, -- YouTube video ID
-    title TEXT
+    title TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE summaries (
