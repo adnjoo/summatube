@@ -5,9 +5,11 @@ import { supabase } from '@/utils/supabase/client';
 export type LikeButtonProps = {
   summaryId: string;
   userId: string;
+  disabled?: boolean; // New prop to control the disabled state
 };
 
-export function LikeButton({ summaryId, userId }: LikeButtonProps) {
+export function LikeButton({ summaryId, userId, disabled = false }: LikeButtonProps) {
+  console.log(disabled, typeof disabled); // Log the disabled prop
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
 
@@ -28,7 +30,6 @@ export function LikeButton({ summaryId, userId }: LikeButtonProps) {
       setLikeCount(countData?.length || 0);
       setLiked(!!likeData);
     };
-
 
     fetchLikes();
   }, [summaryId, userId]);
@@ -54,7 +55,8 @@ export function LikeButton({ summaryId, userId }: LikeButtonProps) {
   return (
     <button
       onClick={handleLikeClick}
-      className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-700`}
+      disabled={disabled} // Use the disabled prop here
+      className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-700 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       aria-label='Like'
     >
       <FiThumbsUp size={18} />
