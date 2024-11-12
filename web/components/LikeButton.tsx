@@ -10,6 +10,14 @@ export type LikeButtonProps = {
   className?: string;
 };
 
+/**
+ * A button component that allows users to like a summary. It displays the total number of likes
+ * and allows logged-in users to like or unlike the summary. Public (not logged-in) users can only view the like count.
+ *
+ * @component
+ * @param {LikeButtonProps} props - The props for the component.
+ * @returns {JSX.Element} A like button with like count display.
+ */
 export function LikeButton({ summaryId, className }: LikeButtonProps) {
   const user = useUser();
   const userId = user?.id;
@@ -17,23 +25,25 @@ export function LikeButton({ summaryId, className }: LikeButtonProps) {
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    if (!userId) return;
-
     const fetchLikes = async () => {
-      const { data: countData } = await supabase
-        .from('summary_likes')
-        .select('*', { count: 'exact' })
-        .eq('summary_id', summaryId);
+      if (userId) {
+        // Fetch both the count and the user's like status if logged in
+        const { data: countData, count } = await supabase
+          .from('summary_likes')
+          .select('*', { count: 'exact' })
+          .eq('summary_id', summaryId);
 
-      const { data: likeData } = await supabase
-        .from('summary_likes')
-        .select('*')
-        .eq('summary_id', summaryId)
-        .eq('user_id', userId)
-        .single();
+        setLikeCount(count || 0);
+        setLiked(!!countData?.find((like) => like.user_id === userId));
+      } else {
+        // Only fetch the like count if not logged in
+        const { count } = await supabase
+          .from('summary_likes')
+          .select('*', { count: 'exact' })
+          .eq('summary_id', summaryId);
 
-      setLikeCount(countData?.length || 0);
-      setLiked(!!likeData);
+        setLikeCount(count || 0);
+      }
     };
 
     fetchLikes();
@@ -64,7 +74,8 @@ export function LikeButton({ summaryId, className }: LikeButtonProps) {
       onClick={handleLikeClick}
       disabled={!userId}
       className={cn(
-        'flex items-center text-white',
+        'flex items-center',
+        liked ? 'text-blue-500' : 'text-gray-500',
         !userId && 'cursor-not-allowed opacity-50',
         className
       )}
