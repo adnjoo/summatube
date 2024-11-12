@@ -14,7 +14,6 @@ export type HistoryCardProps = {
 };
 
 export function HistoryCard({ item }: HistoryCardProps) {
-  console.log(item);
   const { copySuccess, handleCopyClick } = useCopyToClipboard();
 
   return (

@@ -27,7 +27,6 @@ export function LikeButton({ summaryId, userId }: LikeButtonProps) {
 
       setLikeCount(countData?.length || 0);
       setLiked(!!likeData);
-      console.log('likeData', likeData);
     };
 
 

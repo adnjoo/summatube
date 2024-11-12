@@ -99,6 +99,18 @@ export async function GET(request: NextRequest) {
         console.error('Error saving to summaries:', insertError);
       } else {
         newSummary = data;
+
+        // Auto-like the summary if successfully created
+        const { error: likeError } = await supabase
+          .from('summary_likes')
+          .insert({
+            summary_id: newSummary.id,
+            user_id: userId,
+          });
+
+        if (likeError) {
+          console.error('Error adding to summary_likes:', likeError);
+        }
       }
     }
 
