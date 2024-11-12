@@ -1,4 +1,5 @@
 import { type Example } from '@/app/(landing)/page';
+import { LikeButton } from '@/components/LikeButton';
 
 export type MarqueeCardProps = {
   example: Example;
@@ -22,6 +23,14 @@ export const MarqueeCard = ({
       />
       <div className='absolute bottom-0 left-0 z-0 w-full bg-black bg-opacity-75 p-1 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100'>
         {example.title}
+      </div>
+
+      {/* LikeButton overlay in the top-right corner */}
+      <div className='absolute right-2 top-2'>
+        <LikeButton
+          summaryId={example.id}
+          className='rounded-full bg-white p-1 shadow-lg'
+        />
       </div>
     </div>
   );
