@@ -74,8 +74,7 @@ export function LikeButton({ summaryId, className }: LikeButtonProps) {
       onClick={handleLikeClick}
       disabled={!userId}
       className={cn(
-        'flex items-center',
-        liked ? 'text-blue-500' : 'text-gray-500',
+        'flex items-center text-blue-500',
         !userId && 'cursor-not-allowed opacity-50',
         className
       )}
