@@ -1,10 +1,18 @@
 import { FiExternalLink, FiShare2 } from 'react-icons/fi';
 
+import { LikeButton } from '@/components/LikeButton';
 import { Notification } from '@/components/layout/Notification';
 import { copyUrl } from '@/lib/helpers';
 import { useCopyToClipboard } from '@/lib/hooks';
 
-export const SummaryCard = ({ summary, loading, video_id }) => {
+export type SummaryCardProps = {
+  summary: any;
+  loading: boolean;
+  video_id: string;
+  user_id: string;
+};
+
+export const SummaryCard = ({ summary, loading, video_id, user_id }) => {
   const { copySuccess, handleCopyClick } = useCopyToClipboard();
 
   if (!summary || loading) return null;
@@ -12,8 +20,8 @@ export const SummaryCard = ({ summary, loading, video_id }) => {
   return (
     <div className='mx-auto mt-8 max-w-5xl rounded border border-gray-300 p-2 text-sm sm:p-4 sm:text-base'>
       <h2 className='mb-2 text-xl'>Summary</h2>
-      <p>
-        <div className='flex flex-row items-center'>
+      <div>
+        <div className='flex flex-row items-center gap-2'>
           <button
             onClick={() => handleCopyClick(copyUrl(video_id))}
             className='my-2 text-blue-500 hover:text-blue-700'
@@ -29,9 +37,10 @@ export const SummaryCard = ({ summary, loading, video_id }) => {
           >
             <FiExternalLink size={18} />
           </a>
+          <LikeButton summaryId={summary.id} userId={user_id} />
         </div>
-        {summary}
-      </p>
+        <p>{summary?.summary}</p>
+      </div>
       <Notification isVisible={copySuccess} />
     </div>
   );

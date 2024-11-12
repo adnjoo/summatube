@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     // Step 2: Check if a summary already exists for this video
     const { data: existingSummary, error: summaryError } = await supabase
       .from('summaries')
-      .select('content, created_at')
+      .select('id, content, created_at')
       .eq('video_id', videoIdInDb)
       .eq('user_id', userId) // Ensures user-specific summaries are checked
       .order('created_at', { ascending: false })
@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
         JSON.stringify({
           title: videoData?.title,
           summary: existingSummary.content,
+          id: existingSummary.id,
         }),
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -80,6 +81,7 @@ export async function GET(request: NextRequest) {
     const summaryContent = await summarizeTranscript(transcript);
 
     // Step 4: Save the new summary in `summaries` if `save` is true
+    let newSummary;
     if (save && userId) {
       const insertData = {
         video_id: videoIdInDb,
@@ -87,19 +89,38 @@ export async function GET(request: NextRequest) {
         content: summaryContent,
       };
 
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from('summaries')
-        .insert(insertData);
+        .insert(insertData)
+        .select('id')
+        .single();
 
       if (insertError) {
         console.error('Error saving to summaries:', insertError);
+      } else {
+        newSummary = data;
+
+        // Auto-like the summary if successfully created
+        const { error: likeError } = await supabase
+          .from('summary_likes')
+          .insert({
+            summary_id: newSummary.id,
+            user_id: userId,
+          });
+
+        if (likeError) {
+          console.error('Error adding to summary_likes:', likeError);
+        }
       }
     }
 
     // Return the newly generated summary
-    return new Response(JSON.stringify({ title, summary: summaryContent }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ title, summary: summaryContent, id: newSummary?.id }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (err) {
     console.error('Error processing summary:', err);
     return new Response(
