@@ -9,7 +9,6 @@ export type LikeButtonProps = {
 };
 
 export function LikeButton({ summaryId, userId, disabled = false }: LikeButtonProps) {
-  console.log(disabled, typeof disabled); // Log the disabled prop
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
 
