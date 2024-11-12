@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { useState } from 'react';
-import { FiShare2, FiTrash2 } from 'react-icons/fi';
+import { FiShare2 } from 'react-icons/fi';
 
+import { LikeButton } from '@/components/LikeButton';
 import { Notification } from '@/components/layout/Notification';
 import { Card } from '@/components/ui/card';
 import { getThumbnail, getYouTubeURL } from '@/lib/helpers';
@@ -13,16 +13,9 @@ export type HistoryCardProps = {
   onDelete: () => void;
 };
 
-export function HistoryCard({ item, onDelete }: HistoryCardProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+export function HistoryCard({ item }: HistoryCardProps) {
+  console.log(item);
   const { copySuccess, handleCopyClick } = useCopyToClipboard();
-
-  const handleDeleteClick = () => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      setIsDeleting(true);
-      onDelete();
-    }
-  };
 
   return (
     <Card className='flex w-full flex-col rounded-lg border border-gray-100 px-2 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md sm:px-4 md:flex-row'>
@@ -46,14 +39,7 @@ export function HistoryCard({ item, onDelete }: HistoryCardProps) {
         />
       </div>
       <div className='mt-4 flex gap-4 sm:flex-col md:ml-4 md:mt-0'>
-        <button
-          onClick={handleDeleteClick}
-          disabled={isDeleting}
-          className='flex items-center text-red-500 hover:text-red-700'
-          aria-label='Delete'
-        >
-          {isDeleting ? 'Deleting...' : <FiTrash2 size={18} />}
-        </button>
+        <LikeButton summaryId={item.summary_id} userId={item.user_id} />
         <button
           onClick={() =>
             handleCopyClick(copyUrl(item.summaries.videos.video_id))
