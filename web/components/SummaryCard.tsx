@@ -21,7 +21,7 @@ export const SummaryCard = ({ summary, loading, video_id, user_id }) => {
     <div className='mx-auto mt-8 max-w-5xl rounded border border-gray-300 p-2 text-sm sm:p-4 sm:text-base'>
       <h2 className='mb-2 text-xl'>Summary</h2>
       <div>
-        <div className='flex flex-row items-center'>
+        <div className='flex flex-row items-center gap-2'>
           <button
             onClick={() => handleCopyClick(copyUrl(video_id))}
             className='my-2 text-blue-500 hover:text-blue-700'
