@@ -7,15 +7,10 @@ import { supabase } from '@/utils/supabase/client';
 
 export type LikeButtonProps = {
   summaryId: string;
-  disabled?: boolean;
   className?: string;
 };
 
-export function LikeButton({
-  summaryId,
-  disabled = false,
-  className,
-}: LikeButtonProps) {
+export function LikeButton({ summaryId, className }: LikeButtonProps) {
   const user = useUser();
   const userId = user?.id;
   const [likeCount, setLikeCount] = useState(0);
@@ -67,13 +62,11 @@ export function LikeButton({
   return (
     <button
       onClick={handleLikeClick}
-      disabled={disabled || !userId}
+      disabled={!userId}
       className={cn(
-        'flex items-center',
-        liked ? 'text-slate-300' : 'text-slate-500',
-        'hover:text-slate-700',
-        (disabled || !userId) && 'cursor-not-allowed opacity-50',
-        className // Apply additional className prop here
+        'flex items-center text-white',
+        !userId && 'cursor-not-allowed opacity-50',
+        className
       )}
       aria-label='Like'
     >
