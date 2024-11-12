@@ -29,7 +29,7 @@ export const MarqueeCard = ({
       <div className='absolute right-2 top-2'>
         <LikeButton
           summaryId={example.id}
-          className='rounded-full bg-white p-1 shadow-lg'
+          className='p-1'
         />
       </div>
     </div>

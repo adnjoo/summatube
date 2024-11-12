@@ -70,8 +70,8 @@ export function LikeButton({
       disabled={disabled || !userId}
       className={cn(
         'flex items-center',
-        liked ? 'text-red-500' : 'text-gray-500',
-        'hover:text-red-700',
+        liked ? 'text-slate-300' : 'text-slate-500',
+        'hover:text-slate-700',
         (disabled || !userId) && 'cursor-not-allowed opacity-50',
         className // Apply additional className prop here
       )}
