@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       .from('summaries')
       .select('id, content, created_at')
       .eq('video_id', videoIdInDb)
-      .eq('user_id', userId) // Ensures user-specific summaries are checked
+      // .eq('user_id', userId) // Ensures user-specific summaries are checked
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();

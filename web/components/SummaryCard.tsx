@@ -37,7 +37,11 @@ export const SummaryCard = ({ summary, loading, video_id, user_id }) => {
           >
             <FiExternalLink size={18} />
           </a>
-          <LikeButton summaryId={summary.id} userId={user_id} />
+          <LikeButton
+            summaryId={summary.id}
+            userId={user_id}
+            disabled={user_id || true}
+          />
         </div>
         <p>{summary?.summary}</p>
       </div>

@@ -16,7 +16,7 @@ CREATE TABLE summaries (
 
 CREATE TABLE summary_likes (
     id SERIAL PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     summary_id INT REFERENCES summaries(id) ON DELETE CASCADE,
     liked_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(user_id, summary_id)
