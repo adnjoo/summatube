@@ -9,10 +9,9 @@ export type SummaryCardProps = {
   summary: any;
   loading: boolean;
   video_id: string;
-  user_id: string;
 };
 
-export const SummaryCard = ({ summary, loading, video_id, user_id }) => {
+export const SummaryCard = ({ summary, loading, video_id }) => {
   const { copySuccess, handleCopyClick } = useCopyToClipboard();
 
   if (!summary || loading) return null;
@@ -39,8 +38,6 @@ export const SummaryCard = ({ summary, loading, video_id, user_id }) => {
           </a>
           <LikeButton
             summaryId={summary.id}
-            userId={user_id}
-            disabled={user_id || true}
           />
         </div>
         <p>{summary?.summary}</p>

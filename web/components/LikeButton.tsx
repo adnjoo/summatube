@@ -1,18 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FiThumbsUp } from 'react-icons/fi';
+
+import { useUser } from '@/lib/hooks';
 import { supabase } from '@/utils/supabase/client';
 
 export type LikeButtonProps = {
   summaryId: string;
-  userId: string;
-  disabled?: boolean; // New prop to control the disabled state
+  disabled?: boolean;
 };
 
-export function LikeButton({ summaryId, userId, disabled = false }: LikeButtonProps) {
+export function LikeButton({ summaryId, disabled = false }: LikeButtonProps) {
+  const user = useUser();
+  const userId = user?.id;
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
+    if (!userId) return; // Early exit if user is not logged in
+
     const fetchLikes = async () => {
       const { data: countData } = await supabase
         .from('summary_likes')
@@ -34,6 +39,8 @@ export function LikeButton({ summaryId, userId, disabled = false }: LikeButtonPr
   }, [summaryId, userId]);
 
   const handleLikeClick = async () => {
+    if (!userId) return; // Prevent liking if not logged in
+
     if (liked) {
       await supabase
         .from('summary_likes')
@@ -54,8 +61,8 @@ export function LikeButton({ summaryId, userId, disabled = false }: LikeButtonPr
   return (
     <button
       onClick={handleLikeClick}
-      disabled={disabled} // Use the disabled prop here
-      className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-700 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      disabled={disabled || !userId} // Disable if no user or disabled prop is true
+      className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-700 ${disabled || !userId ? 'cursor-not-allowed opacity-50' : ''}`}
       aria-label='Like'
     >
       <FiThumbsUp size={18} />

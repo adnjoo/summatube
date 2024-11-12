@@ -38,7 +38,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
         />
       </div>
       <div className='mt-4 flex gap-4 sm:flex-col md:ml-4 md:mt-0'>
-        <LikeButton summaryId={item.summary_id} userId={item.user_id} />
+        <LikeButton summaryId={item.summary_id} />
         <button
           onClick={() =>
             handleCopyClick(copyUrl(item.summaries.videos.video_id))

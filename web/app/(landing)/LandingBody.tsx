@@ -194,7 +194,6 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           summary={summary}
           loading={loading}
           video_id={video_id}
-          user_id={user?.id}
         />
       )}
     </main>
