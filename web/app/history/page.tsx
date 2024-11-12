@@ -21,10 +21,13 @@ export default function Page() {
 
     // Fetch data from summaries and join with videos to get title and video_id
     const { data, error, count } = await supabase
-      .from('summaries')
-      .select('id, content, created_at, videos (video_id, title)', { count: 'exact' })
+      .from('summary_likes')
+      .select(
+        'id, user_id, summary_id, summaries (content, created_at, videos (video_id, title))',
+        { count: 'exact' }
+      )
       .eq('user_id', user?.id)
-      .order('created_at', { ascending: false })
+      .order('liked_at', { ascending: false })
       .range(start, end);
 
     if (error) throw new Error(error.message);
@@ -41,6 +44,7 @@ export default function Page() {
     queryKey: ['history', page],
     queryFn: fetchHistory,
     placeholderData: keepPreviousData,
+    enabled: !!user,
   });
 
   const deleteMutation = useMutation<void, Error, number>({
