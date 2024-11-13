@@ -15,8 +15,8 @@ export async function POST(request) {
           quantity: 1,
         },
       ],
-      success_url: `${request.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get('origin')}/cancel`,
+      success_url: `${request.headers.get('origin')}/pricing?status=success`,
+      cancel_url: `${request.headers.get('origin')}/pricing?status=cancel`,
     });
 
     return new Response(JSON.stringify({ sessionId: session.id }), {

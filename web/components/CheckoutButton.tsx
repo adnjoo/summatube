@@ -2,7 +2,10 @@
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Stripe } from '@stripe/stripe-js';
+import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
@@ -30,8 +33,8 @@ export default function CheckoutButton({ priceId }) {
   };
 
   return (
-    <button onClick={handleCheckout} disabled={loading}>
-      {loading ? 'Loading...' : 'Checkout'}
-    </button>
+    <Button onClick={handleCheckout} disabled={loading} className='w-full'>
+      {loading ? <Loader2 className='animate-spin' /> : 'Subscribe Now'}
+    </Button>
   );
 }

@@ -1,4 +1,4 @@
-// app/api/stripe-webhook/route.js
+// app/api/stripe-webhook/route.ts
 import Stripe from 'stripe';
 
 import { stripe } from '@/utils/stripe/config';
