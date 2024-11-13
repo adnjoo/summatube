@@ -2,17 +2,13 @@
 CREATE TABLE public.users (
     id UUID REFERENCES auth.users(id) PRIMARY KEY,
     full_name TEXT,
-    avatar_url TEXT
+    avatar_url TEXT,
+    stripe_customer_id TEXT  -- Stores Stripe customer ID directly in users table
 );
+
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Can view own data" ON public.users FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Can update own data" ON public.users FOR UPDATE USING (auth.uid() = id);
-
--- Customers table for Stripe customer ID
-CREATE TABLE public.customers (
-    id UUID REFERENCES auth.users(id) PRIMARY KEY,
-    stripe_customer_id TEXT
-);
 
 -- Minimal Products table
 CREATE TABLE public.products (
