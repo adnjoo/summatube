@@ -3,6 +3,9 @@ import { Suspense } from 'react';
 import { PricingBody } from '@/app/pricing/PricingBody';
 import { Plan, PricingCard } from '@/components/PricingCard';
 
+const FREE_SUMMARY_LIMIT = 50;
+const PRO_PLAN_MONTHLY_PRICE = 1;
+
 const pricingOptions: Plan[] = [
   {
     id: 'free',
@@ -10,7 +13,7 @@ const pricingOptions: Plan[] = [
     description:
       'Access essential features with basic models, perfect for quick and simple summaries.',
     features: [
-      'Save up to 100 summaries',
+      `Save up to ${FREE_SUMMARY_LIMIT} summaries`,
       'Standard summary generation speed',
       'Access to basic models',
       'Basic customer support',
@@ -31,7 +34,7 @@ const pricingOptions: Plan[] = [
     ],
     note: 'Perfect for professionals who need high-quality, reliable summaries.',
     isPremium: true,
-    price: '$1/month',
+    price: `$${PRO_PLAN_MONTHLY_PRICE}/month`,
   },
 ];
 
