@@ -22,7 +22,7 @@ export default function Login() {
   };
 
   return (
-    <section className='mx-auto mt-32 flex flex-col justify-between items-center'>
+    <section className='mx-auto mt-32 flex flex-col items-center justify-between'>
       <div className='w-full max-w-md border-2 border-black p-8'>
         <Link
           href='/'
