@@ -25,8 +25,8 @@ export function PricingCard({ plan }: PricingCardProps) {
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className='flex flex-col items-center'>
-        <p className='mb-4 text-center text-gray-600'>{description}</p>
+      <CardContent className='flex flex-col'>
+        <p className='mb-4 text-gray-600'>{description}</p>
         <ul className='mb-4 space-y-2 text-gray-600'>
           {features.map((feature, index) => (
             <li key={index} className='flex items-center'>
@@ -35,9 +35,9 @@ export function PricingCard({ plan }: PricingCardProps) {
             </li>
           ))}
         </ul>
-        <p className='mb-4 text-center text-sm text-gray-500'>{note}</p>
+        <p className='mb-4 text-sm text-gray-500'>{note}</p>
         {isPremium && (
-          <div className='flex flex-col items-center'>
+          <div className='flex flex-col'>
             <span className='mb-2 text-lg font-bold text-gray-700'>
               {price}
             </span>

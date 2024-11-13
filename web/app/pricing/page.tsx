@@ -11,30 +11,28 @@ const pricingOptions: Plan[] = [
     id: 'free',
     title: 'Free Plan',
     description:
-      'Access essential features with basic models, perfect for quick and simple summaries.',
+      'Get the essentials for free, perfect for quick summaries without breaking the bank (or... actually, just free!).',
     features: [
-      `Save up to ${FREE_SUMMARY_LIMIT} summaries`,
-      'Standard summary generation speed',
+      `Store up to ${FREE_SUMMARY_LIMIT} brilliant summaries`,
+      'Standard-speed summary magic 🪄',
       'Access to basic models',
-      'Basic customer support',
     ],
-    note: 'Great for casual users looking to explore summary features.',
+    note: 'Great for casually curious users or folks who just love the word "free".',
     isPremium: false,
   },
   {
     id: 'pro',
     title: 'Pro Plan',
     description:
-      'Unlock advanced features, faster processing, and access to premium models for high-quality summaries.',
+      'Step it up a notch! Get faster, better summaries with fancy premium models and priority support that actually answers you.',
     features: [
-      'Unlimited summary storage',
-      'Faster processing speed',
+      'Limitless summary vault',
+      'Lightning-fast processing speed (say goodbye to waiting) ⚡️',
       'Access to pro models for enhanced accuracy',
-      'Priority customer support',
     ],
-    note: 'Perfect for professionals who need high-quality, reliable summaries.',
+    note: 'Perfect for power-users and professionals who need summaries on the fly!',
     isPremium: true,
-    price: `$${PRO_PLAN_MONTHLY_PRICE}/month`,
+    price: `$${PRO_PLAN_MONTHLY_PRICE}/month (yep, just a buck!)`,
   },
 ];
 
