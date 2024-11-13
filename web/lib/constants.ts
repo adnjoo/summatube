@@ -14,6 +14,7 @@ export const AppConfig = {
     HISTORY: '/history',
     BLOG: '/blog',
     PRICING: '/pricing',
+    AUTH_CALLBACK: '/api/auth/callback',
   },
   SOCIAL: {
     GITHUB: 'https://github.com/adnjoo/summatube',
