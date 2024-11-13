@@ -37,8 +37,6 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
   );
   const [thumbnailTitle, setThumbnailTitle] = useState('');
 
-  const inputRef = useFocusShortcut('/');
-
   useEffect(() => {
     const showExamplesStored = localStorage.getItem('showExamples');
     const saveHistoryStored = localStorage.getItem('saveHistory');
@@ -167,7 +165,6 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           placeholder='Enter YouTube URL e.g. https://www.youtube.com/watch?v=62wEk02YKs0&pp=ygUIYmJjIG5ld3M%3D'
           value={url}
           onChange={handleInputChange}
-          ref={inputRef}
           className='mb-4'
         />
         <Button type='submit' disabled={loading} className='relative'>

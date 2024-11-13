@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       .limit(1)
       .maybeSingle();
 
-    if (summaryError) throw summaryError;
+    // if (summaryError) throw summaryError;
 
     // Return existing summary if found
     if (existingSummary) {
