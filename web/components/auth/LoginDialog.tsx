@@ -14,18 +14,16 @@ import {
   DialogTrigger,
 } from '@/components/ui';
 import { AppConfig } from '@/lib/constants';
-import { useUser } from '@/lib/hooks/useUser';
 import { createClient } from '@/utils/supabase/client';
 
 export default function LoginDialog() {
   const supabase = createClient();
-  const user = useUser();
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}${AppConfig.SITE_MAP.AUTH_CALLBACK}`,
+        redirectTo: `${window.location.origin}${AppConfig.SITE_MAP.API.AUTH_CALLBACK}`,
       },
     });
     if (error) {
