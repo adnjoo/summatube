@@ -37,7 +37,7 @@ export default async function Blog() {
                 <CardTitle>
                   <Link
                     href={link}
-                    className='text-blue-600 hover:text-blue-800'
+                    className='hover:underline'
                   >
                     {post.title}
                   </Link>
