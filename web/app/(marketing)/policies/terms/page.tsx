@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle, Separator } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Separator,
+} from '@/components/ui';
 import { AppConfig } from '@/lib/constants';
 import { formatISOToHumanReadable } from '@/lib/helpers';
 
@@ -7,9 +12,7 @@ export default function Terms() {
     <div className='mx-auto max-w-4xl px-4 py-12'>
       <Card>
         <CardHeader>
-          <CardTitle className='text-2xl font-bold'>
-            Terms and Conditions
-          </CardTitle>
+          <h1 className='text-2xl font-bold'>Terms and Conditions</h1>
         </CardHeader>
         <CardContent>
           <div className='space-y-6'>

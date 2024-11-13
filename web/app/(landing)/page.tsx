@@ -8,6 +8,7 @@ export type Example = {
   thumbnail: string;
   title: string;
   video_id: string;
+  id: string;
 };
 
 async function getData(): Promise<any> {
@@ -16,26 +17,63 @@ async function getData(): Promise<any> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch the latest 5 summaries (only URLs) from Supabase
-  const { data, error } = await supabase
-    .from('history')
-    .select('video_id, title')
+  // Step 1: Fetch the latest 7 videos
+  const { data: videos, error: videoError } = await supabase
+    .from('videos')
+    .select('id, video_id, title')
     .order('created_at', { ascending: false })
     .limit(7);
 
-  if (error) {
-    console.error('Error fetching summaries:', error);
+  if (videoError) {
+    console.error('Error fetching videos:', videoError);
     return [];
   }
+
+  // Step 2: For each video, fetch the latest summary separately
+  const videoSummaries = await Promise.all(
+    videos.map(async (video) => {
+      const { data: latestSummary, error: summaryError } = await supabase
+        .from('summaries')
+        .select('id, content, created_at')
+        .eq('video_id', video.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (summaryError) {
+        console.error(
+          `Error fetching summary for video ${video.video_id}:`,
+          summaryError
+        );
+        return {
+          ...video,
+          summary: null,
+          summary_id: null,
+          summary_created_at: null,
+        };
+      }
+
+      return {
+        ...video,
+        summary: latestSummary?.content || 'No summary available',
+        summary_id: latestSummary?.id,
+        summary_created_at: latestSummary?.created_at,
+      };
+    })
+  );
+
   // Map the data to include URLs and thumbnails
-  const mappedData = data.map(({ video_id, title }) => ({
-    url: getYouTubeURL({
-      video_id
-    }),
-    thumbnail: getThumbnail(video_id),
-    title,
-    video_id,
-  }));
+  const mappedData = videoSummaries.map(
+    ({ video_id, title, summary, summary_id, summary_created_at }) => ({
+      url: getYouTubeURL({ video_id }),
+      thumbnail: getThumbnail(video_id),
+      title: title || 'Title not available',
+      video_id,
+      id: summary_id,
+      summary,
+      created_at: summary_created_at,
+    })
+  );
 
   return {
     user,

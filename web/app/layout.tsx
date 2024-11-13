@@ -13,8 +13,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: AppConfig.APP_NAME,
-  description: AppConfig.APP_DESCRIPTION,
+  title: AppConfig.META.TITLE,
+  description: AppConfig.META.DESCRIPTION,
   twitter: {
     card: 'summary_large_image',
     site: AppConfig.SOCIAL.X,
@@ -24,6 +24,22 @@ export const metadata: Metadata = {
       url: `${AppConfig.SITE_URL}/x-image.png`,
       alt: AppConfig.APP_NAME,
     },
+  },
+  openGraph: {
+    title: AppConfig.META.TITLE,
+    description: AppConfig.META.DESCRIPTION,
+    url: AppConfig.SITE_URL,
+    type: 'website',
+    images: [
+      {
+        url: `${AppConfig.SITE_URL}/x-image.png`,
+        width: 1200,
+        height: 630,
+        alt: AppConfig.APP_NAME,
+      },
+    ],
+    locale: 'en_US',
+    siteName: AppConfig.APP_NAME,
   },
 };
 
