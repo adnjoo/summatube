@@ -77,6 +77,14 @@ export const Nav = async () => {
               )}
               <SheetClose asChild>
                 <Link
+                  href={AppConfig.SITE_MAP.PRICING}
+                  className='flex items-center py-2 text-lg font-semibold'
+                >
+                  Pricing
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
                   href={AppConfig.SITE_MAP.BLOG}
                   className='flex items-center py-2 text-lg font-semibold'
                 >
@@ -97,6 +105,12 @@ export const Nav = async () => {
               History
             </Link>
           )}
+          <Link
+            href={AppConfig.SITE_MAP.PRICING}
+            className='flex items-center text-sm font-medium transition-colors hover:underline'
+          >
+            Pricing
+          </Link>
           <Link
             href={AppConfig.SITE_MAP.BLOG}
             className='flex items-center text-sm font-medium transition-colors hover:underline'

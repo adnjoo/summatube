@@ -13,6 +13,7 @@ export const AppConfig = {
     TERMS: '/policies/terms',
     HISTORY: '/history',
     BLOG: '/blog',
+    PRICING: '/pricing',
   },
   SOCIAL: {
     GITHUB: 'https://github.com/adnjoo/summatube',
