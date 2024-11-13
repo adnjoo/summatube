@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { PostBody } from '@/components/mdx/post-body';
-import { Button } from '@/components/ui/button';
 import { AppConfig } from '@/lib/constants';
 import { getPost } from '@/lib/get-posts';
 
