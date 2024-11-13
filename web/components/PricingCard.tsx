@@ -43,7 +43,7 @@ export function PricingCard({ plan }: PricingCardProps) {
             </span>
             <CheckoutButton
               priceId={process.env.NEXT_PUBLIC_TEST_ID as string}
-              className='w-full max-w-xs rounded-lg bg-blue-600 py-2 text-white hover:bg-blue-700'
+              className='w-full max-w-xs rounded-lg py-2 text-white hover:underline'
             />
           </div>
         )}
