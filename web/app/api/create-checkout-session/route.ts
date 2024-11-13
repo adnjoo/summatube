@@ -1,6 +1,4 @@
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+import { stripe } from '@/utils/stripe/config';
 
 export async function POST(request) {
   const { priceId } = await request.json();
