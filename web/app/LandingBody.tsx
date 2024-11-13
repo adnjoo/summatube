@@ -10,6 +10,7 @@ import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
 import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
+import { AppConfig } from '@/lib/constants';
 import {
   extractVideoId,
   getTitle,
@@ -103,7 +104,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/summarize?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
+        `${AppConfig.SITE_MAP.API.SUMMARIZE}?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
       );
       const summary = await response.json();
       setSummary(summary);

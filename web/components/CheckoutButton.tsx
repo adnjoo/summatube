@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { AppConfig } from '@/lib/constants';
 import { useUser } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 
@@ -28,13 +29,16 @@ export default function CheckoutButton({
   const handleCheckout = async () => {
     setLoading(true);
 
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ priceId }),
-    });
+    const response = await fetch(
+      AppConfig.SITE_MAP.API.CREATE_CHECKOUT_SESSION,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ priceId }),
+      }
+    );
 
     const { sessionId } = await response.json();
     const stripe = await stripePromise;
