@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useUser } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 
 const stripePromise = loadStripe(
@@ -22,6 +23,7 @@ export default function CheckoutButton({
   className,
 }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
+  const user = useUser();
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -44,10 +46,16 @@ export default function CheckoutButton({
   return (
     <Button
       onClick={handleCheckout}
-      disabled={loading}
+      disabled={loading || !user}
       className={cn('w-full', className)}
     >
-      {loading ? <Loader2 className='animate-spin' /> : 'Subscribe Now'}
+      {loading ? (
+        <Loader2 className='animate-spin' />
+      ) : user ? (
+        'Checkout'
+      ) : (
+        'Sign In to Purchase'
+      )}
     </Button>
   );
 }
