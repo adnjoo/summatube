@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Separator,
-} from '@/components/ui';
+import { Card, CardContent, CardHeader, Separator } from '@/components/ui';
 import { AppConfig } from '@/lib/constants';
 import { formatISOToHumanReadable } from '@/lib/helpers';
 

@@ -10,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 
 export function PostBody({ children }: { children: string }) {
   return (
-    <div className="prose prose-lg max-w-none pt-12">
+    <div className='prose prose-lg max-w-none pt-12'>
       <MDXRemote
         source={children}
         options={{

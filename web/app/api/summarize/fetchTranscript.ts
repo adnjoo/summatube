@@ -1,7 +1,6 @@
 import { Innertube } from 'youtubei.js/web';
 
 export const fetchTranscript = async (video_id: string) => {
-
   const youtube = await Innertube.create({
     lang: 'en',
     location: 'US',

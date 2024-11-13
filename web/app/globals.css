@@ -129,6 +129,8 @@ body {
     transform: translateX(0%);
   }
   100% {
-    transform: translateX(-50%); /* Move by 50% of the width to account for duplicated content */
+    transform: translateX(
+      -50%
+    ); /* Move by 50% of the width to account for duplicated content */
   }
 }
