@@ -1,8 +1,6 @@
 // app/api/stripe-webhook/route.ts
 import Stripe from 'stripe';
 
-import { stripe } from '@/utils/stripe/config';
-
 // import {
 //   deletePriceRecord,
 //   deleteProductRecord,
@@ -32,6 +30,7 @@ export async function POST(req: Request) {
   const sig = req.headers.get('stripe-signature') as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event: Stripe.Event;
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
   try {
     if (!sig || !webhookSecret)
