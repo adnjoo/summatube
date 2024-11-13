@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import LandingBody from '@/app/(marketing)/LandingBody';
+import LandingBody from '@/app/LandingBody';
 import { getThumbnail, getYouTubeURL } from '@/lib/helpers';
 import { createClient } from '@/utils/supabase/server';
 

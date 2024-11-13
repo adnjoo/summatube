@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { PricingBody } from '@/app/(marketing)/pricing/PricingBody';
+import { PricingBody } from '@/app/pricing/PricingBody';
 import CheckoutButton from '@/components/CheckoutButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
