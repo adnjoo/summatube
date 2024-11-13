@@ -16,7 +16,7 @@ import {
   getYouTubeURL,
   isValidYouTubeUrl,
 } from '@/lib/helpers';
-import { useFocusShortcut, useUser } from '@/lib/hooks';
+import { useUser } from '@/lib/hooks';
 
 export default function LandingBody({ examples }: { examples: Example[] }) {
   const searchParams = useSearchParams();
