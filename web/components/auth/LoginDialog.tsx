@@ -35,42 +35,36 @@ export default function LoginDialog() {
 
   return (
     <Dialog>
-      {user ? (
-        <p>Welcome, {user.email}</p>
-      ) : (
-        <>
-          <DialogTrigger asChild>
-            <Button variant='outline'>Sign In</Button>
-          </DialogTrigger>
-          <DialogContent className='sm:max-w-[425px]'>
-            <DialogHeader>
-              <DialogTitle>Sign In</DialogTitle>
-              <DialogDescription>
-                Sign in with your Google account to continue.
-              </DialogDescription>
-            </DialogHeader>
-            <div className='flex items-center justify-center py-4'>
-              <Button
-                onClick={handleGoogleLogin}
-                className='flex w-full items-center justify-center gap-2'
-                variant='outline'
-              >
-                <GoogleIcon className='h-6 w-6' />
-                Sign in with Google
-              </Button>
-            </div>
-            <DialogFooter className='mt-4 text-center'>
-              <Link
-                href={AppConfig.SITE_MAP.TERMS}
-                target='_blank'
-                className='text-sm hover:underline'
-              >
-                By signing in, you agree to our terms and conditions.
-              </Link>
-            </DialogFooter>
-          </DialogContent>
-        </>
-      )}
+      <DialogTrigger asChild>
+        <Button variant='outline'>Sign In</Button>
+      </DialogTrigger>
+      <DialogContent className='sm:max-w-[425px]'>
+        <DialogHeader>
+          <DialogTitle>Sign In</DialogTitle>
+          <DialogDescription>
+            Sign in with your Google account to continue.
+          </DialogDescription>
+        </DialogHeader>
+        <div className='flex items-center justify-center py-4'>
+          <Button
+            onClick={handleGoogleLogin}
+            className='flex w-full items-center justify-center gap-2'
+            variant='outline'
+          >
+            <GoogleIcon className='h-6 w-6' />
+            Sign in with Google
+          </Button>
+        </div>
+        <DialogFooter className='mt-4 text-center'>
+          <Link
+            href={AppConfig.SITE_MAP.TERMS}
+            target='_blank'
+            className='text-sm hover:underline'
+          >
+            By signing in, you agree to our terms and conditions.
+          </Link>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }
