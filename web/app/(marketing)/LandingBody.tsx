@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { type Example } from '@/app/(landing)/page';
+import { type Example } from '@/app/(marketing)/page';
 import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
 import { Marquee } from '@/components/layout/Marquee';

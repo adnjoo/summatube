@@ -1,4 +1,4 @@
-import { type Example } from '@/app/(landing)/page';
+import { type Example } from '@/app/(marketing)/page';
 
 export type MarqueeCardProps = {
   example: Example;
