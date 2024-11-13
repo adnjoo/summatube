@@ -1,8 +1,6 @@
 // app/api/stripe-webhook/route.ts
 import Stripe from 'stripe';
 
-import { stripe } from '@/utils/stripe/config';
-
 // import {
 //   deletePriceRecord,
 //   deleteProductRecord,
@@ -28,6 +26,23 @@ const relevantEvents = new Set([
 ]);
 
 export async function POST(req: Request) {
+  const stripe = new Stripe(
+    process.env.STRIPE_SECRET_KEY_LIVE ?? process.env.STRIPE_SECRET_KEY ?? '',
+    {
+      // https://github.com/stripe/stripe-node#configuration
+      // https://stripe.com/docs/api/versioning
+      // @ts-ignore
+      apiVersion: null,
+      // Register this as an official Stripe plugin.
+      // https://stripe.com/docs/building-plugins#setappinfo
+      appInfo: {
+        name: 'Next.js Subscription Starter',
+        version: '0.0.0',
+        url: 'https://github.com/vercel/nextjs-subscription-payments',
+      },
+    }
+  );
+
   const body = await req.text();
   const sig = req.headers.get('stripe-signature') as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
