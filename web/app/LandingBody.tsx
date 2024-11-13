@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { type Example } from '@/app/(landing)/page';
-import { Marquee } from '@/components/layout/Marquee';
+import { type Example } from '@/app/page';
 import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
+import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
 import {
   extractVideoId,
@@ -16,7 +16,7 @@ import {
   getYouTubeURL,
   isValidYouTubeUrl,
 } from '@/lib/helpers';
-import { useFocusShortcut, useUser } from '@/lib/hooks';
+import { useUser } from '@/lib/hooks';
 
 export default function LandingBody({ examples }: { examples: Example[] }) {
   const searchParams = useSearchParams();
@@ -103,7 +103,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `/summarize?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
+        `/api/summarize?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
       );
       const summary = await response.json();
       setSummary(summary);
@@ -186,13 +186,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
         </div>
       )}
       {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
-      {(
-        <SummaryCard
-          summary={summary}
-          loading={loading}
-          video_id={video_id}
-        />
-      )}
+      {<SummaryCard summary={summary} loading={loading} video_id={video_id} />}
     </main>
   );
 }

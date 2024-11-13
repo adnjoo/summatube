@@ -3,10 +3,11 @@ export const AppConfig = {
   APP_DESCRIPTION: 'Summarize YouTube videos for free',
   META: {
     TITLE: 'SummaTube - Free YouTube Video Summaries in Seconds',
-    DESCRIPTION: 'Summarize YouTube videos for free with summa.tube. Quickly generate summaries for any video, saving you time and helping you capture key points instantly.',
+    DESCRIPTION:
+      'Summarize YouTube videos for free with summa.tube. Quickly generate summaries for any video, saving you time and helping you capture key points instantly.',
   },
   CONTACT_EMAIL: 'support@summa.tube',
-  SITE_URL: 'https://summa.tube',
+  SITE_URL: 'https://www.summa.tube',
   SITE_MAP: {
     HOME: '/',
     PRIVACY: '/policies/privacy',
@@ -14,6 +15,7 @@ export const AppConfig = {
     HISTORY: '/history',
     BLOG: '/blog',
     PRICING: '/pricing',
+    AUTH_CALLBACK: '/api/auth/callback',
   },
   SOCIAL: {
     GITHUB: 'https://github.com/adnjoo/summatube',

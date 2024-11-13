@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 
-import { fetchTranscript } from '@/app/(api)/summarize/fetchTranscript';
-import { summarizeTranscript } from '@/app/(api)/summarize/summarizeTranscript';
+import { fetchTranscript } from '@/app/api/summarize/fetchTranscript';
+import { summarizeTranscript } from '@/app/api/summarize/summarizeTranscript';
 import { createClient } from '@/utils/supabase/server';
 
 async function getYouTubeTranscript(video_id: string) {

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
+import { AppConfig } from '@/lib/constants';
 import { createClient } from '@/utils/supabase/client';
 
 export default function Login() {
@@ -13,7 +14,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}${AppConfig.SITE_MAP.AUTH_CALLBACK}`,
       },
     });
     if (error) {
@@ -22,7 +23,7 @@ export default function Login() {
   };
 
   return (
-    <section className='mx-auto mt-32 flex flex-col justify-between items-center'>
+    <section className='mx-auto mt-32 flex flex-col items-center justify-between'>
       <div className='w-full max-w-md border-2 border-black p-8'>
         <Link
           href='/'
