@@ -15,7 +15,7 @@ export const PricingBody = () => {
       )}
       {status === 'cancel' && (
         <div className='mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-center text-red-800'>
-          Payment was canceled. Please try again if you'd like to subscribe.
+          Payment was canceled. Please try again if you&apos;d like to subscribe.
         </div>
       )}
     </div>

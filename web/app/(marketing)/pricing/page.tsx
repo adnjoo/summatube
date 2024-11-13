@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { PricingBody } from '@/app/(marketing)/pricing/PricingBody';
 import CheckoutButton from '@/components/CheckoutButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function Pricing() {
   return (
     <div className='flex min-h-screen flex-col items-center justify-center bg-gray-100'>
-      <PricingBody />
+      <Suspense fallback={null}>
+        <PricingBody />
+      </Suspense>
       <Card className='mx-auto w-full max-w-lg rounded-lg bg-white p-6 shadow-lg'>
         <CardHeader>
           <CardTitle className='text-center text-2xl font-semibold'>
