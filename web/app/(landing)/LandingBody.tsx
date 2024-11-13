@@ -103,7 +103,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `/summarize?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
+        `/api/summarize?video_id=${encodeURIComponent(video_id)}&save=${saveHistory}`
       );
       const summary = await response.json();
       setSummary(summary);
