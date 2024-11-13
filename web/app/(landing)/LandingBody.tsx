@@ -6,9 +6,9 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { type Example } from '@/app/(landing)/page';
-import { Marquee } from '@/components/layout/Marquee';
 import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
+import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
 import {
   extractVideoId,
@@ -186,13 +186,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
         </div>
       )}
       {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
-      {(
-        <SummaryCard
-          summary={summary}
-          loading={loading}
-          video_id={video_id}
-        />
-      )}
+      {<SummaryCard summary={summary} loading={loading} video_id={video_id} />}
     </main>
   );
 }

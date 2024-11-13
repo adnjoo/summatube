@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation';
 
 import { PostBody } from '@/components/mdx/post-body';
 import { Button } from '@/components/ui/button';
-import { getPost } from '@/lib/get-posts';
 import { AppConfig } from '@/lib/constants';
+import { getPost } from '@/lib/get-posts';
 
 type BlogPostPageParams = Promise<{
   slug: string;
@@ -18,7 +18,7 @@ export default async function BlogPostPage(props: {
   if (!post) return notFound();
 
   return (
-    <section className='container mx-auto px-4 py-16 flex flex-col'>
+    <section className='container mx-auto flex flex-col px-4 py-16'>
       {post.image && (
         <div className='relative mb-8 h-64 w-full overflow-hidden rounded-md'>
           <img
@@ -34,7 +34,9 @@ export default async function BlogPostPage(props: {
       <p>{post.date}</p>
       <PostBody>{post.body}</PostBody>
 
-      <Link href={AppConfig.SITE_MAP.BLOG} className='hover:underline pt-12'>Back to blog</Link>
+      <Link href={AppConfig.SITE_MAP.BLOG} className='pt-12 hover:underline'>
+        Back to blog
+      </Link>
     </section>
   );
 }
