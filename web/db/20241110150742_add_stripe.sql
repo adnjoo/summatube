@@ -4,6 +4,7 @@ CREATE TABLE public.users (
     full_name TEXT,
     avatar_url TEXT,
     stripe_customer_id TEXT,
+    stripe_subscription_id TEXT,
     pro BOOLEAN DEFAULT FALSE
 );
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
