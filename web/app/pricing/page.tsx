@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { PricingBody } from '@/app/pricing/PricingBody';
 import { Plan, PricingCard } from '@/components/PricingCard';
+import { createClient } from '@/utils/supabase/server';
 
 const FREE_SUMMARY_LIMIT = 50;
 const PRO_PLAN_MONTHLY_PRICE = 1;
@@ -36,7 +37,23 @@ const pricingOptions: Plan[] = [
   },
 ];
 
-export default function Pricing() {
+export default async function Pricing() {
+  const supabase = await createClient();
+
+  // Retrieve the authenticated user's information
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Fetch the user's subscription details from the 'users' table
+  const { data: userData } = await supabase
+    .from('users')
+    .select()
+    .eq('id', user?.id)
+    .single();
+
+  // Determine if the user is a Pro subscriber
+  const isProUser = userData?.pro ?? false;
   return (
     <div className='flex min-h-screen flex-col items-center py-8 sm:py-16'>
       <Suspense fallback={null}>
@@ -45,7 +62,7 @@ export default function Pricing() {
 
       <div className='mx-auto flex max-w-4xl flex-wrap justify-center gap-8'>
         {pricingOptions.map((plan) => (
-          <PricingCard key={plan.id} plan={plan} />
+          <PricingCard key={plan.id} plan={plan} isProUser={isProUser} />
         ))}
       </div>
     </div>
