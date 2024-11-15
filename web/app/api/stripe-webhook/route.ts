@@ -1,6 +1,8 @@
 // app/api/stripe-webhook/route.ts
 import Stripe from 'stripe';
 
+import { createClient } from '@/utils/supabase/server';
+
 // import {
 //   deletePriceRecord,
 //   deleteProductRecord,
@@ -17,6 +19,7 @@ const relevantEvents = new Set([
   'price.updated',
   'price.deleted',
   'checkout.session.completed',
+  'customer.created',
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
@@ -31,6 +34,7 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event: Stripe.Event;
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+  const supabase = await createClient();
 
   try {
     if (!sig || !webhookSecret)
@@ -59,6 +63,30 @@ export async function POST(req: Request) {
         case 'product.deleted':
           //   await deleteProductRecord(event.data.object as Stripe.Product);
           break;
+        case 'customer.created':
+          const {id } = event.data.object as Stripe.Customer;
+          // console.log('customer.created', customer);
+
+          const {
+            data: { user }
+          } = await supabase.auth.getUser();
+
+          const { error } = await supabase
+            .from('users')
+            .update({ stripe_customer_id: id })
+            .eq('id', user?.id);
+
+          if (error) {
+            console.error(
+              'Error updating user with Stripe customer ID:',
+              error.message
+            );
+          } else {
+            console.log('User updated successfully with Stripe customer ID.');
+          }
+
+          break;
+
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted':
