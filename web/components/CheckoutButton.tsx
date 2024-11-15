@@ -36,7 +36,7 @@ export default function CheckoutButton({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId, userId: user?.id }),
       }
     );
 

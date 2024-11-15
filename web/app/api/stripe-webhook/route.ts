@@ -1,7 +1,7 @@
 // app/api/stripe-webhook/route.ts
 import Stripe from 'stripe';
 
-import { createClient } from '@/utils/supabase/server';
+import { supabaseAdmin } from '@/utils/supabase/supabaseAdmin';
 
 // import {
 //   deletePriceRecord,
@@ -34,7 +34,6 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event: Stripe.Event;
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-  const supabase = await createClient();
 
   try {
     if (!sig || !webhookSecret)
@@ -64,29 +63,6 @@ export async function POST(req: Request) {
           //   await deleteProductRecord(event.data.object as Stripe.Product);
           break;
         case 'customer.created':
-          const {id } = event.data.object as Stripe.Customer;
-          // console.log('customer.created', customer);
-
-          const {
-            data: { user }
-          } = await supabase.auth.getUser();
-
-          const { error } = await supabase
-            .from('users')
-            .update({ stripe_customer_id: id })
-            .eq('id', user?.id);
-
-          if (error) {
-            console.error(
-              'Error updating user with Stripe customer ID:',
-              error.message
-            );
-          } else {
-            console.log('User updated successfully with Stripe customer ID.');
-          }
-
-          break;
-
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted':
@@ -98,17 +74,44 @@ export async function POST(req: Request) {
           //   );
           break;
         case 'checkout.session.completed':
-          console.log('checkout.session.completed');
-          //   const checkoutSession = event.data.object as Stripe.Checkout.Session;
-          //   if (checkoutSession.mode === 'subscription') {
-          //     const subscriptionId = checkoutSession.subscription;
-          //     await manageSubscriptionStatusChange(
-          //       subscriptionId as string,
-          //       checkoutSession.customer as string,
-          //       true
-          //     );
-          //   }
+          const checkoutSession = event.data.object as Stripe.Checkout.Session;
+
+          // Extract metadata and session details
+          const userId = checkoutSession.metadata?.userId; // Your application's user ID
+          const stripeCustomerId = checkoutSession.customer as string;
+          const subscriptionId = checkoutSession.subscription as string; // For subscriptions
+
+          if (!userId) {
+            console.error('User ID is missing in metadata.');
+            break;
+          }
+
+          try {
+            // Perform an upsert operation
+            const { error } = await supabaseAdmin.from('users').upsert(
+              {
+                id: userId, // Primary key
+                stripe_customer_id: stripeCustomerId,
+                stripe_subscription_id: subscriptionId,
+                pro: true, // Mark as pro since they've subscribed
+              },
+              { onConflict: 'id' }
+            ); // 'id' is the conflict column
+
+            if (error) {
+              console.error('Error upserting user:', error.message);
+              break;
+            }
+
+            console.log('User upserted successfully');
+          } catch (err: any) {
+            console.error(
+              'Error handling checkout session completed:',
+              err.message
+            );
+          }
           break;
+
         case 'payment_intent.created':
           break;
         case 'payment_intent.succeeded':

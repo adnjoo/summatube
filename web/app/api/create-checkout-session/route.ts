@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 
 export async function POST(request) {
-  const { priceId } = await request.json();
+  const { priceId, userId } = await request.json();
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
   try {
@@ -16,6 +16,9 @@ export async function POST(request) {
       ],
       success_url: `${request.headers.get('origin')}/pricing?status=success`,
       cancel_url: `${request.headers.get('origin')}/pricing?status=cancel`,
+      metadata: {
+        userId: userId,
+      },
     });
 
     return new Response(JSON.stringify({ sessionId: session.id }), {
