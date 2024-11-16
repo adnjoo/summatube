@@ -14,25 +14,36 @@ export function LikeButton({ summaryId, disabled = false }: LikeButtonProps) {
   const userId = user?.id;
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
-    if (!userId) return; // Early exit if user is not logged in
+    if (!userId) {
+      setLoading(false); // If no user, no need to fetch data
+      return;
+    }
 
     const fetchLikes = async () => {
-      const { data: countData } = await supabase
-        .from('summary_likes')
-        .select('*', { count: 'exact' })
-        .eq('summary_id', summaryId);
+      setLoading(true); // Start loading
+      try {
+        const { data: countData, count } = await supabase
+          .from('summary_likes')
+          .select('*', { count: 'exact' })
+          .eq('summary_id', summaryId);
 
-      const { data: likeData } = await supabase
-        .from('summary_likes')
-        .select('*')
-        .eq('summary_id', summaryId)
-        .eq('user_id', userId)
-        .single();
+        const { data: likeData } = await supabase
+          .from('summary_likes')
+          .select('*')
+          .eq('summary_id', summaryId)
+          .eq('user_id', userId)
+          .single();
 
-      setLikeCount(countData?.length || 0);
-      setLiked(!!likeData);
+        setLikeCount(count || 0);
+        setLiked(!!likeData);
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      } finally {
+        setLoading(false); // End loading
+      }
     };
 
     fetchLikes();
@@ -58,11 +69,28 @@ export function LikeButton({ summaryId, disabled = false }: LikeButtonProps) {
     setLiked(!liked);
   };
 
+  if (loading) {
+    // Render a skeleton loader or placeholder while loading
+    return (
+      <div
+        className='flex animate-pulse items-center text-gray-300'
+        aria-label='Loading'
+      >
+        <FiThumbsUp size={18} />
+        <span className='ml-1'>-</span>
+      </div>
+    );
+  }
+
   return (
     <button
       onClick={handleLikeClick}
       disabled={disabled || !userId} // Disable if no user or disabled prop is true
-      className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-700 ${disabled || !userId ? 'cursor-not-allowed opacity-50' : ''}`}
+      className={`flex items-center ${
+        liked ? 'text-red-500' : 'text-gray-500'
+      } hover:text-red-700 ${
+        disabled || !userId ? 'cursor-not-allowed opacity-50' : ''
+      }`}
       aria-label='Like'
     >
       <FiThumbsUp size={18} />
