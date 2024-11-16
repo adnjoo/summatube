@@ -5,6 +5,10 @@ import { FaBars } from 'react-icons/fa6';
 import LoginDialog from '@/components/auth/LoginDialog';
 import {
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Sheet,
   SheetClose,
   SheetContent,
@@ -41,7 +45,7 @@ export const Nav = async () => {
             </Button>
           </SheetTrigger>
 
-          {/* Logo  */}
+          {/* Logo */}
           <Link href='/'>
             <img
               className='ml-2 cursor-pointer items-center lg:flex'
@@ -122,11 +126,23 @@ export const Nav = async () => {
         {/* Authentication Button */}
         <div className='-mr-4 flex items-center gap-4 sm:-mr-2'>
           {user ? (
-            <div className='flex items-center gap-4'>
-              <form action={signOut}>
-                <Button variant='default'>Logout</Button>
-              </form>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='default'>Account</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuItem asChild>
+                  <Link href='/settings'>Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <form action={signOut}>
+                    <button type='submit' className='w-full text-left'>
+                      Logout
+                    </button>
+                  </form>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <LoginDialog />
           )}
