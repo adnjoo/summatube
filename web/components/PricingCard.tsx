@@ -13,9 +13,10 @@ export type Plan = {
 
 type PricingCardProps = {
   plan: Plan;
+  isProUser: boolean;
 };
 
-export function PricingCard({ plan }: PricingCardProps) {
+export function PricingCard({ plan, isProUser }: PricingCardProps) {
   const { title, description, features, note, isPremium, price } = plan;
 
   return (
@@ -41,10 +42,16 @@ export function PricingCard({ plan }: PricingCardProps) {
             <span className='mb-2 text-lg font-bold text-gray-700'>
               {price}
             </span>
-            <CheckoutButton
-              priceId={process.env.NEXT_PUBLIC_TEST_ID as string}
-              className='w-full max-w-xs rounded-lg py-2 text-white hover:underline'
-            />
+            {!isProUser ? (
+              <CheckoutButton
+                priceId={process.env.NEXT_PUBLIC_TEST_ID as string}
+                className='w-full max-w-xs rounded-lg py-2 text-white hover:underline'
+              />
+            ) : (
+              <span className='text-green-600'>
+                You are already a Pro user!
+              </span>
+            )}
           </div>
         )}
       </CardContent>
