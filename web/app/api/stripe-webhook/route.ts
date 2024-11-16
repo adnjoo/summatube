@@ -2,12 +2,6 @@
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
-// Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
-
 // import {
 //   deletePriceRecord,
 //   deleteProductRecord,
@@ -39,6 +33,10 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event: Stripe.Event;
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  );
 
   try {
     if (!sig || !webhookSecret)
