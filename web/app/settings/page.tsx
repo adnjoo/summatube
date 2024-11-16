@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { createClient } from '@/utils/supabase/client';
 
 export default function Settings() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
