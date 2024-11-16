@@ -35,10 +35,7 @@ export default async function Blog() {
                   </Link>
                 )}
                 <CardTitle>
-                  <Link
-                    href={link}
-                    className='hover:underline'
-                  >
+                  <Link href={link} className='hover:underline'>
                     {post.title}
                   </Link>
                 </CardTitle>
