@@ -1,5 +1,11 @@
 import OpenAI from 'openai';
 
+export const OpenAIModels = {
+  GPT_3_5_TURBO: 'gpt-3.5-turbo',
+  GPT_4: 'gpt-4',
+  GPT_4_32K: 'gpt-4-32k',
+};
+
 export async function summarizeTranscript(
   transcript: string
 ): Promise<string | null> {
@@ -16,7 +22,7 @@ export async function summarizeTranscript(
     `;
 
   const response = await OPEN_AI.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: OpenAIModels.GPT_3_5_TURBO,
     messages: [
       {
         role: 'system',

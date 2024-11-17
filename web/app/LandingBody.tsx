@@ -1,6 +1,5 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -191,15 +190,11 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           <div className='space-y-6'>
             {/* Summary */}
             <div className='w-full max-w-3xl'>
-              {loading ? (
-                <Loader2 className='h-12 w-12 animate-spin' />
-              ) : (
-                <SummaryCard
-                  summary={summary}
-                  loading={loading}
-                  video_id={video_id}
-                />
-              )}
+              <SummaryCard
+                summary={summary}
+                loading={loading}
+                video_id={video_id}
+              />
             </div>
 
             {/* Timestamps Panel */}
