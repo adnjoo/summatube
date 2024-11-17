@@ -11,14 +11,12 @@ export const fetchTranscriptWithTimestamps = async (video_id: string) => {
     const info = await youtube.getInfo(video_id);
     const transcriptData = await info.getTranscript();
 
-    // console.log('Transcript data:', transcriptData?.transcript?.content?.body?.initial_segments);
-
     const segments: any =
       transcriptData?.transcript?.content?.body?.initial_segments.map(
         (segment: any) => ({
           start_ms: segment.start_ms, // Start time in ms
           end_ms: segment.end_ms, // End time in ms
-          snippet: segment.snippet.text, // Transcript text
+          snippet: segment.snippet.text.trim(), // Trim leading and trailing spaces
           start_time_text: segment.start_time_text?.text, // Pre-formatted time
           target_id: segment.target_id, // Optional navigation ID
         })
@@ -42,13 +40,11 @@ export const fetchTranscriptWithTimestamps = async (video_id: string) => {
       return acc;
     }, []);
 
-    // console.log('Grouped by interval:', groupedByInterval);
-
     // Convert to an array
     return Object.values(groupedByInterval).map((interval: any) => ({
       startTime: interval.startTime,
       endTime: interval.endTime,
-      text: interval.text.join(' '), // Join text for the interval
+      text: interval.text.join(' ').replace(/\s+/g, ' '), // Join and normalize spaces
     }));
   } catch (error) {
     console.error('Error fetching transcript:', error);
