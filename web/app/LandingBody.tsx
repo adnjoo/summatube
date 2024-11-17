@@ -3,11 +3,13 @@
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { type Example } from '@/app/page';
 import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
+import { TimestampsPanel } from '@/components/TimestampsPanel';
+import { YouTubePlayer } from '@/components/YoutubePlayer';
 import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
 import { AppConfig } from '@/lib/constants';
@@ -37,6 +39,17 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     undefined
   );
   const [thumbnailTitle, setThumbnailTitle] = useState('');
+  const [player, setPlayer] = useState<any>(null);
+
+  const handlePlayerReady = (ytPlayer: any) => {
+    setPlayer(ytPlayer);
+  };
+
+  const handleSeek = (seconds: number) => {
+    if (player) {
+      player.seekTo(seconds, true);
+    }
+  };
 
   useEffect(() => {
     const showExamplesStored = localStorage.getItem('showExamples');
@@ -115,17 +128,6 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     }
   };
 
-  const handleThumbnailClick = async (
-    exampleVideoId: string,
-    exampleVideoTitle: string
-  ) => {
-    setVideoId(exampleVideoId);
-    fetchEmbed(exampleVideoId);
-    setThumbnailTitle(exampleVideoTitle);
-
-    handleSummarize(exampleVideoId);
-  };
-
   return (
     <main className='mt-4 flex min-h-screen flex-col sm:p-8'>
       <div className='mx-auto mb-8 flex items-center'>
@@ -148,7 +150,10 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
             <MarqueeCard
               key={example.video_id}
               example={example}
-              handleThumbnailClick={handleThumbnailClick}
+              handleThumbnailClick={(id, title) => {
+                setVideoId(id);
+                setThumbnailTitle(title);
+              }}
             />
           ))}
         </Marquee>
@@ -163,31 +168,49 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
       >
         <Input
           type='url'
-          placeholder='Enter YouTube URL e.g. https://www.youtube.com/watch?v=62wEk02YKs0&pp=ygUIYmJjIG5ld3M%3D'
+          placeholder='Enter YouTube URL'
           value={url}
           onChange={handleInputChange}
           className='mb-4'
         />
-        <Button type='submit' disabled={loading} className='relative'>
+        <Button type='submit' disabled={loading} className='relative mb-4'>
           Summarize
         </Button>
       </form>
-      {embedUrl && (
-        <div className='mx-auto mt-4 flex h-full w-full flex-col items-center sm:max-w-xl'>
-          <h3 className='sr-only mb-2 text-lg'>Embed</h3>
-          <iframe
-            src={embedUrl}
-            title='YouTube Embed'
-            className='aspect-video h-auto w-full rounded'
-            allowFullScreen
-          />
-          {thumbnailTitle && (
-            <div className='mt-1 text-center text-xs'>{thumbnailTitle}</div>
-          )}
+      <div className='container mx-auto px-4 py-8'>
+        {/* Grid Layout for Desktop, Stacked for Mobile */}
+        <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
+          {/* Left Column: YouTube Player */}
+          <div className='flex justify-center'>
+            {embedUrl && (
+              <YouTubePlayer videoId={video_id} onReady={handlePlayerReady} />
+            )}
+          </div>
+
+          {/* Right Column: Summary and Timestamps */}
+          <div className='space-y-6'>
+            {/* Summary */}
+            <div className='w-full max-w-3xl'>
+              {loading ? (
+                <Loader2 className='h-12 w-12 animate-spin' />
+              ) : (
+                <SummaryCard
+                  summary={summary}
+                  loading={loading}
+                  video_id={video_id}
+                />
+              )}
+            </div>
+
+            {/* Timestamps Panel */}
+            <div className='w-full max-w-3xl'>
+              {video_id && (
+                <TimestampsPanel videoId={video_id} onSeek={handleSeek} />
+              )}
+            </div>
+          </div>
         </div>
-      )}
-      {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
-      {<SummaryCard summary={summary} loading={loading} video_id={video_id} />}
+      </div>
     </main>
   );
 }
