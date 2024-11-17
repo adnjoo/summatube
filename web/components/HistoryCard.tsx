@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FiShare2 } from 'react-icons/fi';
+import { FiExternalLink } from 'react-icons/fi';
 
 import { LikeButton } from '@/components/LikeButton';
 import { Notification } from '@/components/layout/Notification';
@@ -20,11 +20,8 @@ export function HistoryCard({ item }: HistoryCardProps) {
     <Card className='flex w-full flex-col rounded-lg border border-gray-100 px-2 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md sm:px-4 md:flex-row'>
       <div className='flex w-full flex-col md:w-64'>
         <Link
-          href={getYouTubeURL({
-            video_id: item.summaries.videos.video_id,
-          })}
+          href={`/?v=${item.summaries.videos.video_id}`}
           className='text-sm font-semibold hover:underline'
-          target='_blank'
         >
           {item.summaries.videos.title}
         </Link>
@@ -39,15 +36,14 @@ export function HistoryCard({ item }: HistoryCardProps) {
       </div>
       <div className='mt-4 flex gap-4 sm:flex-col md:ml-4 md:mt-0'>
         <LikeButton summaryId={item.summary_id} />
-        <button
-          onClick={() =>
-            handleCopyClick(copyUrl(item.summaries.videos.video_id))
-          }
+        <a
+          href={`https://www.youtube.com/watch?v=${item.summaries.videos.video_id}`}
           className='flex items-center text-blue-500 hover:text-blue-700'
-          aria-label='Copy URL'
+          aria-label='Open URL'
+          target='_blank'
         >
-          <FiShare2 size={18} />
-        </button>
+          <FiExternalLink size={18} />
+        </a>
       </div>
       <div className='ml-0 mt-4 w-full text-xs md:ml-4 md:mt-0'>
         <details className='md:hidden'>
