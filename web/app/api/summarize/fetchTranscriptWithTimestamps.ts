@@ -16,7 +16,7 @@ export const fetchTranscriptWithTimestamps = async (video_id: string) => {
         (segment: any) => ({
           start_ms: segment.start_ms, // Start time in ms
           end_ms: segment.end_ms, // End time in ms
-          snippet: segment.snippet.text.trim(), // Trim leading and trailing spaces
+          snippet: segment.snippet?.text?.trim(), // Trim leading and trailing spaces
           start_time_text: segment.start_time_text?.text, // Pre-formatted time
           target_id: segment.target_id, // Optional navigation ID
         })

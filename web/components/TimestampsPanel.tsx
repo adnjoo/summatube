@@ -54,7 +54,7 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
   }, [videoId]);
 
   return (
-    <Accordion type='single' collapsible>
+    <Accordion type='single' collapsible defaultValue='timestamps'>
       <AccordionItem value='timestamps'>
         {/* Header */}
         <AccordionTrigger className='border-b px-4 py-2 text-lg font-semibold'>
