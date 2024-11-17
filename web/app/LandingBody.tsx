@@ -9,6 +9,7 @@ import { type Example } from '@/app/page';
 import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
 import { TimestampsPanel } from '@/components/TimestampsPanel';
+import { YouTubePlayer } from '@/components/YoutubePlayer';
 import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
 import { AppConfig } from '@/lib/constants';
@@ -165,20 +166,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           Summarize
         </Button>
       </form>
-      {embedUrl && (
-        <div className='mx-auto mt-4 flex h-full w-full flex-col items-center sm:max-w-xl'>
-          <h3 className='sr-only mb-2 text-lg'>Embed</h3>
-          <iframe
-            src={embedUrl}
-            title='YouTube Embed'
-            className='aspect-video h-auto w-full rounded'
-            allowFullScreen
-          />
-          {thumbnailTitle && (
-            <div className='mt-1 text-center text-xs'>{thumbnailTitle}</div>
-          )}
-        </div>
-      )}
+      {embedUrl && <YouTubePlayer embedUrl={embedUrl} title={thumbnailTitle} />}
       {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
       <SummaryCard summary={summary} loading={loading} video_id={video_id} />
 
