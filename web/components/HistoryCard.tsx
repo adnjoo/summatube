@@ -4,8 +4,8 @@ import { FiExternalLink } from 'react-icons/fi';
 import { LikeButton } from '@/components/LikeButton';
 import { Notification } from '@/components/layout/Notification';
 import { Card } from '@/components/ui/card';
-import { getThumbnail, getYouTubeURL } from '@/lib/helpers';
-import { copyUrl, formatISOToHumanReadable } from '@/lib/helpers';
+import { getThumbnail } from '@/lib/helpers';
+import { formatISOToHumanReadable } from '@/lib/helpers';
 import { useCopyToClipboard } from '@/lib/hooks';
 
 export type HistoryCardProps = {
