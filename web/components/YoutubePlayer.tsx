@@ -1,28 +1,29 @@
 'use client';
 
 import React from 'react';
+import YouTube, { YouTubeProps } from 'react-youtube';
 
 interface YouTubePlayerProps {
-  embedUrl: string;
-  title?: string;
+  videoId: string;
+  onReady: (player: any) => void;
 }
 
 export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
-  embedUrl,
-  title,
+  videoId,
+  onReady,
 }) => {
-  if (!embedUrl) return null;
+  const opts: YouTubeProps['opts'] = {
+    height: '260',
+    width: '427',
+    playerVars: {
+      autoplay: 0,
+      controls: 1,
+    },
+  };
 
-  return (
-    <div className='mx-auto mt-4 flex h-full w-full flex-col items-center sm:max-w-xl'>
-      <h3 className='sr-only mb-2 text-lg'>Embed</h3>
-      <iframe
-        src={embedUrl}
-        title='YouTube Embed'
-        className='aspect-video h-auto w-full rounded'
-        allowFullScreen
-      />
-      {title && <div className='mt-1 text-center text-xs'>{title}</div>}
-    </div>
-  );
+  const handleReady: YouTubeProps['onReady'] = (event) => {
+    onReady(event.target);
+  };
+
+  return <YouTube videoId={videoId} opts={opts} onReady={handleReady} />;
 };

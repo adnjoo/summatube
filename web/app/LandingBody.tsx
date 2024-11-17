@@ -39,6 +39,17 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     undefined
   );
   const [thumbnailTitle, setThumbnailTitle] = useState('');
+  const [player, setPlayer] = useState<any>(null);
+
+  const handlePlayerReady = (ytPlayer: any) => {
+    setPlayer(ytPlayer);
+  };
+
+  const handleSeek = (seconds: number) => {
+    if (player) {
+      player.seekTo(seconds, true);
+    }
+  };
 
   useEffect(() => {
     const showExamplesStored = localStorage.getItem('showExamples');
@@ -162,16 +173,44 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           onChange={handleInputChange}
           className='mb-4'
         />
-        <Button type='submit' disabled={loading} className='relative'>
+        <Button type='submit' disabled={loading} className='relative mb-4'>
           Summarize
         </Button>
       </form>
-      {embedUrl && <YouTubePlayer embedUrl={embedUrl} title={thumbnailTitle} />}
-      {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
-      <SummaryCard summary={summary} loading={loading} video_id={video_id} />
+      <div className='container mx-auto px-4 py-8'>
+        {/* Grid Layout for Desktop, Stacked for Mobile */}
+        <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
+          {/* Left Column: YouTube Player */}
+          <div className='flex justify-center'>
+            {embedUrl && (
+              <YouTubePlayer videoId={video_id} onReady={handlePlayerReady} />
+            )}
+          </div>
 
-      {/* Timestamps Panel */}
-      {video_id && <TimestampsPanel videoId={video_id} />}
+          {/* Right Column: Summary and Timestamps */}
+          <div className='space-y-6'>
+            {/* Summary */}
+            <div className='w-full max-w-3xl'>
+              {loading ? (
+                <Loader2 className='h-12 w-12 animate-spin' />
+              ) : (
+                <SummaryCard
+                  summary={summary}
+                  loading={loading}
+                  video_id={video_id}
+                />
+              )}
+            </div>
+
+            {/* Timestamps Panel */}
+            <div className='w-full max-w-3xl hidden md:block'>
+              {video_id && (
+                <TimestampsPanel videoId={video_id} onSeek={handleSeek} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

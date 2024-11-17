@@ -17,7 +17,7 @@ export const SummaryCard = ({ summary, loading, video_id }) => {
   if (!summary || loading) return null;
 
   return (
-    <div className='mx-auto mt-8 max-w-5xl rounded border border-gray-300 p-2 text-sm sm:p-4 sm:text-base'>
+    <div className='mx-auto max-w-5xl rounded border border-gray-300 p-2 text-sm sm:text-base'>
       <h2 className='mb-2 text-xl'>Summary</h2>
       <div>
         <div className='flex flex-row items-center gap-2'>
