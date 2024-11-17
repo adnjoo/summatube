@@ -2,7 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface Timestamp {
@@ -35,58 +40,59 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
       if (!response.ok) {
         throw new Error(`Failed to fetch timestamps: ${response.statusText}`);
       }
-
       const data = await response.json();
       setTimestamps(data.intervals || []);
-    } catch (error) {
-      console.error('Error fetching timestamps:', error);
-      setError((error as Error).message || 'Failed to load timestamps.');
+    } catch (err) {
+      setError((err as Error).message || 'Failed to load timestamps.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (videoId) {
-      fetchTimestamps(videoId);
-    }
+    if (videoId) fetchTimestamps(videoId);
   }, [videoId]);
 
   return (
-    <Card className='max-h-96 max-w-5xl overflow-y-auto p-4 shadow-md'>
-      <CardHeader>
-        <h3 className='text-lg font-semibold'>Timestamps</h3>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <>
-            <Skeleton className='mb-4 h-6 w-full' />
-            <Skeleton className='mb-4 h-6 w-3/4' />
-            <Skeleton className='h-6 w-1/2' />
-          </>
-        ) : error ? (
-          <div className='text-center text-red-500'>{error}</div>
-        ) : timestamps.length === 0 ? (
-          <div className='text-center text-gray-500'>
-            No timestamps available
-          </div>
-        ) : (
-          timestamps.map((timestamp, index) => (
-            <div
-              key={index}
-              className='mb-4 cursor-pointer rounded p-2 hover:bg-gray-50'
-              onClick={() => onSeek(timestamp.startTime)}
-            >
-              <div className='font-semibold text-blue-600'>
-                {formatTime(timestamp.startTime)} -{' '}
-                {formatTime(timestamp.endTime)}
-              </div>
-              <p className='text-sm text-gray-700'>{timestamp.text}</p>
+    <Accordion type='single' collapsible>
+      <AccordionItem value='timestamps'>
+        {/* Header */}
+        <AccordionTrigger className='border-b px-4 py-2 text-lg font-semibold'>
+          Timestamps
+        </AccordionTrigger>
+
+        {/* Content */}
+        <AccordionContent className='max-h-64 overflow-y-auto p-4'>
+          {loading ? (
+            <>
+              <Skeleton className='mb-4 h-6 w-full' />
+              <Skeleton className='mb-4 h-6 w-3/4' />
+              <Skeleton className='h-6 w-1/2' />
+            </>
+          ) : error ? (
+            <div className='text-red-500'>{error}</div>
+          ) : timestamps.length === 0 ? (
+            <div className='text-gray-500'>No timestamps available.</div>
+          ) : (
+            <div>
+              {timestamps.map((timestamp, index) => (
+                <div
+                  key={index}
+                  className='mb-4 cursor-pointer rounded p-2 hover:bg-gray-50'
+                  onClick={() => onSeek(timestamp.startTime)}
+                >
+                  <div className='font-semibold text-blue-600'>
+                    {formatTime(timestamp.startTime)} -{' '}
+                    {formatTime(timestamp.endTime)}
+                  </div>
+                  <p className='text-sm text-gray-700'>{timestamp.text}</p>
+                </div>
+              ))}
             </div>
-          ))
-        )}
-      </CardContent>
-    </Card>
+          )}
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 

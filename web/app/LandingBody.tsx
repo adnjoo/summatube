@@ -203,7 +203,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
             </div>
 
             {/* Timestamps Panel */}
-            <div className='w-full max-w-3xl hidden md:block'>
+            <div className='w-full max-w-3xl'>
               {video_id && (
                 <TimestampsPanel videoId={video_id} onSeek={handleSeek} />
               )}
