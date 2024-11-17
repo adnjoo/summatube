@@ -90,7 +90,7 @@ export default async function Home() {
       {!user && (
         <>
           <p className='mx-auto mt-4 max-w-2xl text-center text-lg'>
-            SummaTube helps users to quickly access summaries of trending
+            SummaTube leverages AI to provide users with quick access to summaries of trending
             YouTube videos, making it easy to stay informed.
           </p>
         </>

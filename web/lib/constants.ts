@@ -1,10 +1,10 @@
 export const AppConfig = {
   APP_NAME: 'SummaTube',
-  APP_DESCRIPTION: 'Summarize YouTube videos for free',
+  APP_DESCRIPTION: 'Summarize YouTube videos for free with AI-powered insights',
   META: {
-    TITLE: 'SummaTube - Free YouTube Video Summaries in Seconds',
+    TITLE: 'SummaTube - AI-Powered YouTube Video Summaries',
     DESCRIPTION:
-      'Summarize YouTube videos for free with summa.tube. Quickly generate summaries for any video, saving you time and helping you capture key points instantly.',
+      'Experience the future of video consumption with SummaTube. Get quick, insightful summaries of YouTube videos powered by AI, saving you time and enhancing your knowledge.',
   },
   CONTACT_EMAIL: 'support@summa.tube',
   SITE_URL: 'https://www.summa.tube',
