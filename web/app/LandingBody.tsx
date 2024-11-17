@@ -39,6 +39,20 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
   );
   const [thumbnailTitle, setThumbnailTitle] = useState('');
   const [player, setPlayer] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  const handlePlayerTimeUpdate = () => {
+    if (player) {
+      setCurrentTime(player.getCurrentTime());
+    }
+  };
+
+  useEffect(() => {
+    if (player) {
+      const interval = setInterval(handlePlayerTimeUpdate, 1000); // Poll every second
+      return () => clearInterval(interval);
+    }
+  }, [player]);
 
   const handlePlayerReady = (ytPlayer: any) => {
     setPlayer(ytPlayer);
@@ -200,7 +214,11 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
             {/* Timestamps Panel */}
             <div className='w-full max-w-3xl'>
               {video_id && (
-                <TimestampsPanel videoId={video_id} onSeek={handleSeek} />
+                <TimestampsPanel
+                  videoId={video_id}
+                  onSeek={handleSeek}
+                  currentTime={currentTime}
+                />
               )}
             </div>
           </div>
