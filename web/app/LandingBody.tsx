@@ -3,11 +3,12 @@
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { type Example } from '@/app/page';
 import { MarqueeCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
+import { TimestampsPanel } from '@/components/TimestampsPanel';
 import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
 import { AppConfig } from '@/lib/constants';
@@ -115,17 +116,6 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     }
   };
 
-  const handleThumbnailClick = async (
-    exampleVideoId: string,
-    exampleVideoTitle: string
-  ) => {
-    setVideoId(exampleVideoId);
-    fetchEmbed(exampleVideoId);
-    setThumbnailTitle(exampleVideoTitle);
-
-    handleSummarize(exampleVideoId);
-  };
-
   return (
     <main className='mt-4 flex min-h-screen flex-col sm:p-8'>
       <div className='mx-auto mb-8 flex items-center'>
@@ -148,7 +138,10 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
             <MarqueeCard
               key={example.video_id}
               example={example}
-              handleThumbnailClick={handleThumbnailClick}
+              handleThumbnailClick={(id, title) => {
+                setVideoId(id);
+                setThumbnailTitle(title);
+              }}
             />
           ))}
         </Marquee>
@@ -163,7 +156,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
       >
         <Input
           type='url'
-          placeholder='Enter YouTube URL e.g. https://www.youtube.com/watch?v=62wEk02YKs0&pp=ygUIYmJjIG5ld3M%3D'
+          placeholder='Enter YouTube URL'
           value={url}
           onChange={handleInputChange}
           className='mb-4'
@@ -187,7 +180,10 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
         </div>
       )}
       {loading && <Loader2 className='mx-auto mt-8 h-12 w-12 animate-spin' />}
-      {<SummaryCard summary={summary} loading={loading} video_id={video_id} />}
+      <SummaryCard summary={summary} loading={loading} video_id={video_id} />
+
+      {/* Timestamps Panel */}
+      {video_id && <TimestampsPanel videoId={video_id} />}
     </main>
   );
 }
