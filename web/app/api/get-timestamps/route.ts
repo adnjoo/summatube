@@ -36,12 +36,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching grouped transcript:', error);
     return new Response(
       JSON.stringify({ error: 'Failed to fetch grouped transcript' }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        status: 500,
-      }
+      { headers: { 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 }
