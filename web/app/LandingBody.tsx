@@ -49,7 +49,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
 
   useEffect(() => {
     if (player) {
-      const interval = setInterval(handlePlayerTimeUpdate, 1000); // Poll every second
+      const interval = setInterval(handlePlayerTimeUpdate, 3000); // Poll every second
       return () => clearInterval(interval);
     }
   }, [player]);
@@ -201,27 +201,26 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           </div>
 
           {/* Right Column: Summary and Timestamps */}
-          <div className='space-y-6'>
-            {/* Summary */}
-            <div className='w-full max-w-3xl'>
-              <SummaryCard
-                summary={summary}
-                loading={loading}
-                video_id={video_id}
-              />
-            </div>
+          {video_id && (
+            <div className='space-y-6'>
+              <div className='w-full max-w-3xl'>
+                <SummaryCard
+                  summary={summary}
+                  loading={loading}
+                  video_id={video_id}
+                />
+              </div>
 
-            {/* Timestamps Panel */}
-            <div className='w-full max-w-3xl'>
-              {video_id && (
+              <div className='w-full max-w-3xl'>
                 <TimestampsPanel
                   videoId={video_id}
                   onSeek={handleSeek}
                   currentTime={currentTime}
+                  thumbnailTitle={thumbnailTitle}
                 />
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </main>

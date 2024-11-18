@@ -25,8 +25,6 @@ export const SummaryCard = ({
 }: SummaryCardProps) => {
   const { copySuccess, handleCopyClick } = useCopyToClipboard();
 
-  if (!summary) return null;
-
   return (
     <Accordion type='single' collapsible defaultValue='summary'>
       <AccordionItem value='summary'>
@@ -39,7 +37,7 @@ export const SummaryCard = ({
         <AccordionContent className='p-4'>
           {loading ? (
             <div className='flex items-center justify-center'>
-              <Loader2 size={32} />
+              <Loader2 size={32} className='animate-spin' />
             </div>
           ) : (
             <>
@@ -63,7 +61,7 @@ export const SummaryCard = ({
                   <FiExternalLink size={18} />
                 </a>
                 {/* Like Button */}
-                <LikeButton summaryId={summary.id} />
+                <LikeButton summaryId={summary?.id} />
               </div>
               {/* Summary Text */}
               <p className='text-gray-700'>

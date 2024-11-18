@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { FiDownload } from 'react-icons/fi';
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Switch } from '@/components/ui/switch';
+  Skeleton,
+  Switch,
+} from '@/components/ui';
+import { formatTime } from '@/lib/helpers';
 
 interface Timestamp {
   startTime: number;
@@ -20,18 +22,20 @@ interface Timestamp {
 interface TimestampsPanelProps {
   videoId: string;
   onSeek: (time: number) => void;
-  currentTime: number; // Add a prop to pass the current video time
+  currentTime: number;
+  thumbnailTitle: string;
 }
 
 export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
   videoId,
   onSeek,
   currentTime,
+  thumbnailTitle,
 }) => {
   const [timestamps, setTimestamps] = useState<Timestamp[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false); // Auto-scroll state
+  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
   const activeRef = useRef<HTMLDivElement | null>(null);
 
   const fetchTimestamps = async (video_id: string) => {
@@ -60,7 +64,10 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
 
   useEffect(() => {
     if (isAutoScrollEnabled && activeRef.current) {
-      activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      activeRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
     }
   }, [currentTime, isAutoScrollEnabled]);
 
@@ -69,6 +76,28 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
       (timestamp) =>
         currentTime >= timestamp.startTime && currentTime < timestamp.endTime
     );
+  };
+
+  const downloadTimestampsAsTxt = () => {
+    const header = `Timestamps for ${thumbnailTitle}\n\nsumma.tube/?v=${videoId}\n\n`;
+    const content = timestamps
+      .map(
+        (timestamp) =>
+          `[${formatTime(timestamp.startTime)} - ${formatTime(
+            timestamp.endTime
+          )}]\n${timestamp.text}`
+      )
+      .join('\n\n');
+
+    const finalContent = header + content;
+
+    const blob = new Blob([finalContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `timestamps-${thumbnailTitle}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const activeTimestamp = getActiveTimestamp();
@@ -81,17 +110,8 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
           Timestamps
         </AccordionTrigger>
 
-        {/* Auto-Scroll Toggle */}
-        <div className='flex items-center justify-between px-4 py-2'>
-          <span className='text-sm font-medium text-gray-700'>Auto-Scroll</span>
-          <Switch
-            checked={isAutoScrollEnabled}
-            onCheckedChange={setIsAutoScrollEnabled}
-          />
-        </div>
-
         {/* Content */}
-        <AccordionContent className='max-h-64 overflow-y-auto p-4'>
+        <AccordionContent className='max-h-64 overflow-y-auto p-4 md:max-h-96'>
           {loading ? (
             <>
               <Skeleton className='mb-4 h-6 w-full' />
@@ -104,13 +124,30 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
             <div className='text-gray-500'>No timestamps available.</div>
           ) : (
             <div>
+              {/* Auto-Scroll Toggle */}
+              <div className='flex items-center justify-between py-2'>
+                <span className='text-sm font-medium text-gray-700'>
+                  Auto-Scroll
+                </span>
+                <Switch
+                  checked={isAutoScrollEnabled}
+                  onCheckedChange={setIsAutoScrollEnabled}
+                />
+              </div>
+
+              {/* Download Button */}
+              <div className='hidden py-2 md:block'>
+                <button onClick={downloadTimestampsAsTxt}>
+                  <FiDownload className='' />
+                </button>
+              </div>
               {timestamps.map((timestamp, index) => (
                 <div
                   key={index}
                   ref={
                     activeTimestamp === timestamp
                       ? (ref) => {
-                          activeRef.current = ref; // Just assign, do not return
+                          activeRef.current = ref;
                         }
                       : null
                   }
@@ -136,11 +173,4 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
       </AccordionItem>
     </Accordion>
   );
-};
-
-// Helper function to format time in MM:SS
-const formatTime = (seconds: number) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 };
