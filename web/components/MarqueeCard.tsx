@@ -12,7 +12,7 @@ export const MarqueeCard = ({
   return (
     <div
       key={example.video_id + example.id}
-      className='group relative cursor-pointer'
+      className='group relative cursor-pointer overflow-hidden'
       onClick={() => handleThumbnailClick(example.video_id, example.title)}
     >
       <img
