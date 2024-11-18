@@ -36,21 +36,39 @@
     // Append the container to the body
     document.body.appendChild(container);
 
-    // Fetch the transcript (using a placeholder API or logic)
-    fetchTranscript().then((transcript) => {
-      transcriptContent.innerHTML = transcript;
+    // Fetch the transcript from the API
+    const videoId = new URLSearchParams(window.location.search).get("v");
+    fetchTranscript(videoId).then((transcript) => {
+      transcriptContent.innerHTML = formatTranscript(transcript);
     });
   };
 
-  const fetchTranscript = async () => {
-    // Simulate fetching transcript data
-    const transcript = `
-        <h3>Transcript</h3>
-        <p>Time: 00:00 - Intro</p>
-        <p>Time: 01:00 - Main Topic</p>
-        <p>...</p>
-      `;
-    return transcript;
+  const fetchTranscript = async (videoId) => {
+    const response = await fetch(
+      `https://www.summa.tube/api/get-timestamps?video_id=${videoId}`
+    );
+    const data = await response.json();
+    return data.intervals;
+  };
+
+  const formatTranscript = (intervals) => {
+    return `
+      <h3>Transcript</h3>
+      ${intervals
+        .map(
+          (interval) =>
+            `<p><strong>${formatTime(interval.startTime)} - ${formatTime(
+              interval.endTime
+            )}</strong>: ${interval.text}</p>`
+        )
+        .join("")}
+    `;
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   // Add a button to the YouTube UI

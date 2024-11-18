@@ -1,18 +1,35 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Transcript Viewer",
-  "version": "1.0",
-  "description": "Displays a transcript on the right-hand side of YouTube videos.",
+  "name": "SummaTube",
+  "description": "Displays a transcript with timestamps on the right-hand side of YouTube videos.",
+  "version": "0.0.2",
   "icons": {
-    "16": "assets/icon16.png"
+    "16": "./assets/icon16.png",
+    "48": "./assets/icon48.png",
+    "128": "./assets/icon128.png"
   },
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_title": "SummaTube",
+    "default_popup": "./popup.html",
+    "default_icon": {
+      "16": "./assets/icon16.png",
+      "48": "./assets/icon48.png",
+      "128": "./assets/icon128.png"
+    }
+  },
   "host_permissions": ["https://www.youtube.com/*"],
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/watch*"],
       "js": ["content.js"],
       "css": ["styles.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["./assets/*"],
+      "matches": ["https://www.youtube.com/*"]
     }
   ]
 }
