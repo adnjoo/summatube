@@ -3,6 +3,8 @@
 import React from 'react';
 import YouTube, { YouTubeProps } from 'react-youtube';
 
+import { useCheckMobile } from '@/lib/hooks';
+
 interface YouTubePlayerProps {
   videoId: string;
   onReady: (player: any) => void;
@@ -12,9 +14,10 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   videoId,
   onReady,
 }) => {
+  const isMobile = useCheckMobile();
   const opts: YouTubeProps['opts'] = {
-    height: '260',
-    width: '427',
+    height: isMobile ? '260' : '335',
+    width: isMobile ? '427' : '550',
     playerVars: {
       autoplay: 0,
       controls: 1,

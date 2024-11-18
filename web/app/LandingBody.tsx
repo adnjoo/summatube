@@ -142,8 +142,8 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
   };
 
   return (
-    <main className='mt-4 flex min-h-screen flex-col sm:p-8'>
-      <div className='mx-auto mb-8 flex items-center'>
+    <main className='mt-4 flex min-h-screen flex-col md:p-4'>
+      <div className='mx-auto mb-4 flex items-center'>
         <span className='mr-2 text-lg font-semibold'>Show Latest</span>
         <Switch checked={showExamples} onCheckedChange={setShowExamples} />
 
@@ -177,7 +177,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           e.preventDefault();
           handleSummarize(video_id);
         }}
-        className='mx-auto flex w-full max-w-md flex-col items-center'
+        className='mx-auto flex w-full max-w-md flex-row items-center gap-2'
       >
         <Input
           type='url'
