@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*', // Allow all origins
           'Access-Control-Allow-Methods': 'GET', // Specify allowed methods
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
       }
     );
