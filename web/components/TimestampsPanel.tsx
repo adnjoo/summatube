@@ -50,6 +50,7 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
         throw new Error(`Failed to fetch timestamps: ${response.statusText}`);
       }
       const data = await response.json();
+      // console.log(data);
       setTimestamps(data.intervals || []);
     } catch (err) {
       setError((err as Error).message || 'Failed to load timestamps.');
@@ -102,6 +103,10 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
 
   const activeTimestamp = getActiveTimestamp();
 
+  const isTranscriptUnavailable = timestamps.every(
+    (timestamp) => timestamp.text.trim() === ''
+  );
+
   return (
     <Accordion type='single' collapsible defaultValue='timestamps'>
       <AccordionItem value='timestamps'>
@@ -111,7 +116,7 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
         </AccordionTrigger>
 
         {/* Content */}
-        <AccordionContent className='max-h-64 overflow-y-auto p-4 md:max-h-96'>
+        <AccordionContent className='relative max-h-64 overflow-y-auto p-4 md:max-h-96'>
           {loading ? (
             <>
               <Skeleton className='mb-4 h-6 w-full' />
@@ -122,25 +127,43 @@ export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({
             <div className='text-red-500'>{error}</div>
           ) : timestamps.length === 0 ? (
             <div className='text-gray-500'>No timestamps available.</div>
+          ) : isTranscriptUnavailable ? (
+            <div className='text-gray-500'>
+              Transcript Unavailable for This Video.
+            </div>
           ) : (
-            <div>
-              {/* Auto-Scroll Toggle */}
-              <div className='flex items-center justify-between py-2'>
-                <span className='text-sm font-medium text-gray-700'>
-                  Auto-Scroll
-                </span>
-                <Switch
-                  checked={isAutoScrollEnabled}
-                  onCheckedChange={setIsAutoScrollEnabled}
-                />
+            <div className='relative'>
+              {/* Sticky Auto-Scroll Toggle */}
+              <div className='sticky -top-4 z-10 bg-white p-1 shadow'>
+                <div className='flex items-center justify-between'>
+                  <button
+                    className='text-sm font-medium text-gray-700 hover:underline'
+                    onClick={() => {
+                      if (activeRef.current) {
+                        activeRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'nearest',
+                        });
+                      }
+                    }}
+                  >
+                    Auto-Scroll
+                  </button>
+                  <Switch
+                    checked={isAutoScrollEnabled}
+                    onCheckedChange={setIsAutoScrollEnabled}
+                  />
+                </div>
               </div>
 
               {/* Download Button */}
-              <div className='hidden py-2 md:block'>
+              <div className='hidden py-1 md:block'>
                 <button onClick={downloadTimestampsAsTxt}>
                   <FiDownload className='' />
                 </button>
               </div>
+
+              {/* Timestamps List */}
               {timestamps.map((timestamp, index) => (
                 <div
                   key={index}
