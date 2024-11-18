@@ -84,17 +84,17 @@ async function getData(): Promise<any> {
 export default async function Home() {
   const { data, user } = await getData();
   return (
-    <main className='flex flex-col py-4 sm:py-24'>
+    <main className='flex flex-col py-4 sm:py-12'>
       <h1 className='text-center text-4xl font-bold'>SummaTube</h1>
 
-      {!user && (
+      {/* {!user && (
         <>
           <p className='mx-auto mt-4 max-w-2xl text-center text-lg'>
             SummaTube leverages AI to provide users with quick access to summaries of trending
             YouTube videos, making it easy to stay informed.
           </p>
         </>
-      )}
+      )} */}
 
       <Suspense fallback={null}>
         <LandingBody examples={data} />

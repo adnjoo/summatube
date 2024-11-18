@@ -39,6 +39,20 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
   );
   const [thumbnailTitle, setThumbnailTitle] = useState('');
   const [player, setPlayer] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  const handlePlayerTimeUpdate = () => {
+    if (player) {
+      setCurrentTime(player.getCurrentTime());
+    }
+  };
+
+  useEffect(() => {
+    if (player) {
+      const interval = setInterval(handlePlayerTimeUpdate, 3000); // Poll every second
+      return () => clearInterval(interval);
+    }
+  }, [player]);
 
   const handlePlayerReady = (ytPlayer: any) => {
     setPlayer(ytPlayer);
@@ -128,8 +142,8 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
   };
 
   return (
-    <main className='mt-4 flex min-h-screen flex-col sm:p-8'>
-      <div className='mx-auto mb-8 flex items-center'>
+    <main className='mt-4 flex min-h-screen flex-col md:p-4'>
+      <div className='mx-auto mb-4 flex items-center'>
         <span className='mr-2 text-lg font-semibold'>Show Latest</span>
         <Switch checked={showExamples} onCheckedChange={setShowExamples} />
 
@@ -163,7 +177,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           e.preventDefault();
           handleSummarize(video_id);
         }}
-        className='mx-auto flex w-full max-w-md flex-col items-center'
+        className='mx-auto flex w-full max-w-md flex-row items-center gap-2'
       >
         <Input
           type='url'
@@ -187,23 +201,26 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           </div>
 
           {/* Right Column: Summary and Timestamps */}
-          <div className='space-y-6'>
-            {/* Summary */}
-            <div className='w-full max-w-3xl'>
-              <SummaryCard
-                summary={summary}
-                loading={loading}
-                video_id={video_id}
-              />
-            </div>
+          {video_id && (
+            <div className='space-y-6'>
+              <div className='w-full max-w-3xl'>
+                <SummaryCard
+                  summary={summary}
+                  loading={loading}
+                  video_id={video_id}
+                />
+              </div>
 
-            {/* Timestamps Panel */}
-            <div className='w-full max-w-3xl'>
-              {video_id && (
-                <TimestampsPanel videoId={video_id} onSeek={handleSeek} />
-              )}
+              <div className='w-full max-w-3xl'>
+                <TimestampsPanel
+                  videoId={video_id}
+                  onSeek={handleSeek}
+                  currentTime={currentTime}
+                  thumbnailTitle={thumbnailTitle}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </main>
