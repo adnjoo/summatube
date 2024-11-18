@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { FiThumbsUp } from 'react-icons/fi';
 
@@ -12,6 +13,8 @@ export type LikeButtonProps = {
 export function LikeButton({ summaryId, disabled = false }: LikeButtonProps) {
   const user = useUser();
   const userId = user?.id;
+  const queryClient = useQueryClient();
+
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(true); // Add loading state
@@ -67,6 +70,9 @@ export function LikeButton({ summaryId, disabled = false }: LikeButtonProps) {
       setLikeCount((prev) => prev + 1);
     }
     setLiked(!liked);
+    queryClient.invalidateQueries({
+      queryKey: ['history'],
+    }); // Invalidate the history query
   };
 
   if (loading) {
