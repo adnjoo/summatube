@@ -24,7 +24,14 @@ export async function GET(request: NextRequest) {
         video_id,
         intervals: groupedTranscript,
       }),
-      { headers: { 'Content-Type': 'application/json' } }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*', // Allow all origins
+          'Access-Control-Allow-Methods': 'GET', // Specify allowed methods
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      }
     );
   } catch (error) {
     console.error('Error fetching grouped transcript:', error);
