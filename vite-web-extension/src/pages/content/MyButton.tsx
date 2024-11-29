@@ -4,9 +4,9 @@ import { Bot, Captions, ChevronDown } from "lucide-react";
 const API_URL = "https://www.summa.tube/api/";
 
 const ACTIVE_TAB_CLASS =
-  "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none items-center";
 const INACTIVE_TAB_CLASS =
-  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none items-center";
 const HIDDEN_SECTION_CLASS = "hidden";
 
 const TranscriptSummaryUI: React.FC = () => {
