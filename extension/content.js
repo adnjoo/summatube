@@ -1,6 +1,7 @@
 const API_URL = "https://www.summa.tube/api/"; // Base API URL
-const captionsIconUrl = chrome.runtime.getURL("assets/captions.svg");
-const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
+const captionsIcon = chrome.runtime.getURL("assets/captions.svg");
+const botIcon = chrome.runtime.getURL("assets/bot.svg");
+const chevronIcon = chrome.runtime.getURL("assets/chevron-down.svg");
 const ACTIVE_TAB_CLASS =
   "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
 const INACTIVE_TAB_CLASS =
@@ -19,34 +20,55 @@ const HIDDEN_SECTION_CLASS = "hidden";
     const container = document.createElement("div");
     container.id = "custom-container";
     container.className =
-      "h-[calc(100vh-170px)] overflow-y-scroll bg-white dark:bg-gray-800 border rounded shadow-lg";
+      "overflow-y-scroll bg-white dark:bg-gray-800 border rounded shadow-lg";
 
-    // Header with Tabs
+    // Header with Tabs and Chevron
     const header = document.createElement("div");
     header.className =
-      "flex border-b sticky top-0 z-50 bg-white dark:bg-gray-800";
+      "flex justify-between items-center border-b sticky top-0 z-50 bg-white dark:bg-gray-800 px-4 py-2";
+
+    // Tabs Container
+    const tabsContainer = document.createElement("div");
+    tabsContainer.className = "flex";
 
     const transcriptTab = document.createElement("button");
     transcriptTab.id = "transcript-tab";
     transcriptTab.className = ACTIVE_TAB_CLASS;
     transcriptTab.innerHTML = `
-    <img src=${captionsIconUrl} alt="Captions Icon" class="w-5 h-5">
-    <span>Transcript</span>
-  `;
+      <img src=${captionsIcon} alt="Captions Icon" class="w-5 h-5">
+      <span>Transcript</span>
+    `;
     transcriptTab.onclick = () => switchTab("transcript");
 
     const summaryTab = document.createElement("button");
-    // summaryTab.innerText = "Summary";
     summaryTab.id = "summary-tab";
     summaryTab.className = INACTIVE_TAB_CLASS;
     summaryTab.innerHTML = `
-    <img src=${botIconUrl} alt="Bot Icon" class="w-5 h-5">
-    <span>Summary</span>
+      <img src=${botIcon} alt="Bot Icon" class="w-5 h-5">
+      <span>Summary</span>
     `;
     summaryTab.onclick = () => switchTab("summary");
 
-    header.appendChild(transcriptTab);
-    header.appendChild(summaryTab);
+    tabsContainer.appendChild(transcriptTab);
+    tabsContainer.appendChild(summaryTab);
+
+    // Chevron Button
+    const toggleButton = document.createElement("button");
+    toggleButton.id = "toggle-button";
+    toggleButton.className =
+      "flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700";
+    toggleButton.innerHTML = `<img src=${chevronIcon} alt="Toggle" class="w-4 h-4 transform rotate-0">`;
+    toggleButton.onclick = () =>
+      toggleContent("content-container", toggleButton);
+
+    // Append Tabs and Chevron to Header
+    header.appendChild(tabsContainer);
+    header.appendChild(toggleButton);
+
+    // Content Container
+    const contentContainer = document.createElement("div");
+    contentContainer.id = "content-container";
+    contentContainer.className = "h-[calc(100vh-170px)]";
 
     // Content Sections
     const transcriptSection = document.createElement("div");
@@ -61,9 +83,11 @@ const HIDDEN_SECTION_CLASS = "hidden";
     summarySection.innerHTML =
       "<p class='text-gray-800 dark:text-gray-300'>Loading summary...</p>";
 
+    contentContainer.appendChild(transcriptSection);
+    contentContainer.appendChild(summarySection);
+
     container.appendChild(header);
-    container.appendChild(transcriptSection);
-    container.appendChild(summarySection);
+    container.appendChild(contentContainer);
 
     secondarySection.insertBefore(container, secondarySection.firstChild);
 
@@ -98,6 +122,19 @@ const HIDDEN_SECTION_CLASS = "hidden";
     }
   };
 
+  const toggleContent = (containerId, toggleButton) => {
+    const contentContainer = document.getElementById(containerId);
+    const chevronIcon = toggleButton.querySelector("img");
+
+    if (contentContainer.classList.contains(HIDDEN_SECTION_CLASS)) {
+      contentContainer.classList.remove(HIDDEN_SECTION_CLASS);
+      chevronIcon.classList.remove("rotate-180");
+    } else {
+      contentContainer.classList.add(HIDDEN_SECTION_CLASS);
+      chevronIcon.classList.add("rotate-180");
+    }
+  };
+
   const fetchTranscript = async (videoId) => {
     const response = await fetch(
       `${API_URL}get-timestamps?video_id=${videoId}`
@@ -108,7 +145,6 @@ const HIDDEN_SECTION_CLASS = "hidden";
 
   const formatTranscript = (intervals) => {
     return `
-      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 hidden">Transcript</h3>
       ${intervals
         .map(
           (interval) =>
