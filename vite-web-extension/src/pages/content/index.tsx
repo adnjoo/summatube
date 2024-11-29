@@ -2,25 +2,22 @@ import { createRoot } from "react-dom/client";
 import "./style.css";
 import MyButton from "./MyButton"; // Import the custom component
 
-// Create a container for the React app
-const div = document.createElement("div");
-div.id = "__root";
-document.body.appendChild(div);
+const initializeReactApp = () => {
+  const secondarySection = document.querySelector("#secondary");
 
-// Select the container and handle potential errors
-const rootContainer = document.querySelector("#__root");
-if (!rootContainer) {
-  throw new Error("Can't find content root element");
-}
+  if (!secondarySection) {
+    throw new Error("Can't find the secondary section element");
+  }
 
-// Initialize React root
-const root = createRoot(rootContainer);
+  // Create a container for the React app
+  const appContainer = document.createElement("div");
+  appContainer.id = "__root";
+  secondarySection.prepend(appContainer);
 
-// Render the imported React component
-root.render(<MyButton />);
+  // Initialize React root and render the component
+  const root = createRoot(appContainer);
+  root.render(<MyButton />);
+};
 
-try {
-  console.log("Content script loaded successfully");
-} catch (e) {
-  console.error(e);
-}
+// Run the function after a delay
+setTimeout(initializeReactApp, 1000);
