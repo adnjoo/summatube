@@ -58,9 +58,15 @@
       ${intervals
         .map(
           (interval) =>
-            `<p class="my-2 text-gray-800 dark:text-gray-300"><strong class="text-gray-900 dark:text-gray-100">${formatTime(
-              interval.startTime
-            )} - ${formatTime(interval.endTime)}</strong>: ${interval.text}</p>`
+            `<p class="my-2 text-gray-800 dark:text-gray-300">
+              <a href="#" class="text-blue-500 hover:underline timestamp" data-start="${
+                interval.startTime
+              }">
+                ${formatTime(interval.startTime)} - ${formatTime(
+              interval.endTime
+            )}
+              </a>: ${interval.text}
+            </p>`
         )
         .join("")}
     `;
@@ -91,7 +97,32 @@
     secondarySection.insertBefore(button, secondarySection.firstChild);
   };
 
+  const setupTimestampClicks = () => {
+    document.querySelectorAll(".timestamp").forEach((timestamp) => {
+      timestamp.addEventListener("click", (event) => {
+        event.preventDefault();
+        const startTime = parseFloat(timestamp.getAttribute("data-start"));
+
+        // Seek to the correct position in the video
+        const video = document.querySelector("video");
+        if (video) {
+          video.currentTime = startTime;
+          video.play();
+        } else {
+          console.error("Video element not found.");
+        }
+      });
+    });
+  };
+
   window.addEventListener("load", () => {
     setTimeout(addTranscriptButton, 2000);
   });
+
+  // Listen for transcript container changes to set up timestamp clicks
+  const observer = new MutationObserver(() => {
+    setupTimestampClicks();
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
 })();
