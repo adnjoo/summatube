@@ -11,7 +11,6 @@
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {
     "default_title": "SummaTube",
-    "default_popup": "./popup.html",
     "default_icon": {
       "16": "./assets/icon16.png",
       "48": "./assets/icon48.png",
@@ -23,7 +22,7 @@
     {
       "matches": ["https://www.youtube.com/watch*"],
       "js": ["content.js"],
-      "css": ["styles.css"]
+      "css": ["tailwind.min.css"]
     }
   ],
   "web_accessible_resources": [
