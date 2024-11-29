@@ -1,4 +1,21 @@
 (function () {
+  const toggleTranscript = (button) => {
+    // Check if the transcript container already exists
+    const container = document.querySelector("#custom-transcript-container");
+
+    if (container) {
+      // If the container exists, toggle its visibility
+      const isHidden = container.style.display === "none";
+      container.style.display = isHidden ? "block" : "none";
+
+      // Update the button text
+      button.innerText = isHidden ? "Hide Transcript" : "Show Transcript";
+    } else {
+      // If the container doesn't exist, initialize the transcript
+      initTranscript(button);
+    }
+  };
+
   const initTranscript = (button) => {
     // Prevent duplicate containers
     if (document.querySelector("#custom-transcript-container")) return;
@@ -21,6 +38,9 @@
     const videoId = new URLSearchParams(window.location.search).get("v");
     fetchTranscript(videoId).then((transcript) => {
       transcriptContent.innerHTML = formatTranscript(transcript);
+
+      // Update button text to indicate hiding
+      button.innerText = "Hide Transcript";
     });
   };
 
@@ -65,8 +85,8 @@
     button.className =
       "block my-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition";
 
-    // Attach click event to initialize the transcript
-    button.onclick = () => initTranscript(button);
+    // Attach click event to toggle the transcript
+    button.onclick = () => toggleTranscript(button);
 
     secondarySection.insertBefore(button, secondarySection.firstChild);
   };
