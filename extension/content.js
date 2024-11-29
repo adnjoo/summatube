@@ -23,7 +23,7 @@ const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
     const transcriptTab = document.createElement("button");
     transcriptTab.id = "transcript-tab";
     transcriptTab.className =
-      "px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
+      "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
     transcriptTab.innerHTML = `
     <img src=${captionsIconUrl} alt="Captions Icon" class="w-5 h-5">
     <span>Transcript</span>
@@ -34,7 +34,7 @@ const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
     // summaryTab.innerText = "Summary";
     summaryTab.id = "summary-tab";
     summaryTab.className =
-      "px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
+      "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
     summaryTab.innerHTML = `
     <img src=${botIconUrl} alt="Bot Icon" class="w-5 h-5">
     <span>Summary</span>
