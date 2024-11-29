@@ -14,18 +14,11 @@
   "icons": {
     "128": "icon-128.png"
   },
-  "permissions": [
-    "activeTab",
-    "sidePanel"
-  ],
+  "permissions": ["activeTab", "sidePanel"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "src/pages/content/index.tsx"
-      ]
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["src/pages/content/index.tsx"]
     }
   ],
   "side_panel": {
@@ -33,10 +26,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "icon-128.png",
-        "icon-32.png"
-      ],
+      "resources": ["icon-128.png", "icon-32.png"],
       "matches": []
     }
   ]
