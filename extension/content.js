@@ -1,6 +1,11 @@
 const API_URL = "https://www.summa.tube/api/"; // Base API URL
 const captionsIconUrl = chrome.runtime.getURL("assets/captions.svg");
 const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
+const ACTIVE_TAB_CLASS =
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
+const INACTIVE_TAB_CLASS =
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
+const HIDDEN_SECTION_CLASS = "hidden";
 
 (function () {
   const addTranscriptAndSummaryUI = () => {
@@ -14,16 +19,16 @@ const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
     const container = document.createElement("div");
     container.id = "custom-container";
     container.className =
-      "bg-white dark:bg-gray-800 border rounded shadow-lg p-4 mt-4";
+      "h-[calc(100vh-170px)] overflow-y-scroll bg-white dark:bg-gray-800 border rounded shadow-lg";
 
     // Header with Tabs
     const header = document.createElement("div");
-    header.className = "flex border-b";
+    header.className =
+      "flex border-b sticky top-0 z-50 bg-white dark:bg-gray-800";
 
     const transcriptTab = document.createElement("button");
     transcriptTab.id = "transcript-tab";
-    transcriptTab.className =
-      "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
+    transcriptTab.className = ACTIVE_TAB_CLASS;
     transcriptTab.innerHTML = `
     <img src=${captionsIconUrl} alt="Captions Icon" class="w-5 h-5">
     <span>Transcript</span>
@@ -33,8 +38,7 @@ const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
     const summaryTab = document.createElement("button");
     // summaryTab.innerText = "Summary";
     summaryTab.id = "summary-tab";
-    summaryTab.className =
-      "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
+    summaryTab.className = INACTIVE_TAB_CLASS;
     summaryTab.innerHTML = `
     <img src=${botIconUrl} alt="Bot Icon" class="w-5 h-5">
     <span>Summary</span>
@@ -80,19 +84,17 @@ const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
     const summarySection = document.getElementById("summary-section");
 
     if (tab === "transcript") {
-      transcriptTab.className =
-        "px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
-      summaryTab.className =
-        "px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
-      transcriptSection.classList.remove("hidden");
-      summarySection.classList.add("hidden");
-    } else {
-      summaryTab.className =
-        "px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
-      transcriptTab.className =
-        "px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
-      summarySection.classList.remove("hidden");
-      transcriptSection.classList.add("hidden");
+      transcriptTab.className = ACTIVE_TAB_CLASS;
+      summaryTab.className = INACTIVE_TAB_CLASS;
+
+      transcriptSection.classList.remove(HIDDEN_SECTION_CLASS);
+      summarySection.classList.add(HIDDEN_SECTION_CLASS);
+    } else if (tab === "summary") {
+      summaryTab.className = ACTIVE_TAB_CLASS;
+      transcriptTab.className = INACTIVE_TAB_CLASS;
+
+      summarySection.classList.remove(HIDDEN_SECTION_CLASS);
+      transcriptSection.classList.add(HIDDEN_SECTION_CLASS);
     }
   };
 
@@ -106,7 +108,7 @@ const botIconUrl = chrome.runtime.getURL("assets/bot.svg");
 
   const formatTranscript = (intervals) => {
     return `
-      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Transcript</h3>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 hidden">Transcript</h3>
       ${intervals
         .map(
           (interval) =>
