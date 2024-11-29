@@ -17,6 +17,8 @@ async function getYouTubeTranscript(video_id: string) {
   };
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const video_id = searchParams.get('video_id') as string;
