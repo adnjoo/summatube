@@ -27,7 +27,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["./assets/*"],
+      "resources": ["assets/*"],
       "matches": ["https://www.youtube.com/*"]
     }
   ]

@@ -1,38 +1,138 @@
 const API_URL = "https://www.summa.tube/api/"; // Base API URL
+const captionsIcon = chrome.runtime.getURL("assets/captions.svg");
+const botIcon = chrome.runtime.getURL("assets/bot.svg");
+const chevronIcon = chrome.runtime.getURL("assets/chevron-down.svg");
+const ACTIVE_TAB_CLASS =
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none";
+const INACTIVE_TAB_CLASS =
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none";
+const HIDDEN_SECTION_CLASS = "hidden";
 
 (function () {
-  const toggleTranscript = (button) => {
-    const container = document.querySelector("#custom-transcript-container");
-    if (container) {
-      const isHidden = container.style.display === "none";
-      container.style.display = isHidden ? "block" : "none";
-      button.innerText = isHidden ? "Hide Transcript" : "Show Transcript";
-    } else {
-      initTranscript(button);
+  const addTranscriptAndSummaryUI = () => {
+    const secondarySection = document.querySelector("#secondary");
+    if (!secondarySection) {
+      console.error("Could not find the #secondary section.");
+      return;
+    }
+
+    // Main container for the UI
+    const container = document.createElement("div");
+    container.id = "custom-container";
+    container.className =
+      "overflow-y-scroll bg-white dark:bg-gray-800 border rounded shadow-lg";
+
+    // Header with Tabs and Chevron
+    const header = document.createElement("div");
+    header.className =
+      "flex justify-between items-center border-b sticky top-0 z-50 bg-white dark:bg-gray-800 px-4 py-2";
+
+    // Tabs Container
+    const tabsContainer = document.createElement("div");
+    tabsContainer.className = "flex";
+
+    const transcriptTab = document.createElement("button");
+    transcriptTab.id = "transcript-tab";
+    transcriptTab.className = ACTIVE_TAB_CLASS;
+    transcriptTab.innerHTML = `
+      <img src=${captionsIcon} alt="Captions Icon" class="w-5 h-5">
+      <span>Transcript</span>
+    `;
+    transcriptTab.onclick = () => switchTab("transcript");
+
+    const summaryTab = document.createElement("button");
+    summaryTab.id = "summary-tab";
+    summaryTab.className = INACTIVE_TAB_CLASS;
+    summaryTab.innerHTML = `
+      <img src=${botIcon} alt="Bot Icon" class="w-5 h-5">
+      <span>Summary</span>
+    `;
+    summaryTab.onclick = () => switchTab("summary");
+
+    tabsContainer.appendChild(transcriptTab);
+    tabsContainer.appendChild(summaryTab);
+
+    // Chevron Button
+    const toggleButton = document.createElement("button");
+    toggleButton.id = "toggle-button";
+    toggleButton.className =
+      "flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700";
+    toggleButton.innerHTML = `<img src=${chevronIcon} alt="Toggle" class="w-4 h-4 transform rotate-0">`;
+    toggleButton.onclick = () =>
+      toggleContent("content-container", toggleButton);
+
+    // Append Tabs and Chevron to Header
+    header.appendChild(tabsContainer);
+    header.appendChild(toggleButton);
+
+    // Content Container
+    const contentContainer = document.createElement("div");
+    contentContainer.id = "content-container";
+    contentContainer.className = "h-[calc(100vh-170px)]";
+
+    // Content Sections
+    const transcriptSection = document.createElement("div");
+    transcriptSection.id = "transcript-section";
+    transcriptSection.className = "mt-4";
+    transcriptSection.innerHTML =
+      "<p class='text-gray-800 dark:text-gray-300'>Loading transcript...</p>";
+
+    const summarySection = document.createElement("div");
+    summarySection.id = "summary-section";
+    summarySection.className = "mt-4 hidden";
+    summarySection.innerHTML =
+      "<p class='text-gray-800 dark:text-gray-300'>Loading summary...</p>";
+
+    contentContainer.appendChild(transcriptSection);
+    contentContainer.appendChild(summarySection);
+
+    container.appendChild(header);
+    container.appendChild(contentContainer);
+
+    secondarySection.insertBefore(container, secondarySection.firstChild);
+
+    // Fetch and Load Data
+    const videoId = new URLSearchParams(window.location.search).get("v");
+    fetchTranscript(videoId).then((transcript) => {
+      transcriptSection.innerHTML = formatTranscript(transcript);
+    });
+    fetchSummary(videoId).then((summary) => {
+      summarySection.innerHTML = `<p>${summary}</p>`;
+    });
+  };
+
+  const switchTab = (tab) => {
+    const transcriptTab = document.getElementById("transcript-tab");
+    const summaryTab = document.getElementById("summary-tab");
+    const transcriptSection = document.getElementById("transcript-section");
+    const summarySection = document.getElementById("summary-section");
+
+    if (tab === "transcript") {
+      transcriptTab.className = ACTIVE_TAB_CLASS;
+      summaryTab.className = INACTIVE_TAB_CLASS;
+
+      transcriptSection.classList.remove(HIDDEN_SECTION_CLASS);
+      summarySection.classList.add(HIDDEN_SECTION_CLASS);
+    } else if (tab === "summary") {
+      summaryTab.className = ACTIVE_TAB_CLASS;
+      transcriptTab.className = INACTIVE_TAB_CLASS;
+
+      summarySection.classList.remove(HIDDEN_SECTION_CLASS);
+      transcriptSection.classList.add(HIDDEN_SECTION_CLASS);
     }
   };
 
-  const initTranscript = (button) => {
-    if (document.querySelector("#custom-transcript-container")) return;
+  const toggleContent = (containerId, toggleButton) => {
+    const contentContainer = document.getElementById(containerId);
+    const chevronIcon = toggleButton.querySelector("img");
 
-    const container = document.createElement("div");
-    container.id = "custom-transcript-container";
-    container.className =
-      "w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-lg overflow-y-auto p-4 mt-2";
-
-    const transcriptContent = document.createElement("div");
-    transcriptContent.id = "transcript-content";
-    transcriptContent.innerHTML =
-      "<p class='text-gray-800 dark:text-gray-300'>Loading transcript...</p>";
-    container.appendChild(transcriptContent);
-
-    button.insertAdjacentElement("afterend", container);
-
-    const videoId = new URLSearchParams(window.location.search).get("v");
-    fetchTranscript(videoId).then((transcript) => {
-      transcriptContent.innerHTML = formatTranscript(transcript);
-      button.innerText = "Hide Transcript";
-    });
+    if (contentContainer.classList.contains(HIDDEN_SECTION_CLASS)) {
+      contentContainer.classList.remove(HIDDEN_SECTION_CLASS);
+      chevronIcon.classList.remove("rotate-180");
+    } else {
+      contentContainer.classList.add(HIDDEN_SECTION_CLASS);
+      chevronIcon.classList.add("rotate-180");
+    }
   };
 
   const fetchTranscript = async (videoId) => {
@@ -45,7 +145,6 @@ const API_URL = "https://www.summa.tube/api/"; // Base API URL
 
   const formatTranscript = (intervals) => {
     return `
-      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Transcript</h3>
       ${intervals
         .map(
           (interval) =>
@@ -63,118 +162,23 @@ const API_URL = "https://www.summa.tube/api/"; // Base API URL
     `;
   };
 
+  const fetchSummary = async (videoId) => {
+    const response = await fetch(`${API_URL}summarize?video_id=${videoId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.summary;
+  };
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  const addTranscriptButton = () => {
-    const secondarySection = document.querySelector("#secondary");
-    if (!secondarySection) {
-      console.error("Could not find the #secondary section.");
-      return;
-    }
-
-    const transcriptButton = document.createElement("button");
-    transcriptButton.innerText = "Show Transcript";
-    transcriptButton.className =
-      "block my-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition";
-    transcriptButton.onclick = () => toggleTranscript(transcriptButton);
-
-    const summarizeButton = document.createElement("button");
-    summarizeButton.id = "summarize-button";
-    summarizeButton.innerText = "Summarize Video";
-    summarizeButton.className =
-      "block my-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition";
-    summarizeButton.onclick = async () => {
-      const videoId = new URLSearchParams(window.location.search).get("v");
-      const summary = await fetchSummary(videoId);
-      displaySummary(summary);
-    };
-
-    secondarySection.insertBefore(summarizeButton, secondarySection.firstChild);
-    secondarySection.insertBefore(
-      transcriptButton,
-      secondarySection.firstChild
-    );
-  };
-
-  const fetchSummary = async (videoId) => {
-    const spinner = createLoadingSpinner();
-    const summaryContainer = getOrCreateSummaryContainer();
-    summaryContainer.innerHTML = ""; // Clear content before adding spinner
-    summaryContainer.appendChild(spinner); // Add spinner to the container
-
-    try {
-      const response = await fetch(`${API_URL}summarize?video_id=${videoId}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      summaryContainer.removeChild(spinner); // Remove spinner
-      return data.summary;
-    } catch (error) {
-      console.error("Failed to fetch summary:", error);
-      summaryContainer.removeChild(spinner); // Remove spinner
-      summaryContainer.innerHTML = `<p class="text-red-500">Failed to fetch summary. Please try again.</p>`;
-      throw error;
-    }
-  };
-
-  const displaySummary = (summary) => {
-    const summaryContainer = getOrCreateSummaryContainer();
-    summaryContainer.innerHTML = `
-      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Summary</h3>
-      <p class="text-gray-800 dark:text-gray-300">${summary}</p>
-    `;
-  };
-
-  const createLoadingSpinner = () => {
-    const spinner = document.createElement("div");
-    spinner.className = "loading-spinner";
-    spinner.style.cssText = `
-      width: 24px;
-      height: 24px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 10px auto;
-    `;
-    return spinner;
-  };
-
-  const getOrCreateSummaryContainer = () => {
-    let summaryContainer = document.querySelector("#custom-summary-container");
-    if (!summaryContainer) {
-      summaryContainer = document.createElement("div");
-      summaryContainer.id = "custom-summary-container";
-      summaryContainer.className =
-        "w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 shadow-lg overflow-y-auto p-4 mt-2";
-
-      const summarizeButton = document.querySelector(
-        "#summarize-button"
-      );
-      if (summarizeButton) {
-        summarizeButton.appendChild(summaryContainer);
-        // summarizeButton.insertAdjacentElement("afterend", summaryContainer);
-      }
-    }
-    return summaryContainer;
-  };
-
-  // Add CSS for Spinner Animation
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-
+  // Add the UI once the page has loaded
   window.addEventListener("load", () => {
-    setTimeout(addTranscriptButton, 2000);
+    setTimeout(addTranscriptAndSummaryUI, 2000);
   });
 })();
