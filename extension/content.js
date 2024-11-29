@@ -1,3 +1,5 @@
+const API_URL = "https://www.summa.tube/api/"; // Base API URL
+
 (function () {
   const toggleTranscript = (button) => {
     // Check if the transcript container already exists
@@ -46,8 +48,9 @@
 
   const fetchTranscript = async (videoId) => {
     const response = await fetch(
-      `https://www.summa.tube/api/get-timestamps?video_id=${videoId}`
+      `${API_URL}get-timestamps?video_id=${videoId}`
     );
+
     const data = await response.json();
     return data.intervals;
   };
