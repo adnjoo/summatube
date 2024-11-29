@@ -26,7 +26,7 @@ const API_URL = "https://www.summa.tube/api/"; // Base API URL
       "<p class='text-gray-800 dark:text-gray-300'>Loading transcript...</p>";
     container.appendChild(transcriptContent);
 
-    button.parentNode.insertBefore(container, button.nextSibling);
+    button.insertAdjacentElement("afterend", container);
 
     const videoId = new URLSearchParams(window.location.search).get("v");
     fetchTranscript(videoId).then((transcript) => {
@@ -83,6 +83,7 @@ const API_URL = "https://www.summa.tube/api/"; // Base API URL
     transcriptButton.onclick = () => toggleTranscript(transcriptButton);
 
     const summarizeButton = document.createElement("button");
+    summarizeButton.id = "summarize-button";
     summarizeButton.innerText = "Summarize Video";
     summarizeButton.className =
       "block my-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition";
@@ -100,48 +101,78 @@ const API_URL = "https://www.summa.tube/api/"; // Base API URL
   };
 
   const fetchSummary = async (videoId) => {
-    const response = await fetch(`${API_URL}summarize?video_id=${videoId}`);
-    if (!response.ok) {
-      console.error(
-        "Failed to fetch summary:",
-        response.status,
-        response.statusText
-      );
-      throw new Error("Failed to fetch summary");
+    const spinner = createLoadingSpinner();
+    const summaryContainer = getOrCreateSummaryContainer();
+    summaryContainer.innerHTML = ""; // Clear content before adding spinner
+    summaryContainer.appendChild(spinner); // Add spinner to the container
+
+    try {
+      const response = await fetch(`${API_URL}summarize?video_id=${videoId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      summaryContainer.removeChild(spinner); // Remove spinner
+      return data.summary;
+    } catch (error) {
+      console.error("Failed to fetch summary:", error);
+      summaryContainer.removeChild(spinner); // Remove spinner
+      summaryContainer.innerHTML = `<p class="text-red-500">Failed to fetch summary. Please try again.</p>`;
+      throw error;
     }
-    const data = await response.json();
-    return data.summary;
   };
 
   const displaySummary = (summary) => {
-    const summaryContainer = document.querySelector(
-      "#custom-summary-container"
-    );
-    if (!summaryContainer) {
-      const container = document.createElement("div");
-      container.id = "custom-summary-container";
-      container.className =
-        "w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 shadow-lg overflow-y-auto p-4 mt-2";
-
-      const content = document.createElement("div");
-      content.id = "summary-content";
-      content.innerHTML =
-        "<p class='text-gray-800 dark:text-gray-300'>Loading summary...</p>";
-      container.appendChild(content);
-
-      const transcriptButton = document.querySelector("#secondary button");
-      transcriptButton.parentNode.insertBefore(
-        container,
-        transcriptButton.nextSibling
-      );
-    }
-
-    const content = document.querySelector("#summary-content");
-    content.innerHTML = `
+    const summaryContainer = getOrCreateSummaryContainer();
+    summaryContainer.innerHTML = `
       <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Summary</h3>
       <p class="text-gray-800 dark:text-gray-300">${summary}</p>
     `;
   };
+
+  const createLoadingSpinner = () => {
+    const spinner = document.createElement("div");
+    spinner.className = "loading-spinner";
+    spinner.style.cssText = `
+      width: 24px;
+      height: 24px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+    `;
+    return spinner;
+  };
+
+  const getOrCreateSummaryContainer = () => {
+    let summaryContainer = document.querySelector("#custom-summary-container");
+    if (!summaryContainer) {
+      summaryContainer = document.createElement("div");
+      summaryContainer.id = "custom-summary-container";
+      summaryContainer.className =
+        "w-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 shadow-lg overflow-y-auto p-4 mt-2";
+
+      const summarizeButton = document.querySelector(
+        "#summarize-button"
+      );
+      if (summarizeButton) {
+        summarizeButton.appendChild(summaryContainer);
+        // summarizeButton.insertAdjacentElement("afterend", summaryContainer);
+      }
+    }
+    return summaryContainer;
+  };
+
+  // Add CSS for Spinner Animation
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
 
   window.addEventListener("load", () => {
     setTimeout(addTranscriptButton, 2000);
