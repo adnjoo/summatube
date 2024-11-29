@@ -1,20 +1,26 @@
-import { createRoot } from 'react-dom/client';
-import './style.css' 
-const div = document.createElement('div');
-div.id = '__root';
+import { createRoot } from "react-dom/client";
+import "./style.css";
+import MyButton from "./MyButton"; // Import the custom component
+
+// Create a container for the React app
+const div = document.createElement("div");
+div.id = "__root";
 document.body.appendChild(div);
 
-const rootContainer = document.querySelector('#__root');
-if (!rootContainer) throw new Error("Can't find Content root element");
+// Select the container and handle potential errors
+const rootContainer = document.querySelector("#__root");
+if (!rootContainer) {
+  throw new Error("Can't find content root element");
+}
+
+// Initialize React root
 const root = createRoot(rootContainer);
-root.render(
-  <div className='absolute bottom-0 left-0 text-lg text-black bg-amber-400 z-50'  >
-    content script <span className='your-class'>loaded</span>
-  </div>
-);
+
+// Render the imported React component
+root.render(<MyButton />);
 
 try {
-  console.log('content script loaded');
+  console.log("Content script loaded successfully");
 } catch (e) {
   console.error(e);
 }

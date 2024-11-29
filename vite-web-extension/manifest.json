@@ -11,9 +11,6 @@
       "32": "icon-32.png"
     }
   },
-  "chrome_url_overrides": {
-    "newtab": "src/pages/newtab/index.html"
-  },
   "icons": {
     "128": "icon-128.png"
   },
@@ -24,8 +21,7 @@
   "content_scripts": [
     {
       "matches": [
-        "http://*/*",
-        "https://*/*",
+        "https://www.youtube.com/watch/*",
         "<all_urls>"
       ],
       "js": [
@@ -39,7 +35,6 @@
   "side_panel": {
     "default_path": "src/pages/panel/index.html"
   },
-  "devtools_page": "src/pages/devtools/index.html",
   "web_accessible_resources": [
     {
       "resources": [
