@@ -118,7 +118,12 @@ export async function GET(request: NextRequest) {
     return new Response(
       JSON.stringify({ title, summary: summaryContent, id: newSummary?.id }),
       {
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
       }
     );
   } catch (err) {
