@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import "./style.css";
-import MyButton from "./MyButton"; // Import the custom component
+import TranscriptSummaryUI from "./TranscriptSummaryUI"; // Import the custom component
 
 const initializeReactApp = () => {
   const secondarySection = document.querySelector("#secondary");
@@ -16,7 +16,7 @@ const initializeReactApp = () => {
 
   // Initialize React root and render the component
   const root = createRoot(appContainer);
-  root.render(<MyButton />);
+  root.render(<TranscriptSummaryUI />);
 };
 
 // Run the function after a delay

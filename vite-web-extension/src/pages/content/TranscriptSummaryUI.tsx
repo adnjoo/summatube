@@ -115,7 +115,7 @@ const TranscriptSummaryUI: React.FC = () => {
       {/* Content */}
       <div
         id="content-container"
-        className={`h-[calc(100vh-170px)] ${
+        className={`h-[calc(100vh-170px)] px-4 ${
           isContentHidden ? HIDDEN_SECTION_CLASS : ""
         }`}
       >
