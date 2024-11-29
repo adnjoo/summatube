@@ -1,6 +1,10 @@
-### Extension
-
-tailwind build step
+### Quickstart:
 ```bash
-npm run build:css
+yarn i
+yarn dev
 ```
+
+1. Load unpacked (`dist_chrome`)
+
+### Ref
+- https://github.com/JohnBra/vite-web-extension

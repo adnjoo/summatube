@@ -1,34 +1,30 @@
 {
   "manifest_version": 3,
-  "name": "SummaTube",
-  "description": "Displays a transcript with timestamps on the right-hand side of YouTube videos.",
-  "version": "0.0.2",
-  "icons": {
-    "16": "./assets/icon16.png",
-    "48": "./assets/icon48.png",
-    "128": "./assets/icon128.png"
-  },
-  "permissions": ["activeTab", "scripting", "storage"],
+  "name": "Summa.tube",
+  "description": "Transcript and AI summaries of YouTube videos.",
   "action": {
-    "default_title": "SummaTube",
+    "default_popup": "src/pages/popup/index.html",
     "default_icon": {
-      "16": "./assets/icon16.png",
-      "48": "./assets/icon48.png",
-      "128": "./assets/icon128.png"
+      "48": "icon48.png"
     }
   },
-  "host_permissions": ["https://www.youtube.com/*"],
+  "icons": {
+    "128": "icon128.png"
+  },
+  "permissions": ["activeTab", "sidePanel"],
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/watch*"],
-      "js": ["content.js"],
-      "css": ["tailwind.min.css"]
+      "js": ["src/pages/content/index.tsx"]
     }
   ],
+  "side_panel": {
+    "default_path": "src/pages/panel/index.html"
+  },
   "web_accessible_resources": [
     {
-      "resources": ["assets/*"],
-      "matches": ["https://www.youtube.com/*"]
+      "resources": ["icon128.png", "icon48.png"],
+      "matches": []
     }
   ]
 }
