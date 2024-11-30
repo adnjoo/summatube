@@ -5,9 +5,9 @@ import { Bot, Captions, ChevronDown, Loader } from "lucide-react";
 const API_URL = "https://www.summa.tube/api/";
 
 const ACTIVE_TAB_CLASS =
-  "flex flex-row gap-4 px-4 py-2 text-sm font-medium border-b-2 border-blue-500 focus:outline-none items-center";
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-blue-500 items-center transition-all group";
 const INACTIVE_TAB_CLASS =
-  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 focus:outline-none items-center";
+  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent items-center transition-all group";
 const HIDDEN_SECTION_CLASS = "hidden";
 
 const TranscriptSummaryUI: React.FC = () => {
@@ -113,8 +113,13 @@ const TranscriptSummaryUI: React.FC = () => {
             }
             onClick={() => setActiveTab("transcript")}
           >
-            <Captions size={24} />
-            <span>Transcript</span>
+            <Captions
+              size={24}
+              className="dark:group-hover:stroke-white group-hover:stroke-black"
+            />
+            <span className="dark:group-hover:text-white group-hover:text-black">
+              Transcript
+            </span>
           </button>
           <button
             id="summary-tab"
@@ -123,18 +128,25 @@ const TranscriptSummaryUI: React.FC = () => {
             }
             onClick={() => setActiveTab("summary")}
           >
-            <Bot size={24} />
-            <span>Summary</span>
+            <Bot
+              size={24}
+              className="dark:group-hover:stroke-white group-hover:stroke-black"
+            />
+            <span className="dark:group-hover:text-white group-hover:text-black">
+              Summary
+            </span>
           </button>
         </div>
         <button
           id="toggle-button"
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700"
+          className="flex items-center justify-center w-8 h-8 rounded-full"
           onClick={toggleContent}
         >
           <ChevronDown
             size={24}
-            className={`${isContentHidden ? "rotate-180" : ""}`}
+            className={`${
+              isContentHidden ? "rotate-180" : ""
+            } transition-transform stroke-gray-300`}
           />
         </button>
       </div>
@@ -200,14 +212,11 @@ const TranscriptSummaryUI: React.FC = () => {
             )}
           </div>
         ) : (
-          <div id="summary-section" className="mt-4">
-            {summary ? (
-              <p>{summary}</p>
-            ) : (
-              <p className="text-gray-800 dark:text-gray-300">
-                No summary available.
-              </p>
-            )}
+          <div
+            id="summary-section"
+            className="mt-4 text-gray-800 dark:text-gray-300"
+          >
+            {summary ? <p>{summary}</p> : <p>No summary available.</p>}
           </div>
         )}
       </div>
