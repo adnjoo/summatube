@@ -153,7 +153,7 @@ const TranscriptSummaryUI: React.FC = () => {
 
       {/* Auto-Scroll Button - Fixed and under Transcript Tab */}
       {activeTab === 'transcript' && (
-        <div className='sticky top-[46px] z-50 bg-white p-3 shadow-lg dark:bg-gray-800'>
+        <div className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${isContentHidden ? HIDDEN_SECTION_CLASS : ''}`}>
           <button
             className={`px-4 py-2 text-sm font-medium ${
               isAutoScrollEnabled
