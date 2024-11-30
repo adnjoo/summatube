@@ -139,6 +139,22 @@ const TranscriptSummaryUI: React.FC = () => {
         </button>
       </div>
 
+      {/* Auto-Scroll Button - Fixed and under Transcript Tab */}
+      {activeTab === "transcript" && (
+        <div className="sticky top-[46px] z-50 bg-white dark:bg-gray-800 shadow-lg p-3">
+          <button
+            className={`px-4 py-2 text-sm font-medium ${
+              isAutoScrollEnabled
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-800"
+            } rounded`}
+            onClick={toggleAutoScroll}
+          >
+            {isAutoScrollEnabled ? "Disable Auto-Scroll" : "Enable Auto-Scroll"}
+          </button>
+        </div>
+      )}
+
       {/* Content */}
       <div
         id="content-container"
@@ -152,21 +168,6 @@ const TranscriptSummaryUI: React.FC = () => {
           </div>
         ) : activeTab === "transcript" ? (
           <div id="transcript-section" className="mt-4 relative">
-            {/* Auto-Scroll Toggle */}
-            <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 shadow-lg p-3 rounded-full">
-              <button
-                className={`px-4 py-2 text-sm font-medium ${
-                  isAutoScrollEnabled
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-800"
-                } rounded`}
-                onClick={toggleAutoScroll}
-              >
-                {isAutoScrollEnabled
-                  ? "Disable Auto-Scroll"
-                  : "Enable Auto-Scroll"}
-              </button>
-            </div>
             {transcript.length > 0 ? (
               transcript.map((interval, index) => (
                 <div
