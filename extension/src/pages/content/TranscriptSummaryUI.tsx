@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
-import Interval from "./Interval";
-import { Bot, Captions, ChevronDown, Loader } from "lucide-react";
+import React, { useState, useEffect, useRef } from 'react';
+import Interval from './Interval';
+import { Bot, Captions, ChevronDown, Loader } from 'lucide-react';
 
-const API_URL = "https://www.summa.tube/api/";
+const API_URL = 'https://www.summa.tube/api/';
 
 const ACTIVE_TAB_CLASS =
-  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-blue-500 items-center transition-all group";
+  'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-blue-500 items-center transition-all group';
 const INACTIVE_TAB_CLASS =
-  "flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent items-center transition-all group";
-const HIDDEN_SECTION_CLASS = "hidden";
+  'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent items-center transition-all group';
+const HIDDEN_SECTION_CLASS = 'hidden';
 
 const TranscriptSummaryUI: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"transcript" | "summary">(
-    "transcript"
+  const [activeTab, setActiveTab] = useState<'transcript' | 'summary'>(
+    'transcript'
   );
   const [transcript, setTranscript] = useState<any[]>([]);
-  const [summary, setSummary] = useState<string | null>("Loading...");
+  const [summary, setSummary] = useState<string | null>('Loading...');
   const [isContentHidden, setIsContentHidden] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
@@ -23,7 +23,7 @@ const TranscriptSummaryUI: React.FC = () => {
   const activeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const videoId = new URLSearchParams(window.location.search).get("v");
+    const videoId = new URLSearchParams(window.location.search).get('v');
     if (videoId) {
       setLoading(true);
       Promise.all([fetchTranscript(videoId), fetchSummary(videoId)])
@@ -32,7 +32,7 @@ const TranscriptSummaryUI: React.FC = () => {
           setSummary(summaryData);
         })
         .catch((error) => {
-          console.error("Error fetching data:", error);
+          console.error('Error fetching data:', error);
         })
         .finally(() => setLoading(false));
     }
@@ -41,18 +41,18 @@ const TranscriptSummaryUI: React.FC = () => {
   useEffect(() => {
     if (isAutoScrollEnabled && activeRef.current) {
       activeRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+        behavior: 'smooth',
+        block: 'center',
       });
     }
   }, [currentTime, isAutoScrollEnabled]);
 
   useEffect(() => {
-    const videoElement = document.getElementsByTagName("video")[0];
+    const videoElement = document.getElementsByTagName('video')[0];
     if (videoElement) {
       const updateTime = () => setCurrentTime(videoElement.currentTime);
-      videoElement.addEventListener("timeupdate", updateTime);
-      return () => videoElement.removeEventListener("timeupdate", updateTime);
+      videoElement.addEventListener('timeupdate', updateTime);
+      return () => videoElement.removeEventListener('timeupdate', updateTime);
     }
   }, []);
 
@@ -82,7 +82,7 @@ const TranscriptSummaryUI: React.FC = () => {
   };
 
   const handleTimestampClick = (time: number) => {
-    const videoElement = document.getElementsByTagName("video")[0];
+    const videoElement = document.getElementsByTagName('video')[0];
     if (videoElement) {
       videoElement.currentTime = time;
       videoElement.play();
@@ -100,86 +100,86 @@ const TranscriptSummaryUI: React.FC = () => {
 
   return (
     <div
-      id="custom-container"
-      className={`overflow-y-scroll bg-white dark:bg-gray-800 border rounded shadow-lg`}
+      id='custom-container'
+      className={`overflow-y-scroll rounded border bg-white shadow-lg dark:bg-gray-800`}
     >
       {/* Header with Tabs */}
-      <div className="flex justify-between items-center border-b sticky top-0 z-50 bg-white dark:bg-gray-800 px-4 py-2">
-        <div className="flex">
+      <div className='sticky top-0 z-50 flex items-center justify-between border-b bg-white px-4 py-2 dark:bg-gray-800'>
+        <div className='flex'>
           <button
-            id="transcript-tab"
+            id='transcript-tab'
             className={
-              activeTab === "transcript" ? ACTIVE_TAB_CLASS : INACTIVE_TAB_CLASS
+              activeTab === 'transcript' ? ACTIVE_TAB_CLASS : INACTIVE_TAB_CLASS
             }
-            onClick={() => setActiveTab("transcript")}
+            onClick={() => setActiveTab('transcript')}
           >
             <Captions
               size={24}
-              className="dark:group-hover:stroke-white group-hover:stroke-black"
+              className='group-hover:stroke-black dark:group-hover:stroke-white'
             />
-            <span className="dark:group-hover:text-white group-hover:text-black">
+            <span className='group-hover:text-black dark:group-hover:text-white'>
               Transcript
             </span>
           </button>
           <button
-            id="summary-tab"
+            id='summary-tab'
             className={
-              activeTab === "summary" ? ACTIVE_TAB_CLASS : INACTIVE_TAB_CLASS
+              activeTab === 'summary' ? ACTIVE_TAB_CLASS : INACTIVE_TAB_CLASS
             }
-            onClick={() => setActiveTab("summary")}
+            onClick={() => setActiveTab('summary')}
           >
             <Bot
               size={24}
-              className="dark:group-hover:stroke-white group-hover:stroke-black"
+              className='group-hover:stroke-black dark:group-hover:stroke-white'
             />
-            <span className="dark:group-hover:text-white group-hover:text-black">
+            <span className='group-hover:text-black dark:group-hover:text-white'>
               Summary
             </span>
           </button>
         </div>
         <button
-          id="toggle-button"
-          className="flex items-center justify-center w-8 h-8 rounded-full"
+          id='toggle-button'
+          className='flex h-8 w-8 items-center justify-center rounded-full'
           onClick={toggleContent}
         >
           <ChevronDown
             size={24}
             className={`${
-              isContentHidden ? "rotate-180" : ""
-            } transition-transform stroke-gray-300`}
+              isContentHidden ? 'rotate-180' : ''
+            } stroke-gray-300 transition-transform`}
           />
         </button>
       </div>
 
       {/* Auto-Scroll Button - Fixed and under Transcript Tab */}
-      {activeTab === "transcript" && (
-        <div className="sticky top-[46px] z-50 bg-white dark:bg-gray-800 shadow-lg p-3">
+      {activeTab === 'transcript' && (
+        <div className='sticky top-[46px] z-50 bg-white p-3 shadow-lg dark:bg-gray-800'>
           <button
             className={`px-4 py-2 text-sm font-medium ${
               isAutoScrollEnabled
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-800"
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-800'
             } rounded`}
             onClick={toggleAutoScroll}
           >
-            {isAutoScrollEnabled ? "Disable Auto-Scroll" : "Enable Auto-Scroll"}
+            {isAutoScrollEnabled ? 'Disable Auto-Scroll' : 'Enable Auto-Scroll'}
           </button>
         </div>
       )}
 
       {/* Content */}
       <div
-        id="content-container"
+        id='content-container'
         className={`h-[calc(100vh-170px)] px-4 ${
-          isContentHidden ? HIDDEN_SECTION_CLASS : ""
+          isContentHidden ? HIDDEN_SECTION_CLASS : ''
         }`}
       >
         {loading ? (
-          <div className="flex justify-center items-center h-full">
-            <Loader size={48} className="animate-spin text-blue-500" />
+          <div className='flex h-full items-center justify-center'>
+            <Loader size={48} className='animate-spin text-blue-500' />
           </div>
-        ) : activeTab === "transcript" ? (
-          <div id="transcript-section" className="mt-4 relative">
+        ) : activeTab === 'transcript' ? (
+          <div id='transcript-section' className='relative mt-4'>
             {transcript.length > 0 ? (
               transcript.map((interval, index) => (
                 <div
@@ -191,10 +191,10 @@ const TranscriptSummaryUI: React.FC = () => {
                         }
                       : null
                   }
-                  className={`p-2 rounded ${
+                  className={`rounded p-2 ${
                     activeTimestamp === interval
-                      ? "bg-blue-700" // Highlight the active section
-                      : "hover:bg-gray-700"
+                      ? 'bg-blue-700' // Highlight the active section
+                      : 'hover:bg-gray-700'
                   }`}
                 >
                   <Interval
@@ -206,15 +206,15 @@ const TranscriptSummaryUI: React.FC = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-800 dark:text-gray-300">
+              <p className='text-gray-800 dark:text-gray-300'>
                 No transcript available.
               </p>
             )}
           </div>
         ) : (
           <div
-            id="summary-section"
-            className="mt-4 text-gray-800 dark:text-gray-300"
+            id='summary-section'
+            className='mt-4 text-gray-800 dark:text-gray-300'
           >
             {summary ? <p>{summary}</p> : <p>No summary available.</p>}
           </div>
