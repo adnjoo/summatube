@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Interval from "./Interval";
 import { Bot, Captions, ChevronDown } from "lucide-react";
 
 const API_URL = "https://www.summa.tube/api/";
@@ -13,16 +14,14 @@ const TranscriptSummaryUI: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"transcript" | "summary">(
     "transcript"
   );
-  const [transcript, setTranscript] = useState<string | null>("Loading...");
+  const [transcript, setTranscript] = useState<any[]>([]);
   const [summary, setSummary] = useState<string | null>("Loading...");
   const [isContentHidden, setIsContentHidden] = useState(false);
 
   useEffect(() => {
     const videoId = new URLSearchParams(window.location.search).get("v");
     if (videoId) {
-      fetchTranscript(videoId).then((data) =>
-        setTranscript(formatTranscript(data))
-      );
+      fetchTranscript(videoId).then((data) => setTranscript(data));
       fetchSummary(videoId).then((data) => setSummary(data));
     }
   }, []);
@@ -44,31 +43,16 @@ const TranscriptSummaryUI: React.FC = () => {
     return data.summary;
   };
 
-  const formatTranscript = (intervals: any[]) => {
-    return intervals
-      .map(
-        (interval) => `
-          <p class="my-2 text-gray-800 dark:text-gray-300">
-            <a href="#" class="text-blue-500 hover:underline timestamp" data-start="${
-              interval.startTime
-            }">
-              ${formatTime(interval.startTime)} - ${formatTime(
-          interval.endTime
-        )}
-            </a>: ${interval.text}
-          </p>`
-      )
-      .join("");
-  };
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
   const toggleContent = () => {
     setIsContentHidden((prev) => !prev);
+  };
+
+  const handleTimestampClick = (time: number) => {
+    const videoElement = document.getElementsByTagName("video")[0];
+    if (videoElement) {
+      videoElement.currentTime = time;
+      videoElement.play();
+    }
   };
 
   return (
@@ -121,8 +105,16 @@ const TranscriptSummaryUI: React.FC = () => {
       >
         {activeTab === "transcript" ? (
           <div id="transcript-section" className="mt-4">
-            {transcript ? (
-              <div dangerouslySetInnerHTML={{ __html: transcript }} />
+            {transcript.length > 0 ? (
+              transcript.map((interval, index) => (
+                <Interval
+                  key={index}
+                  startTime={interval.startTime}
+                  endTime={interval.endTime}
+                  text={interval.text}
+                  onClick={handleTimestampClick}
+                />
+              ))
             ) : (
               <p className="text-gray-800 dark:text-gray-300">
                 Loading transcript...
