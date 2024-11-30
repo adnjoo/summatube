@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Interval from "./Interval";
 import { Bot, Captions, ChevronDown, Loader } from "lucide-react";
 
@@ -18,6 +18,9 @@ const TranscriptSummaryUI: React.FC = () => {
   const [summary, setSummary] = useState<string | null>("Loading...");
   const [isContentHidden, setIsContentHidden] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const activeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const videoId = new URLSearchParams(window.location.search).get("v");
@@ -32,6 +35,24 @@ const TranscriptSummaryUI: React.FC = () => {
           console.error("Error fetching data:", error);
         })
         .finally(() => setLoading(false));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isAutoScrollEnabled && activeRef.current) {
+      activeRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [currentTime, isAutoScrollEnabled]);
+
+  useEffect(() => {
+    const videoElement = document.getElementsByTagName("video")[0];
+    if (videoElement) {
+      const updateTime = () => setCurrentTime(videoElement.currentTime);
+      videoElement.addEventListener("timeupdate", updateTime);
+      return () => videoElement.removeEventListener("timeupdate", updateTime);
     }
   }, []);
 
@@ -56,6 +77,10 @@ const TranscriptSummaryUI: React.FC = () => {
     setIsContentHidden((prev) => !prev);
   };
 
+  const toggleAutoScroll = () => {
+    setIsAutoScrollEnabled((prev) => !prev);
+  };
+
   const handleTimestampClick = (time: number) => {
     const videoElement = document.getElementsByTagName("video")[0];
     if (videoElement) {
@@ -63,6 +88,15 @@ const TranscriptSummaryUI: React.FC = () => {
       videoElement.play();
     }
   };
+
+  const getActiveTimestamp = () => {
+    return transcript.find(
+      (interval) =>
+        currentTime >= interval.startTime && currentTime < interval.endTime
+    );
+  };
+
+  const activeTimestamp = getActiveTimestamp();
 
   return (
     <div
@@ -117,16 +151,41 @@ const TranscriptSummaryUI: React.FC = () => {
             <Loader size={48} className="animate-spin text-blue-500" />
           </div>
         ) : activeTab === "transcript" ? (
-          <div id="transcript-section" className="mt-4">
+          <div id="transcript-section" className="mt-4 relative">
+            {/* Auto-Scroll Toggle */}
+            <div className="sticky top-0 z-10 bg-white p-2 shadow">
+              <div className="flex items-center justify-between">
+                <button
+                  className={`px-3 py-1 text-sm font-medium ${
+                    isAutoScrollEnabled
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  } rounded`}
+                  onClick={toggleAutoScroll}
+                >
+                  {isAutoScrollEnabled ? "Disable Auto-Scroll" : "Enable Auto-Scroll"}
+                </button>
+              </div>
+            </div>
             {transcript.length > 0 ? (
               transcript.map((interval, index) => (
-                <Interval
+                <div
                   key={index}
-                  startTime={interval.startTime}
-                  endTime={interval.endTime}
-                  text={interval.text}
-                  onClick={handleTimestampClick}
-                />
+                  ref={
+                    activeTimestamp === interval
+                      ? (ref) => {
+                          activeRef.current = ref;
+                        }
+                      : null
+                  }
+                >
+                  <Interval
+                    startTime={interval.startTime}
+                    endTime={interval.endTime}
+                    text={interval.text}
+                    onClick={handleTimestampClick}
+                  />
+                </div>
               ))
             ) : (
               <p className="text-gray-800 dark:text-gray-300">
