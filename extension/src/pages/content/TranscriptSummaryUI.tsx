@@ -163,7 +163,9 @@ const TranscriptSummaryUI: React.FC = () => {
                   } rounded`}
                   onClick={toggleAutoScroll}
                 >
-                  {isAutoScrollEnabled ? "Disable Auto-Scroll" : "Enable Auto-Scroll"}
+                  {isAutoScrollEnabled
+                    ? "Disable Auto-Scroll"
+                    : "Enable Auto-Scroll"}
                 </button>
               </div>
             </div>
@@ -178,6 +180,11 @@ const TranscriptSummaryUI: React.FC = () => {
                         }
                       : null
                   }
+                  className={`p-2 rounded ${
+                    activeTimestamp === interval
+                      ? "bg-blue-700" // Highlight the active section
+                      : "hover:bg-gray-700"
+                  }`}
                 >
                   <Interval
                     startTime={interval.startTime}
