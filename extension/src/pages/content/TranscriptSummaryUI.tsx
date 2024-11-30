@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Interval from "./Interval";
-import { Bot, Captions, ChevronDown } from "lucide-react";
+import { Bot, Captions, ChevronDown, Loader } from "lucide-react";
 
 const API_URL = "https://www.summa.tube/api/";
 
@@ -17,12 +17,21 @@ const TranscriptSummaryUI: React.FC = () => {
   const [transcript, setTranscript] = useState<any[]>([]);
   const [summary, setSummary] = useState<string | null>("Loading...");
   const [isContentHidden, setIsContentHidden] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const videoId = new URLSearchParams(window.location.search).get("v");
     if (videoId) {
-      fetchTranscript(videoId).then((data) => setTranscript(data));
-      fetchSummary(videoId).then((data) => setSummary(data));
+      setLoading(true);
+      Promise.all([fetchTranscript(videoId), fetchSummary(videoId)])
+        .then(([transcriptData, summaryData]) => {
+          setTranscript(transcriptData);
+          setSummary(summaryData);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => setLoading(false));
     }
   }, []);
 
@@ -103,7 +112,11 @@ const TranscriptSummaryUI: React.FC = () => {
           isContentHidden ? HIDDEN_SECTION_CLASS : ""
         }`}
       >
-        {activeTab === "transcript" ? (
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <Loader size={48} className="animate-spin text-blue-500" />
+          </div>
+        ) : activeTab === "transcript" ? (
           <div id="transcript-section" className="mt-4">
             {transcript.length > 0 ? (
               transcript.map((interval, index) => (
@@ -117,7 +130,7 @@ const TranscriptSummaryUI: React.FC = () => {
               ))
             ) : (
               <p className="text-gray-800 dark:text-gray-300">
-                Loading transcript...
+                No transcript available.
               </p>
             )}
           </div>
@@ -127,7 +140,7 @@ const TranscriptSummaryUI: React.FC = () => {
               <p>{summary}</p>
             ) : (
               <p className="text-gray-800 dark:text-gray-300">
-                Loading summary...
+                No summary available.
               </p>
             )}
           </div>
