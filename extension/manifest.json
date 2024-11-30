@@ -11,7 +11,7 @@
   "icons": {
     "128": "icon128.png"
   },
-  "permissions": ["activeTab", "sidePanel"],
+  "permissions": ["activeTab", "sidePanel", "webNavigation"],
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/watch*"],

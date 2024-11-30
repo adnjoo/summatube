@@ -1,23 +1,44 @@
-import { createRoot } from "react-dom/client";
-import "./style.css";
-import TranscriptSummaryUI from "./TranscriptSummaryUI"; // Import the custom component
+import { createRoot } from 'react-dom/client';
+import './style.css';
+import TranscriptSummaryUI from './TranscriptSummaryUI';
+
+let reactRoot: ReturnType<typeof createRoot> | null = null; // Keep track of the React root
 
 const initializeReactApp = () => {
-  const secondarySection = document.querySelector("#secondary");
+  const secondarySection = document.querySelector('#secondary');
 
   if (!secondarySection) {
-    throw new Error("Can't find the secondary section element");
+    console.error("Can't find the secondary section element");
+    return;
   }
 
-  // Create a container for the React app
-  const appContainer = document.createElement("div");
-  appContainer.id = "__root";
-  secondarySection.prepend(appContainer);
+  // Check if the app container already exists
+  let appContainer = document.querySelector('#__root');
+  if (!appContainer) {
+    // If not, create a new one
+    appContainer = document.createElement('div');
+    appContainer.id = '__root';
+    secondarySection.prepend(appContainer);
+  } else {
+    // If it exists, unmount the previous React root
+    if (reactRoot) {
+      console.log('Unmounting old React root...');
+      reactRoot.unmount();
+    }
+  }
 
-  // Initialize React root and render the component
-  const root = createRoot(appContainer);
-  root.render(<TranscriptSummaryUI />);
+  console.log('Injecting React app...');
+  reactRoot = createRoot(appContainer); // Create a new React root
+  reactRoot.render(<TranscriptSummaryUI />);
 };
 
-// Run the function after a delay
-setTimeout(initializeReactApp, 1000);
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === 'initialize') {
+    console.log('Received initialize message. Initializing app...');
+    initializeReactApp();
+  }
+});
+
+// Initial check (in case the page is already loaded)
+initializeReactApp();
