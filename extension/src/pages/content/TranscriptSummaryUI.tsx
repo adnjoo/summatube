@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Interval from './Interval';
 import { Bot, Captions, ChevronDown, Loader } from 'lucide-react';
+import Interval from './Interval';
 
 const API_URL = 'https://www.summa.tube/api/';
 
@@ -8,7 +8,6 @@ const ACTIVE_TAB_CLASS =
   'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-blue-500 items-center transition-all group';
 const INACTIVE_TAB_CLASS =
   'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent items-center transition-all group';
-const HIDDEN_SECTION_CLASS = 'hidden';
 
 const TranscriptSummaryUI: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'transcript' | 'summary'>(
@@ -40,10 +39,28 @@ const TranscriptSummaryUI: React.FC = () => {
 
   useEffect(() => {
     if (isAutoScrollEnabled && activeRef.current) {
-      activeRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      const container = document.getElementById('custom-container');
+      const activeElement = activeRef.current;
+
+      if (container && activeElement) {
+        const containerBounds = container.getBoundingClientRect();
+        const activeBounds = activeElement.getBoundingClientRect();
+
+        // Check if the active element is outside the visible bounds of the container
+        if (
+          activeBounds.top < containerBounds.top ||
+          activeBounds.bottom > containerBounds.bottom
+        ) {
+          container.scrollTo({
+            top:
+              activeElement.offsetTop -
+              container.offsetTop -
+              container.clientHeight / 2 +
+              activeElement.clientHeight / 2,
+            behavior: 'smooth',
+          });
+        }
+      }
     }
   }, [currentTime, isAutoScrollEnabled]);
 
@@ -101,7 +118,7 @@ const TranscriptSummaryUI: React.FC = () => {
   return (
     <div
       id='custom-container'
-      className={`overflow-y-scroll rounded border bg-white shadow-lg dark:bg-gray-800`}
+      className='overflow-y-scroll rounded border bg-white shadow-lg dark:bg-gray-800'
     >
       {/* Header with Tabs */}
       <div className='sticky top-0 z-50 flex items-center justify-between border-b bg-white px-4 py-2 dark:bg-gray-800'>
@@ -153,7 +170,9 @@ const TranscriptSummaryUI: React.FC = () => {
 
       {/* Auto-Scroll Button - Fixed and under Transcript Tab */}
       {activeTab === 'transcript' && (
-        <div className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${isContentHidden ? HIDDEN_SECTION_CLASS : ''}`}>
+        <div
+          className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${isContentHidden ? 'hidden' : ''}`}
+        >
           <button
             className={`px-4 py-2 text-sm font-medium ${
               isAutoScrollEnabled
@@ -171,7 +190,7 @@ const TranscriptSummaryUI: React.FC = () => {
       <div
         id='content-container'
         className={`h-[calc(100vh-170px)] px-4 ${
-          isContentHidden ? HIDDEN_SECTION_CLASS : ''
+          isContentHidden ? 'hidden' : ''
         }`}
       >
         {loading ? (
