@@ -163,7 +163,7 @@ const TranscriptSummaryUI: React.FC = () => {
             size={24}
             className={`${
               isContentHidden ? 'rotate-180' : ''
-            } stroke-gray-300 transition-transform`}
+            } stroke-gray-300 transition-all hover:stroke-gray-500 dark:stroke-gray-500 dark:hover:stroke-gray-300`}
           />
         </button>
       </div>
