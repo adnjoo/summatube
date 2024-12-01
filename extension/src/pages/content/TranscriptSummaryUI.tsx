@@ -118,7 +118,7 @@ const TranscriptSummaryUI: React.FC = () => {
   return (
     <div
       id='custom-container'
-      className='overflow-y-scroll rounded border bg-white shadow-lg dark:bg-gray-800'
+      className='rounded border bg-white shadow-lg dark:bg-gray-800'
     >
       {/* Header with Tabs */}
       <div className='sticky top-0 z-50 flex items-center justify-between border-b bg-white px-4 py-2 dark:bg-gray-800'>
@@ -189,7 +189,7 @@ const TranscriptSummaryUI: React.FC = () => {
       {/* Content */}
       <div
         id='content-container'
-        className={`h-[calc(100vh-170px)] px-4 ${
+        className={`h-[calc(100vh-170px)] overflow-y-scroll px-4 ${
           isContentHidden ? 'hidden' : ''
         }`}
       >
