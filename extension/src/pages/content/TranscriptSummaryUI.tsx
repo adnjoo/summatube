@@ -39,7 +39,7 @@ const TranscriptSummaryUI: React.FC = () => {
 
   useEffect(() => {
     if (isAutoScrollEnabled && activeRef.current) {
-      const container = document.getElementById('custom-container');
+      const container = document.getElementById('content-container');
       const activeElement = activeRef.current;
 
       if (container && activeElement) {
