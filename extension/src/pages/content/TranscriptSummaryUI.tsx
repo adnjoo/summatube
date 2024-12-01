@@ -5,7 +5,7 @@ import Interval from './Interval';
 const API_URL = 'https://www.summa.tube/api/';
 
 const ACTIVE_TAB_CLASS =
-  'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-blue-500 items-center transition-all group';
+  'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-black border-b-2 border-blue-500 items-center transition-all group dark:text-white';
 const INACTIVE_TAB_CLASS =
   'flex flex-row gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent items-center transition-all group';
 
@@ -118,10 +118,10 @@ const TranscriptSummaryUI: React.FC = () => {
   return (
     <div
       id='custom-container'
-      className='rounded border bg-white shadow-lg dark:bg-gray-800'
+      className='rounded-md border border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800'
     >
       {/* Header with Tabs */}
-      <div className='sticky top-0 z-50 flex items-center justify-between border-b bg-white px-4 py-2 dark:bg-gray-800'>
+      <div className='sticky top-0 z-50 flex items-center justify-between rounded-md border-b bg-white px-4 py-2 dark:bg-gray-800'>
         <div className='flex'>
           <button
             id='transcript-tab'
