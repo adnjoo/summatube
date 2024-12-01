@@ -53,7 +53,7 @@ export function LikeButton({ summaryId, disabled = false }: LikeButtonProps) {
   }, [summaryId, userId]);
 
   const handleLikeClick = async () => {
-    if (!userId) return; // Prevent liking if not logged in
+    if (!userId || !summaryId) return; // Prevent liking if not logged in
 
     if (liked) {
       await supabase
