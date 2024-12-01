@@ -118,7 +118,7 @@ const TranscriptSummaryUI: React.FC = () => {
   return (
     <div
       id='custom-container'
-      className='rounded-md border border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800'
+      className='rounded-md border border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800 border-solid'
     >
       {/* Header with Tabs */}
       <div className='sticky top-0 z-50 flex items-center justify-between rounded-md border-b bg-white px-4 py-2 dark:bg-gray-800'>
