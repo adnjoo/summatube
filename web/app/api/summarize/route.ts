@@ -17,8 +17,6 @@ async function getYouTubeTranscript(video_id: string) {
   };
 }
 
-export const dynamic = 'force-dynamic'
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const video_id = searchParams.get('video_id') as string;
@@ -74,7 +72,14 @@ export async function GET(request: NextRequest) {
           summary: existingSummary.content,
           id: existingSummary.id,
         }),
-        { headers: { 'Content-Type': 'application/json' } }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        }
       );
     }
 
