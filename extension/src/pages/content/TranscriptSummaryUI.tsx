@@ -16,7 +16,8 @@ const TranscriptSummaryUI: React.FC = () => {
   const [transcript, setTranscript] = useState<any[]>([]);
   const [summary, setSummary] = useState<string | null>('Loading...');
   const [isContentHidden, setIsContentHidden] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [transcriptLoading, setTranscriptLoading] = useState<boolean>(true);
+  const [summaryLoading, setSummaryLoading] = useState<boolean>(true);
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const activeRef = useRef<HTMLDivElement | null>(null);
@@ -24,16 +25,29 @@ const TranscriptSummaryUI: React.FC = () => {
   useEffect(() => {
     const videoId = new URLSearchParams(window.location.search).get('v');
     if (videoId) {
-      setLoading(true);
-      Promise.all([fetchTranscript(videoId), fetchSummary(videoId)])
-        .then(([transcriptData, summaryData]) => {
+      // Fetch transcript and handle its loading state
+      setTranscriptLoading(true);
+      fetchTranscript(videoId)
+        .then((transcriptData) => {
           setTranscript(transcriptData);
+        })
+        .catch((error) => {
+          console.error('Error fetching transcript:', error);
+          setTranscript([]);
+        })
+        .finally(() => setTranscriptLoading(false));
+
+      // Fetch summary and handle its loading state
+      setSummaryLoading(true);
+      fetchSummary(videoId)
+        .then((summaryData) => {
           setSummary(summaryData);
         })
         .catch((error) => {
-          console.error('Error fetching data:', error);
+          console.error('Error fetching summary:', error);
+          setSummary('Failed to fetch summary.');
         })
-        .finally(() => setLoading(false));
+        .finally(() => setSummaryLoading(false));
     }
   }, []);
 
@@ -46,7 +60,6 @@ const TranscriptSummaryUI: React.FC = () => {
         const containerBounds = container.getBoundingClientRect();
         const activeBounds = activeElement.getBoundingClientRect();
 
-        // Check if the active element is outside the visible bounds of the container
         if (
           activeBounds.top < containerBounds.top ||
           activeBounds.bottom > containerBounds.bottom
@@ -118,7 +131,7 @@ const TranscriptSummaryUI: React.FC = () => {
   return (
     <div
       id='custom-container'
-      className='rounded-md border border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800 border-solid'
+      className='rounded-md border border-solid border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800'
     >
       {/* Header with Tabs */}
       <div className='sticky top-0 z-50 flex items-center justify-between rounded-md border-b bg-white px-4 py-2 dark:bg-gray-800'>
@@ -168,10 +181,12 @@ const TranscriptSummaryUI: React.FC = () => {
         </button>
       </div>
 
-      {/* Auto-Scroll Button - Fixed and under Transcript Tab */}
+      {/* Auto-Scroll Button */}
       {activeTab === 'transcript' && (
         <div
-          className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${isContentHidden ? 'hidden' : ''}`}
+          className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${
+            isContentHidden ? 'hidden' : ''
+          }`}
         >
           <button
             className={`px-4 py-2 text-sm font-medium ${
@@ -193,14 +208,14 @@ const TranscriptSummaryUI: React.FC = () => {
           isContentHidden ? 'hidden' : ''
         }`}
       >
-        {loading ? (
-          <div className='flex h-full items-center justify-center'>
-            <Loader size={48} className='animate-spin text-blue-500' />
-          </div>
-        ) : activeTab === 'transcript' ? (
-          <div id='transcript-section' className='relative mt-4'>
-            {transcript.length > 0 ? (
-              transcript.map((interval, index) => (
+        {activeTab === 'transcript' ? (
+          transcriptLoading ? (
+            <div className='flex h-full items-center justify-center'>
+              <Loader size={48} className='animate-spin text-blue-500' />
+            </div>
+          ) : transcript.length > 0 ? (
+            <div id='transcript-section' className='relative mt-4'>
+              {transcript.map((interval, index) => (
                 <div
                   key={index}
                   ref={
@@ -223,12 +238,16 @@ const TranscriptSummaryUI: React.FC = () => {
                     onClick={handleTimestampClick}
                   />
                 </div>
-              ))
-            ) : (
-              <p className='text-gray-800 dark:text-gray-300'>
-                No transcript available.
-              </p>
-            )}
+              ))}
+            </div>
+          ) : (
+            <p className='text-gray-800 dark:text-gray-300'>
+              No transcript available.
+            </p>
+          )
+        ) : summaryLoading ? (
+          <div className='flex h-full items-center justify-center'>
+            <Loader size={48} className='animate-spin text-blue-500' />
           </div>
         ) : (
           <div
