@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@src/helpers/supabase';
+import { useEffect, useState } from 'react';
+
+import { supabase } from '@/helpers/supabase';
 
 export default function Popup(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

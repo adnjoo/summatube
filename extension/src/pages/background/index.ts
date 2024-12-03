@@ -1,4 +1,4 @@
-import { parseUrlHash, supabase } from '@src/helpers';
+import { parseUrlHash, supabase } from '@/helpers';
 
 // Listen for navigation events on YouTube
 chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {

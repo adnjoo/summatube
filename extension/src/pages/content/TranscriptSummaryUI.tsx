@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Captions, ChevronDown, Loader } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import Interval from './Interval';
 
 const API_URL = 'https://www.summa.tube/api/';

@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
+
 import '@/globals.css';
-import TranscriptSummaryUI from './TranscriptSummaryUI';
+import TranscriptSummaryUI from '@/pages/content/TranscriptSummaryUI';
 
 let reactRoot: ReturnType<typeof createRoot> | null = null; // Keep track of the React root
 
