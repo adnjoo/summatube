@@ -11,7 +11,11 @@
   "icons": {
     "128": "icon128.png"
   },
-  "permissions": ["activeTab", "sidePanel", "webNavigation"],
+  "permissions": ["activeTab", "sidePanel", "webNavigation", "identity", "tabs", "storage"],
+  "oauth2": {
+    "client_id": "1008217284817-lvrcdp2fe69t1pptjdaclr9ko9oajbbd.apps.googleusercontent.com",
+    "scopes": ["openid", "email", "profile"]
+  },
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/watch*"],
