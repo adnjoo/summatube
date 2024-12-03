@@ -3,7 +3,6 @@
   "name": "Summa.tube",
   "description": "Transcript and AI summaries of YouTube videos.",
   "action": {
-    "default_popup": "src/pages/popup/index.html",
     "default_icon": {
       "48": "icon48.png"
     }
@@ -11,7 +10,8 @@
   "icons": {
     "128": "icon128.png"
   },
-  "permissions": ["activeTab", "sidePanel", "webNavigation", "identity", "tabs", "storage"],
+  "options_page": "src/pages/options/index.html",
+  "permissions": ["activeTab", "webNavigation", "identity", "tabs", "storage"],
   "oauth2": {
     "client_id": "1008217284817-lvrcdp2fe69t1pptjdaclr9ko9oajbbd.apps.googleusercontent.com",
     "scopes": ["openid", "email", "profile"]
@@ -22,9 +22,6 @@
       "js": ["src/pages/content/index.tsx"]
     }
   ],
-  "side_panel": {
-    "default_path": "src/pages/panel/index.html"
-  },
   "web_accessible_resources": [
     {
       "resources": ["icon128.png", "icon48.png"],
