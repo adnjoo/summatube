@@ -11,7 +11,7 @@
     "128": "icon128.png"
   },
   "options_page": "src/pages/options/index.html",
-  "permissions": ["activeTab", "webNavigation", "identity", "tabs", "storage"],
+  "permissions": ["activeTab", "webNavigation", "identity", "tabs", "storage", "nativeMessaging"],
   "oauth2": {
     "client_id": "1008217284817-lvrcdp2fe69t1pptjdaclr9ko9oajbbd.apps.googleusercontent.com",
     "scopes": ["openid", "email", "profile"]

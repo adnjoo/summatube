@@ -1,7 +1,9 @@
 import { Bot, Captions, ChevronDown, Loader } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
-import Interval from './Interval';
+import { useCheckSession } from '@/helpers/useCheckSession';
+import Interval from '@/pages/content/Interval';
+import { NonAuth } from '@/pages/content/NonAuth';
 
 const API_URL = 'https://www.summa.tube/api/';
 
@@ -22,35 +24,34 @@ const TranscriptSummaryUI: React.FC = () => {
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const activeRef = useRef<HTMLDivElement | null>(null);
+  const { isLoggedIn, loading } = useCheckSession();
 
   useEffect(() => {
-    const videoId = new URLSearchParams(window.location.search).get('v');
-    if (videoId) {
-      // Fetch transcript and handle its loading state
-      setTranscriptLoading(true);
-      fetchTranscript(videoId)
-        .then((transcriptData) => {
-          setTranscript(transcriptData);
-        })
-        .catch((error) => {
-          console.error('Error fetching transcript:', error);
-          setTranscript([]);
-        })
-        .finally(() => setTranscriptLoading(false));
+    if (isLoggedIn) {
+      const videoId = new URLSearchParams(window.location.search).get('v');
+      if (videoId) {
+        // Fetch transcript
+        setTranscriptLoading(true);
+        fetchTranscript(videoId)
+          .then((transcriptData) => setTranscript(transcriptData))
+          .catch((error) => {
+            console.error('Error fetching transcript:', error);
+            setTranscript([]);
+          })
+          .finally(() => setTranscriptLoading(false));
 
-      // Fetch summary and handle its loading state
-      setSummaryLoading(true);
-      fetchSummary(videoId)
-        .then((summaryData) => {
-          setSummary(summaryData);
-        })
-        .catch((error) => {
-          console.error('Error fetching summary:', error);
-          setSummary('Failed to fetch summary.');
-        })
-        .finally(() => setSummaryLoading(false));
+        // Fetch summary
+        setSummaryLoading(true);
+        fetchSummary(videoId)
+          .then((summaryData) => setSummary(summaryData))
+          .catch((error) => {
+            console.error('Error fetching summary:', error);
+            setSummary('Failed to fetch summary.');
+          })
+          .finally(() => setSummaryLoading(false));
+      }
     }
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (isAutoScrollEnabled && activeRef.current) {
@@ -104,14 +105,6 @@ const TranscriptSummaryUI: React.FC = () => {
     return data.summary;
   };
 
-  const toggleContent = () => {
-    setIsContentHidden((prev) => !prev);
-  };
-
-  const toggleAutoScroll = () => {
-    setIsAutoScrollEnabled((prev) => !prev);
-  };
-
   const handleTimestampClick = (time: number) => {
     const videoElement = document.getElementsByTagName('video')[0];
     if (videoElement) {
@@ -134,131 +127,145 @@ const TranscriptSummaryUI: React.FC = () => {
       id='custom-container'
       className='rounded-md border border-solid border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800'
     >
-      {/* Header with Tabs */}
-      <div className='sticky top-0 z-50 flex items-center justify-between rounded-md border-b bg-white px-4 py-2 dark:bg-gray-800'>
-        <div className='flex'>
-          <button
-            id='transcript-tab'
-            className={
-              activeTab === 'transcript' ? ACTIVE_TAB_CLASS : INACTIVE_TAB_CLASS
-            }
-            onClick={() => setActiveTab('transcript')}
-          >
-            <Captions
-              size={24}
-              className='group-hover:stroke-black dark:group-hover:stroke-white'
-            />
-            <span className='group-hover:text-black dark:group-hover:text-white'>
-              Transcript
-            </span>
-          </button>
-          <button
-            id='summary-tab'
-            className={
-              activeTab === 'summary' ? ACTIVE_TAB_CLASS : INACTIVE_TAB_CLASS
-            }
-            onClick={() => setActiveTab('summary')}
-          >
-            <Bot
-              size={24}
-              className='group-hover:stroke-black dark:group-hover:stroke-white'
-            />
-            <span className='group-hover:text-black dark:group-hover:text-white'>
-              Summary
-            </span>
-          </button>
+      {!isLoggedIn ? (
+        <div className='p-2'>
+          <NonAuth />
         </div>
-        <button
-          id='toggle-button'
-          className='flex h-8 w-8 items-center justify-center rounded-full'
-          onClick={toggleContent}
-        >
-          <ChevronDown
-            size={24}
-            className={`${
-              isContentHidden ? 'rotate-180' : ''
-            } stroke-gray-300 transition-all hover:stroke-gray-500 dark:stroke-gray-500 dark:hover:stroke-gray-300`}
-          />
-        </button>
-      </div>
-
-      {/* Auto-Scroll Button */}
-      {activeTab === 'transcript' && (
-        <div
-          className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${
-            isContentHidden ? 'hidden' : ''
-          }`}
-        >
-          <button
-            className={`px-4 py-2 text-sm font-medium ${
-              isAutoScrollEnabled
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-800'
-            } rounded`}
-            onClick={toggleAutoScroll}
-          >
-            {isAutoScrollEnabled ? 'Disable Auto-Scroll' : 'Enable Auto-Scroll'}
-          </button>
-        </div>
-      )}
-
-      {/* Content */}
-      <div
-        id='content-container'
-        className={`h-[calc(100vh-170px)] overflow-y-scroll px-4 ${
-          isContentHidden ? 'hidden' : ''
-        }`}
-      >
-        {activeTab === 'transcript' ? (
-          transcriptLoading ? (
-            <div className='flex h-full items-center justify-center'>
-              <Loader size={48} className='animate-spin text-blue-500' />
+      ) : (
+        <>
+          {/* Header with Tabs */}
+          <div className='sticky top-0 z-50 flex items-center justify-between rounded-md border-b bg-white px-4 py-2 dark:bg-gray-800'>
+            <div className='flex'>
+              <button
+                id='transcript-tab'
+                className={
+                  activeTab === 'transcript'
+                    ? ACTIVE_TAB_CLASS
+                    : INACTIVE_TAB_CLASS
+                }
+                onClick={() => setActiveTab('transcript')}
+              >
+                <Captions
+                  size={24}
+                  className='group-hover:stroke-black dark:group-hover:stroke-white'
+                />
+                <span className='group-hover:text-black dark:group-hover:text-white'>
+                  Transcript
+                </span>
+              </button>
+              <button
+                id='summary-tab'
+                className={
+                  activeTab === 'summary'
+                    ? ACTIVE_TAB_CLASS
+                    : INACTIVE_TAB_CLASS
+                }
+                onClick={() => setActiveTab('summary')}
+              >
+                <Bot
+                  size={24}
+                  className='group-hover:stroke-black dark:group-hover:stroke-white'
+                />
+                <span className='group-hover:text-black dark:group-hover:text-white'>
+                  Summary
+                </span>
+              </button>
             </div>
-          ) : transcript.length > 0 ? (
-            <div id='transcript-section' className='relative mt-4'>
-              {transcript.map((interval, index) => (
-                <div
-                  key={index}
-                  ref={
-                    activeTimestamp === interval
-                      ? (ref) => {
-                          activeRef.current = ref;
-                        }
-                      : null
-                  }
-                  className={`rounded p-2 ${
-                    activeTimestamp === interval
-                      ? 'bg-blue-700' // Highlight the active section
-                      : 'hover:bg-gray-700'
-                  }`}
-                >
-                  <Interval
-                    startTime={interval.startTime}
-                    endTime={interval.endTime}
-                    text={interval.text}
-                    onClick={handleTimestampClick}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className='text-gray-800 dark:text-gray-300'>
-              No transcript available.
-            </p>
-          )
-        ) : summaryLoading ? (
-          <div className='flex h-full items-center justify-center'>
-            <Loader size={48} className='animate-spin text-blue-500' />
+            <button
+              id='toggle-button'
+              className='flex h-8 w-8 items-center justify-center rounded-full'
+              onClick={() => setIsContentHidden((prev) => !prev)}
+            >
+              <ChevronDown
+                size={24}
+                className={`${
+                  isContentHidden ? 'rotate-180' : ''
+                } stroke-gray-300 transition-all hover:stroke-gray-500 dark:stroke-gray-500 dark:hover:stroke-gray-300`}
+              />
+            </button>
           </div>
-        ) : (
+
+          {/* Auto-Scroll Button */}
+          {activeTab === 'transcript' && (
+            <div
+              className={`sticky top-[46px] z-50 bg-white p-3 dark:bg-gray-800 ${
+                isContentHidden ? 'hidden' : ''
+              }`}
+            >
+              <button
+                className={`px-4 py-2 text-sm font-medium ${
+                  isAutoScrollEnabled
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                } rounded`}
+                onClick={() => setIsAutoScrollEnabled((prev) => !prev)}
+              >
+                {isAutoScrollEnabled
+                  ? 'Disable Auto-Scroll'
+                  : 'Enable Auto-Scroll'}
+              </button>
+            </div>
+          )}
+
+          {/* Content */}
           <div
-            id='summary-section'
-            className='mt-4 text-gray-800 dark:text-gray-300'
+            id='content-container'
+            className={`h-[calc(100vh-170px)] overflow-y-scroll px-4 ${
+              isContentHidden ? 'hidden' : ''
+            }`}
           >
-            {summary ? <p>{summary}</p> : <p>No summary available.</p>}
+            {activeTab === 'transcript' ? (
+              transcriptLoading ? (
+                <div className='flex h-full items-center justify-center'>
+                  <Loader size={48} className='animate-spin text-blue-500' />
+                </div>
+              ) : transcript.length > 0 ? (
+                <div id='transcript-section' className='relative mt-4'>
+                  {transcript.map((interval, index) => (
+                    <div
+                      key={index}
+                      ref={
+                        activeTimestamp === interval
+                          ? (ref) => {
+                              activeRef.current = ref;
+                            }
+                          : null
+                      }
+                      className={`rounded p-2 ${
+                        activeTimestamp === interval
+                          ? 'bg-blue-700' // Highlight the active section
+                          : 'hover:bg-gray-700'
+                      }`}
+                    >
+                      <Interval
+                        startTime={interval.startTime}
+                        endTime={interval.endTime}
+                        text={interval.text}
+                        onClick={handleTimestampClick}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className='text-gray-800 dark:text-gray-300'>
+                  No transcript available.
+                </p>
+              )
+            ) : summaryLoading ? (
+              <div className='flex h-full items-center justify-center'>
+                <Loader size={48} className='animate-spin text-blue-500' />
+              </div>
+            ) : (
+              <div
+                id='summary-section'
+                className='mt-4 text-gray-800 dark:text-gray-300'
+              >
+                {summary ? <p>{summary}</p> : <p>No summary available.</p>}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };

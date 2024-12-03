@@ -1,6 +1,7 @@
 import { parseUrlHash, supabase } from '@/helpers';
 
-const OPTIONS_URL = 'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/options/index.html';
+const OPTIONS_URL =
+  'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/options/index.html';
 
 // Redirect to panel
 chrome.action.onClicked.addListener(() => {
@@ -57,6 +58,16 @@ async function handleOAuthCallback(url) {
     console.error('Error during OAuth callback:', error.message);
   }
 }
+
+// Redirect on click if user is not authenticated
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('Message received in background script:', message);
+  if (message.type === 'GREETING') {
+    chrome.tabs.create({ url: OPTIONS_URL });
+  }
+  // Return true to indicate that you will send a response asynchronously
+  return true;
+});
 
 // Enable service worker in the background script (required for Manifest V3)
 export {};
