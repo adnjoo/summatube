@@ -1,12 +1,10 @@
 import { parseUrlHash, supabase } from '@/helpers';
 
+const OPTIONS_URL = 'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/options/index.html';
+
 // Redirect to panel
 chrome.action.onClicked.addListener(() => {
-  console.log('Opening panel...');
-  const url =
-    'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/options/index.html';
-
-  chrome.tabs.create({ url });
+  chrome.tabs.create({ url: OPTIONS_URL });
 });
 
 // Listen for navigation events on YouTube
@@ -51,7 +49,7 @@ async function handleOAuthCallback(url) {
 
     // Redirect to a friendly page
     chrome.tabs.update({
-      url: 'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/panel/index.html',
+      url: OPTIONS_URL,
     });
 
     console.log('OAuth callback handled successfully.');

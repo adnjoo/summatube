@@ -9,7 +9,7 @@ export default function Options(): JSX.Element {
   useEffect(() => {
     const checkSession = async () => {
       const { session } = await chrome.storage.local.get('session');
-      console.log('session', session);
+      // console.log('session', session);
       if (session) {
         const { error } = await supabase.auth.setSession(session);
         if (!error) {
@@ -34,9 +34,6 @@ export default function Options(): JSX.Element {
       });
 
       if (error) throw error;
-
-      // Open the OAuth URL in a new tab
-      await chrome.tabs.create({ url: data.url });
     } catch (error: any) {
       console.error('Login error:', error.message);
       alert('Login failed. Please try again.');
