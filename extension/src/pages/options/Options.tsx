@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { supabase } from '@/helpers/supabase';
 
-export default function Popup(): JSX.Element {
+export default function Options(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 

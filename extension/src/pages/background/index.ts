@@ -1,5 +1,14 @@
 import { parseUrlHash, supabase } from '@/helpers';
 
+// Redirect to panel
+chrome.action.onClicked.addListener(() => {
+  console.log('Opening panel...');
+  const url =
+    'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/options/index.html';
+
+  chrome.tabs.create({ url });
+});
+
 // Listen for navigation events on YouTube
 chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
   if (details.url && details.url.includes('youtube.com/watch')) {
@@ -41,7 +50,9 @@ async function handleOAuthCallback(url) {
     await chrome.storage.local.set({ session: data.session });
 
     // Redirect to a friendly page
-    chrome.tabs.update({ url: 'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/panel/index.html' });
+    chrome.tabs.update({
+      url: 'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/panel/index.html',
+    });
 
     console.log('OAuth callback handled successfully.');
   } catch (error: any) {
