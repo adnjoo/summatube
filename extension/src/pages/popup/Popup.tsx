@@ -42,12 +42,38 @@ export default function Popup(): JSX.Element {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      // Clear the session from local storage
+      await chrome.storage.local.remove('session');
+
+      // Update the state
+      setIsLoggedIn(false);
+      alert('Successfully logged out.');
+    } catch (error: any) {
+      console.error('Logout error:', error.message);
+      alert('Logout failed. Please try again.');
+    }
+  };
+
   return (
     <div className='p-4'>
       {loading ? (
         <p>Loading...</p>
       ) : isLoggedIn ? (
-        <h1 className='text-lg font-bold'>Welcome Back!</h1>
+        <>
+          <h1 className='text-lg font-bold'>Welcome Back!</h1>
+          <button
+            onClick={handleLogout}
+            className='mt-4 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600'
+          >
+            Logout
+          </button>
+        </>
       ) : (
         <>
           <h1 className='text-lg font-bold'>Login with Google</h1>

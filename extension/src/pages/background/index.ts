@@ -41,7 +41,7 @@ async function handleOAuthCallback(url) {
     await chrome.storage.local.set({ session: data.session });
 
     // Redirect to a friendly page
-    chrome.tabs.update({ url: 'https://your-app.com/login-success' });
+    chrome.tabs.update({ url: 'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/panel/index.html' });
 
     console.log('OAuth callback handled successfully.');
   } catch (error: any) {
