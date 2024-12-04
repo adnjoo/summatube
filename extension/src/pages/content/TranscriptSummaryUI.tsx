@@ -18,7 +18,7 @@ const TranscriptSummaryUI: React.FC = () => {
     'transcript'
   );
   const [transcript, setTranscript] = useState<any[]>([]);
-  const [summary, setSummary] = useState<string | null>('Loading...');
+  const [summary, setSummary] = useState<any>(null);
   const [transcriptLoading, setTranscriptLoading] = useState<boolean>(true);
   const [summaryLoading, setSummaryLoading] = useState<boolean>(true);
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
@@ -60,9 +60,18 @@ const TranscriptSummaryUI: React.FC = () => {
   };
 
   const fetchSummary = async (videoId: string) => {
-    const response = await fetch(`${API_URL}summarize?video_id=${videoId}`);
+    const {
+      session: { access_token },
+    } = await chrome.storage.local.get('session');
+
+    const response = await fetch(`${API_URL}summarize?extension=true&video_id=${videoId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
     const data = await response.json();
-    return data.summary;
+    return data;
   };
 
   const handleTimestampClick = (time: number) => {
