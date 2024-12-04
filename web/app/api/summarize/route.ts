@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
 import { fetchTranscript } from '@/app/api/summarize/fetchTranscript';
@@ -17,18 +18,56 @@ async function getYouTubeTranscript(video_id: string) {
   };
 }
 
+// OPTIONS request for CORS
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*', // Replace '*' with the Chrome extension origin for stricter security
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const video_id = searchParams.get('video_id') as string;
+  const extension = searchParams.get('extension') === 'true';
   const save = searchParams.get('save') === 'true';
   const supabase = await createClient();
+  let userId: string | null = null;
 
-  // Fetch the authenticated user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!extension) {
+    // Fetch the authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const userId = user ? user.id : null;
+    userId = user ? user.id : null;
+  } else {
+    // Extract the user ID from the token
+    const access_token = request.headers
+      .get('Authorization')
+      ?.split('Bearer ')[1];
+
+    if (!access_token) {
+      return new Response(JSON.stringify({ error: 'Missing access_token' }), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+
+    // Supabase JWT Secret (keep this secure)
+    const JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
+
+    // Verify the token
+    const decodedToken = jwt.verify(access_token, JWT_SECRET);
+
+    // console.log('Decoded Token:', decodedToken);
+
+    userId = decodedToken['sub'];
+  }
 
   try {
     // Step 1: Check if the video exists in `videos`; insert if it doesn’t
