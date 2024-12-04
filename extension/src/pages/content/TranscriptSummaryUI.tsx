@@ -92,8 +92,13 @@ const TranscriptSummaryUI: React.FC = () => {
                 }
                 onClick={() => setActiveTab('transcript')}
               >
-                <Captions size={24} />
-                Transcript
+                <Captions
+                  size={24}
+                  className='group-hover:stroke-black dark:group-hover:stroke-white'
+                />
+                <span className='group-hover:text-black dark:group-hover:text-white'>
+                  Transcript
+                </span>
               </button>
               <button
                 className={
@@ -103,8 +108,13 @@ const TranscriptSummaryUI: React.FC = () => {
                 }
                 onClick={() => setActiveTab('summary')}
               >
-                <Bot size={24} />
-                Summary
+                <Bot
+                  size={24}
+                  className='group-hover:stroke-black dark:group-hover:stroke-white'
+                />
+                <span className='group-hover:text-black dark:group-hover:text-white'>
+                  Summary
+                </span>
               </button>
             </div>
             <div className='flex gap-1'>
