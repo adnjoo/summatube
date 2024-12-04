@@ -58,12 +58,10 @@ export default function Options(): JSX.Element {
   };
 
   return (
-    <div className='mx-auto mt-12 max-w-sm rounded-lg bg-white p-6 shadow-md'>
-      <img
-        src='/icon128.png'
-        alt='Extension Icon'
-        className='mx-auto h-16 w-16'
-      />
+    <div className='mx-auto mt-12 flex max-w-sm flex-col items-center rounded-lg bg-white p-6 shadow-md'>
+      <a href='https://summa.tube' target='_blank' rel='noreferrer noopener'>
+        <img src='/icon128.png' alt='Extension Icon' className='h-16 w-16' />
+      </a>
       <h1 className='mt-4 text-center text-xl font-bold text-gray-800'>
         Summatube Extension
       </h1>
