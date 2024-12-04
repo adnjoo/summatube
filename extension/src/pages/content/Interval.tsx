@@ -1,10 +1,13 @@
 import React from 'react';
 
+import { cn } from '@/helpers/cn';
+
 interface IntervalProps {
   startTime: number;
   endTime: number;
   text: string;
   onClick: (time: number) => void;
+  active: boolean;
 }
 
 const Interval: React.FC<IntervalProps> = ({
@@ -12,6 +15,7 @@ const Interval: React.FC<IntervalProps> = ({
   endTime,
   text,
   onClick,
+  active,
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -20,7 +24,12 @@ const Interval: React.FC<IntervalProps> = ({
   };
 
   return (
-    <p className='my-2 text-gray-800 dark:text-gray-300'>
+    <p
+      className={cn(
+        'my-2 text-gray-800 dark:text-gray-300',
+        active ? '!text-white' : ''
+      )}
+    >
       <button
         className='text-blue-500 hover:underline'
         onClick={() => onClick(startTime)}
