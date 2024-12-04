@@ -24,7 +24,7 @@ const TranscriptSummaryUI: React.FC = () => {
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const activeRef = useRef<HTMLDivElement | null>(null);
-  const { isLoggedIn, loading } = useCheckSession();
+  const { isLoggedIn, loading, pfpUrl } = useCheckSession();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -171,18 +171,25 @@ const TranscriptSummaryUI: React.FC = () => {
                 </span>
               </button>
             </div>
-            <button
-              id='toggle-button'
-              className='flex h-8 w-8 items-center justify-center rounded-full'
-              onClick={() => setIsContentHidden((prev) => !prev)}
-            >
-              <ChevronDown
-                size={24}
-                className={`${
-                  isContentHidden ? 'rotate-180' : ''
-                } stroke-gray-300 transition-all hover:stroke-gray-500 dark:stroke-gray-500 dark:hover:stroke-gray-300`}
+            <div className='flex gap-1'>
+              <img
+                src={pfpUrl}
+                alt='Profile'
+                className='h-8 w-8 rounded-full'
               />
-            </button>
+              <button
+                id='toggle-button'
+                className='flex h-8 w-8 items-center justify-center rounded-full'
+                onClick={() => setIsContentHidden((prev) => !prev)}
+              >
+                <ChevronDown
+                  size={24}
+                  className={`${
+                    isContentHidden ? 'rotate-180' : ''
+                  } stroke-gray-300 transition-all hover:stroke-gray-500 dark:stroke-gray-500 dark:hover:stroke-gray-300`}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Auto-Scroll Button */}
