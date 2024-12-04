@@ -8,17 +8,21 @@ export default function Options(): JSX.Element {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { session } = await chrome.storage.local.get('session');
-      // console.log('session', session);
-      if (session) {
-        const { error } = await supabase.auth.setSession(session);
-        if (!error) {
-          setIsLoggedIn(true);
-        } else {
-          console.error('Error restoring session:', error.message);
+      try {
+        const { session } = await chrome.storage.local.get('session');
+        if (session) {
+          const { error } = await supabase.auth.setSession(session);
+          if (error) {
+            console.error('Error restoring session:', error.message);
+          } else {
+            setIsLoggedIn(true);
+          }
         }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false); // Ensure loading is stopped
     };
 
     checkSession();
@@ -32,7 +36,6 @@ export default function Options(): JSX.Element {
           redirectTo: chrome.identity.getRedirectURL(),
         },
       });
-
       if (error) throw error;
     } catch (error: any) {
       console.error('Login error:', error.message);
@@ -42,14 +45,10 @@ export default function Options(): JSX.Element {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Clear the session from local storage
       await chrome.storage.local.remove('session');
-
-      // Update the state
       setIsLoggedIn(false);
       alert('Successfully logged out.');
     } catch (error: any) {
@@ -59,29 +58,38 @@ export default function Options(): JSX.Element {
   };
 
   return (
-    <div className='p-4'>
+    <div className='mx-auto mt-12 flex max-w-sm flex-col items-center rounded-lg bg-white p-6 shadow-md'>
+      <a href='https://summa.tube' target='_blank' rel='noreferrer noopener'>
+        <img src='/icon128.png' alt='Extension Icon' className='h-16 w-16' />
+      </a>
+      <h1 className='mt-4 text-center text-xl font-bold text-gray-800'>
+        Summatube Extension
+      </h1>
+      <p className='mt-2 text-center text-gray-600'>
+        AI-powered YouTube summary at your fingertips.
+      </p>
       {loading ? (
-        <p>Loading...</p>
+        <p className='mt-4 text-center text-gray-600'>Loading...</p>
       ) : isLoggedIn ? (
-        <>
-          <h1 className='text-lg font-bold'>Welcome Back!</h1>
+        <div className='text-center'>
+          <h2 className='mt-4 text-lg font-semibold'>Welcome Back!</h2>
           <button
             onClick={handleLogout}
-            className='mt-4 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600'
+            className='mt-4 rounded bg-red-500 px-6 py-2 text-white transition hover:bg-red-600'
           >
             Logout
           </button>
-        </>
+        </div>
       ) : (
-        <>
-          <h1 className='text-lg font-bold'>Login with Google</h1>
+        <div className='text-center'>
+          <h2 className='mt-4 text-lg font-semibold'>Login with Google</h2>
           <button
             onClick={handleLogin}
-            className='rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
+            className='mt-4 rounded bg-blue-500 px-6 py-2 text-white transition hover:bg-blue-600'
           >
             Login
           </button>
-        </>
+        </div>
       )}
     </div>
   );

@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Summa.tube",
   "description": "Transcript and AI summaries of YouTube videos.",
+  "version": "0.1",
   "action": {
     "default_icon": {
       "48": "icon48.png"
