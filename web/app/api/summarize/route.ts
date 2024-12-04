@@ -128,24 +128,25 @@ export async function GET(request: NextRequest) {
 
     // Step 4: Save the new summary in `summaries` if `save` is true
     let newSummary;
-    if (save && userId) {
-      const insertData = {
-        video_id: videoIdInDb,
-        user_id: userId,
-        content: summaryContent,
-      };
 
-      const { data, error: insertError } = await supabase
-        .from('summaries')
-        .insert(insertData)
-        .select('id')
-        .single();
+    const insertData = {
+      video_id: videoIdInDb,
+      user_id: userId || null,
+      content: summaryContent,
+    };
 
-      if (insertError) {
-        console.error('Error saving to summaries:', insertError);
-      } else {
-        newSummary = data;
+    const { data, error: insertError } = await supabase
+      .from('summaries')
+      .insert(insertData)
+      .select('id')
+      .single();
 
+    if (insertError) {
+      console.error('Error saving to summaries:', insertError);
+    } else {
+      newSummary = data;
+
+      if (userId) {
         // Auto-like the summary if successfully created
         const { error: likeError } = await supabase
           .from('summary_likes')
