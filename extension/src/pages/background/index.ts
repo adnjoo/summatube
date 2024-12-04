@@ -46,7 +46,7 @@ async function handleOAuthCallback(url) {
     if (error) throw error;
 
     // Save session in local storage
-    await chrome.storage.local.set({ session: data.session });
+    await chrome.storage.local.set({ session: data.session, refresh_token });
 
     // Redirect to a friendly page
     chrome.tabs.update({
@@ -68,6 +68,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Return true to indicate that you will send a response asynchronously
   return true;
 });
+
+// async function refreshToken() {
+//   try {
+//     const { refresh_token, expires_at } =
+//       (await chrome.storage.local.get(['refresh_token', 'expires_at'])) || {};
+//     if (!refresh_token) {
+//       throw new Error('No refresh token found.');
+//     }
+
+//     // Refresh token if it’s about to expire in the next 5 minutes
+//     if (Date.now() > expires_at - 5 * 60 * 1000) {
+//       console.log('Refreshing token...');
+//       const { data, error } = await supabase.auth.refreshSession({
+//         refresh_token,
+//       });
+//       if (error) throw error;
+
+//       // Update storage with the new tokens
+//       await chrome.storage.local.set({
+//         session: data.session,
+//         refresh_token: data.session.refresh_token,
+//         expires_at: Date.now() + data.session.expires_in * 1000, // Update expiration time
+//       });
+
+//       console.log('Token refreshed successfully.');
+//     }
+//   } catch (error: any) {
+//     console.error('Error refreshing token:', error.message);
+//   }
+// }
+
+// // Set an interval to check and refresh the token
+// setInterval(refreshToken, 5 * 60 * 1000); // Run every 5 minutes
 
 // Enable service worker in the background script (required for Manifest V3)
 export {};

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FiThumbsUp } from 'react-icons/fi';
 
 import { supabase } from '@/helpers';
 import useUser from '@/helpers/useUser';
@@ -32,25 +33,36 @@ export const LikeButton = ({ summaryId }) => {
   const handleLikeClick = async () => {
     if (!userId || !summaryId) return;
 
-    if (liked) {
-      await supabase
-        .from('summary_likes')
-        .delete()
-        .eq('summary_id', summaryId)
-        .eq('user_id', userId);
-    } else {
-      await supabase.from('summary_likes').insert({
-        summary_id: summaryId,
-        user_id: userId,
-      });
-    }
+    try {
+      if (liked) {
+        await supabase
+          .from('summary_likes')
+          .delete()
+          .eq('summary_id', summaryId)
+          .eq('user_id', userId);
+      } else {
+        await supabase.from('summary_likes').insert({
+          summary_id: summaryId,
+          user_id: userId,
+        });
+      }
 
-    setLiked((prev) => !prev);
+      setLiked((prev) => !prev);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
   };
 
   return (
-    <button onClick={handleLikeClick}>
-      {liked ? 'Unlike' : 'Like'}
+    <button
+      onClick={handleLikeClick}
+      className={`flex items-center gap-2 rounded border px-4 py-2 transition ${
+        liked ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+      } hover:bg-blue-600 hover:text-white`}
+    >
+      <FiThumbsUp
+        className={`${liked ? 'text-white' : 'text-gray-500'} transition`}
+      />
     </button>
   );
 };
