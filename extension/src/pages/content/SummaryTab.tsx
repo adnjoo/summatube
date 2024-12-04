@@ -12,7 +12,7 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ summary, summaryLoading }) => {
   if (summaryLoading) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <Loader size={48} className='animate-spin text-blue-500' />asd
+        <Loader size={48} className='animate-spin text-blue-500' />
       </div>
     );
   }
