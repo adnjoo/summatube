@@ -18,7 +18,7 @@ export const LikeButton = ({ summaryId }) => {
           .select('*')
           .eq('summary_id', summaryId)
           .eq('user_id', userId)
-          .single();
+          .maybeSingle();
 
         setLiked(!!likeData);
       } catch (error) {
