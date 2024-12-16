@@ -1,7 +1,7 @@
 import { parseUrlHash, supabase } from '@/helpers';
 
 const OPTIONS_URL =
-  'chrome-extension://pflnhnplhknlnolfdadeggidfblffipc/src/pages/options/index.html';
+  'chrome-extension://aioabfnakidnpddenbpgcdklgpaajbha/src/pages/options/index.html';
 
 // Redirect to panel
 chrome.action.onClicked.addListener(() => {
