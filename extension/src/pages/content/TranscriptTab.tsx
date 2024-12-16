@@ -85,8 +85,8 @@ const TranscriptTab: React.FC<TranscriptTabProps> = ({
           }
           className={`rounded p-2 ${
             activeTimestamp === interval
-              ? 'bg-blue-700 text-white' // Highlight the active section
-              : 'hover:bg-gray-700'
+              ? 'outline outline-1 outline-black dark:bg-blue-700 dark:text-white' // Highlight the active section
+              : 'hover:bg-gray-300 dark:hover:bg-gray-700' // Hover effect
           }`}
         >
           <Interval
@@ -94,6 +94,7 @@ const TranscriptTab: React.FC<TranscriptTabProps> = ({
             endTime={interval.endTime}
             text={interval.text}
             onClick={handleTimestampClick}
+            active={activeTimestamp === interval}
           />
         </div>
       ))}
