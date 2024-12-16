@@ -1,4 +1,4 @@
-import { Bot, Captions, ChevronDown } from 'lucide-react';
+import { ArrowDownNarrowWide, Bot, Captions, ChevronDown } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { useCheckSession } from '@/helpers/useCheckSession';
@@ -165,9 +165,17 @@ const TranscriptSummaryUI: React.FC = () => {
                 } rounded`}
                 onClick={() => setIsAutoScrollEnabled((prev) => !prev)}
               >
-                {isAutoScrollEnabled
-                  ? 'Disable Auto-Scroll'
-                  : 'Enable Auto-Scroll'}
+                {isAutoScrollEnabled ? (
+                  <>
+                    <ArrowDownNarrowWide size={16} className='inline' />
+                    <span className='ml-2'>Disable Auto-Scroll</span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownNarrowWide size={16} className='inline' />
+                    <span className='ml-2'>Enable Auto-Scroll</span>
+                  </>
+                )}
               </button>
             </div>
           )}

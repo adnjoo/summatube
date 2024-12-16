@@ -1,13 +1,10 @@
 import React from 'react';
 
-import { cn } from '@/helpers/cn';
-
 interface IntervalProps {
   startTime: number;
   endTime: number;
   text: string;
   onClick: (time: number) => void;
-  active: boolean;
 }
 
 const Interval: React.FC<IntervalProps> = ({
@@ -15,7 +12,6 @@ const Interval: React.FC<IntervalProps> = ({
   endTime,
   text,
   onClick,
-  active,
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
