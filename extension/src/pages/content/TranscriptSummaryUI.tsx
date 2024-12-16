@@ -64,12 +64,15 @@ const TranscriptSummaryUI: React.FC = () => {
       session: { access_token },
     } = await chrome.storage.local.get('session');
 
-    const response = await fetch(`${API_URL}summarize?extension=true&video_id=${videoId}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
+    const response = await fetch(
+      `${API_URL}summarize?extension=true&video_id=${videoId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
     const data = await response.json();
     return data;
   };
@@ -105,7 +108,7 @@ const TranscriptSummaryUI: React.FC = () => {
                   size={24}
                   className='group-hover:stroke-black dark:group-hover:stroke-white'
                 />
-                <span className='group-hover:text-black dark:group-hover:text-white'>
+                <span className='text-xl group-hover:text-black dark:group-hover:text-white'>
                   Transcript
                 </span>
               </button>
@@ -121,7 +124,7 @@ const TranscriptSummaryUI: React.FC = () => {
                   size={24}
                   className='group-hover:stroke-black dark:group-hover:stroke-white'
                 />
-                <span className='group-hover:text-black dark:group-hover:text-white'>
+                <span className='text-xl group-hover:text-black dark:group-hover:text-white'>
                   Summary
                 </span>
               </button>

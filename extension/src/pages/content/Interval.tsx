@@ -24,12 +24,7 @@ const Interval: React.FC<IntervalProps> = ({
   };
 
   return (
-    <p
-      className={cn(
-        'my-2 text-gray-800 dark:text-gray-300',
-        active ? '!text-white' : ''
-      )}
-    >
+    <p className='my-2 text-2xl text-gray-800 dark:text-gray-300'>
       <button
         className='text-blue-500 hover:underline'
         onClick={() => onClick(startTime)}
