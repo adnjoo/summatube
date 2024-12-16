@@ -86,7 +86,7 @@ const TranscriptSummaryUI: React.FC = () => {
   };
 
   return (
-    <div className='rounded-md border border-solid border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800'>
+    <div className='my-2 h-[calc(100vh-170px)] overflow-y-hidden rounded-md border border-solid border-gray-300 bg-white shadow-lg dark:!border-gray-600 dark:bg-gray-800'>
       {!isLoggedIn ? (
         <div className='p-2'>
           <NonAuth />
