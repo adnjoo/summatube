@@ -18,7 +18,7 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ summary, summaryLoading }) => {
   }
 
   return (
-    <div id='summary-section' className='mt-4 text-gray-800 dark:text-gray-300'>
+    <div id='summary-section' className='mt-4 text-gray-800 text-2xl dark:text-gray-300'>
       {summary ? <p>{summary?.summary}</p> : <p>No summary available.</p>}
       <LikeButton summaryId={summary?.id} />
     </div>
