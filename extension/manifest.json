@@ -23,6 +23,9 @@
       "js": ["src/pages/content/index.tsx"]
     }
   ],
+  "background": {
+    "service_worker": "src/pages/background/index.ts"
+  },
   "web_accessible_resources": [
     {
       "resources": ["icon128.png", "icon48.png"],
