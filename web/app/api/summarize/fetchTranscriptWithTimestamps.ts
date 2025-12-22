@@ -1,31 +1,27 @@
-import { Innertube } from 'youtubei.js/web';
+import YouTubeTranscriptApi from 'youtube-captions-api';
 
 export const fetchTranscriptWithTimestamps = async (video_id: string) => {
-  const youtube = await Innertube.create({
-    lang: 'en',
-    location: 'US',
-    retrieve_player: false,
-  });
+  const api = new YouTubeTranscriptApi();
+  // Optional: for cloud deployments
+  // const api = new YouTubeTranscriptApi('http://user:pass@residential-ip:port');
 
   try {
-    const info = await youtube.getInfo(video_id);
-    const transcriptData = await info.getTranscript();
+    const transcript = await api.fetch(video_id, {
+      languages: ['en'], // You can add more fallbacks: ['en', 'en-GB']
+    });
 
-    const segments: any =
-      transcriptData?.transcript?.content?.body?.initial_segments.map(
-        (segment: any) => ({
-          start_ms: segment.start_ms, // Start time in ms
-          end_ms: segment.end_ms, // End time in ms
-          snippet: segment.snippet?.text?.trim(), // Trim leading and trailing spaces
-          start_time_text: segment.start_time_text?.text, // Pre-formatted time
-          target_id: segment.target_id, // Optional navigation ID
-        })
-      );
+    // Raw timed segments (start/duration in seconds)
+    const segments = transcript.snippets.map((seg) => ({
+      start_ms: Math.round(seg.start * 1000),
+      end_ms: Math.round((seg.start + seg.duration) * 1000),
+      snippet: seg.text.trim(),
+      start_time_text: formatTime(seg.start), // Helper below
+    }));
 
-    // Convert to seconds and group by 30-second intervals
-    const groupedByInterval = segments.reduce((acc, segment) => {
-      const startTime = parseInt(segment.start_ms, 10) / 1000; // Convert ms to seconds
-      const intervalIndex = Math.floor(startTime / 30); // Determine the 30-second interval
+    // Group by 30-second intervals (same logic as your original code)
+    const groupedByInterval = segments.reduce((acc: any[], segment: any) => {
+      const startTimeSec = segment.start_ms / 1000;
+      const intervalIndex = Math.floor(startTimeSec / 30);
 
       if (!acc[intervalIndex]) {
         acc[intervalIndex] = {
@@ -35,19 +31,26 @@ export const fetchTranscriptWithTimestamps = async (video_id: string) => {
         };
       }
 
-      acc[intervalIndex].text.push(segment.snippet); // Add transcript text to the interval
+      acc[intervalIndex].text.push(segment.snippet);
 
       return acc;
     }, []);
 
-    // Convert to an array
+    // Convert to clean array
     return Object.values(groupedByInterval).map((interval: any) => ({
       startTime: interval.startTime,
       endTime: interval.endTime,
-      text: interval.text.join(' ').replace(/\s+/g, ' '), // Join and normalize spaces
+      text: interval.text.join(' ').replace(/\s+/g, ' ').trim(),
     }));
   } catch (error) {
     console.error('Error fetching transcript:', error);
     throw error;
   }
 };
+
+// Helper to format seconds → "0:12" or "12:34"
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `0:${secs.toString().padStart(2, '0')}`;
+}

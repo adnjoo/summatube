@@ -40,7 +40,7 @@
     "stripe": "^17.3.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "youtubei.js": "^10.3.0"
+    "youtube-captions-api": "^1.0.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
