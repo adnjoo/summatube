@@ -1,7 +1,7 @@
-import YouTubeTranscriptApi from 'youtube-captions-api';
+import { getTranscriptApi } from './transcriptClient';
 
 export const fetchTranscriptWithTimestamps = async (video_id: string) => {
-  const api = new YouTubeTranscriptApi();
+  const api = getTranscriptApi();
   // Optional: for cloud deployments
   // const api = new YouTubeTranscriptApi('http://user:pass@residential-ip:port');
 
