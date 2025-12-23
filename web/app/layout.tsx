@@ -11,10 +11,41 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: AppConfig.META.TITLE,
   description: AppConfig.META.DESCRIPTION,
+  keywords: [
+    'YouTube summary',
+    'YouTube transcript',
+    'AI video summary',
+    'Chrome extension',
+    'video summarizer',
+    'YouTube AI',
+    'video transcripts',
+    'YouTube captions',
+    'video summarization tool',
+    'YouTube helper extension',
+  ],
+  authors: [{ name: AppConfig.APP_NAME }],
+  creator: AppConfig.APP_NAME,
+  publisher: AppConfig.APP_NAME,
+  metadataBase: new URL(AppConfig.SITE_URL),
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   twitter: {
     card: 'summary_large_image',
     site: AppConfig.SOCIAL.X,
-    title: AppConfig.APP_NAME,
+    title: AppConfig.META.TITLE,
+    description: AppConfig.META.DESCRIPTION,
     creator: AppConfig.SOCIAL.X,
     images: {
       url: `${AppConfig.SITE_URL}/x-image.png`,
@@ -26,6 +57,7 @@ export const metadata: Metadata = {
     description: AppConfig.META.DESCRIPTION,
     url: AppConfig.SITE_URL,
     type: 'website',
+    siteName: AppConfig.APP_NAME,
     images: [
       {
         url: `${AppConfig.SITE_URL}/x-image.png`,
@@ -35,7 +67,10 @@ export const metadata: Metadata = {
       },
     ],
     locale: 'en_US',
-    siteName: AppConfig.APP_NAME,
+  },
+  verification: {
+    // Add Google Search Console verification when available
+    // google: 'your-verification-code',
   },
 };
 
