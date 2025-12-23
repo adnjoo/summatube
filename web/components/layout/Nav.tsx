@@ -69,14 +69,6 @@ export const Nav = async () => {
                 </Link>
               </SheetClose>
               <SheetClose asChild>
-                <Link
-                  href={AppConfig.SITE_MAP.PRICING}
-                  className='flex items-center py-2 text-lg font-semibold'
-                >
-                  Pricing
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
               </SheetClose>
             </div>
           </SheetContent>
@@ -84,12 +76,6 @@ export const Nav = async () => {
 
         {/* Desktop Navigation */}
         <nav className='hidden gap-6 lg:flex'>
-          <Link
-            href={AppConfig.SITE_MAP.PRICING}
-            className='flex items-center text-sm font-medium transition-colors hover:underline'
-          >
-            Pricing
-          </Link>
         </nav>
 
         {/* Authentication Button */}
