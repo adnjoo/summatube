@@ -23,6 +23,17 @@ export function Footer() {
             © {new Date().getFullYear()} {AppConfig.APP_NAME}. All rights
             reserved.
           </p>
+          <p className='hidden text-center text-sm text-muted-foreground md:flex'>
+            Built by&nbsp;
+            <Link
+              href="https://stacktosale.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className='text-muted-foreground hover:text-foreground underline'
+            >
+              stacktosale
+            </Link>
+          </p>
         </div>
         <nav className='flex items-center space-x-4 text-sm font-medium'>
           <Link

@@ -21,6 +21,7 @@ export const AppConfig = {
     GITHUB: 'https://github.com/adnjoo/summatube',
     X: 'https://x.com/adnjoo',
   },
+  CHROME_STORE_URL: 'https://chromewebstore.google.com/detail/summatube-youtube-transcr/fihcdliafahgfgffjjnogmhgaigdjndj?authuser=0&hl=en',
   ADMIN: {
     TERMS_DATE: '2024-11-05T13:28:51.860Z',
     PRIVACY_DATE: '2024-11-05T13:28:51.860Z',
