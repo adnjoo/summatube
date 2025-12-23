@@ -4,7 +4,7 @@ export default defineConfig({
   outDir: 'dist',
   manifest: {
     name: 'SummaTube - YouTube Transcript & Summary',
-    version: '1.0.1',
+    version: '1.0.2',
     description: 'Automatically extracts and displays YouTube video transcripts in sidebar',
     icons: {
       '16': '/icon16.png',
