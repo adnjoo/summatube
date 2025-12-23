@@ -23,7 +23,7 @@ interface TimestampsPanelProps {
   videoId: string;
   onSeek: (time: number) => void;
   currentTime: number;
-  thumbnailTitle: string;
+  thumbnailTitle: any;
 }
 
 export const TimestampsPanel: React.FC<TimestampsPanelProps> = ({

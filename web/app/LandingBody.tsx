@@ -120,7 +120,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
         // Split into roughly equal chunks for display purposes
         const words = fullText.split(' ');
         const chunkSize = Math.ceil(words.length / 10); // Split into ~10 chunks
-        const chunks = [];
+        const chunks: any = [];
 
         for (let i = 0; i < words.length; i += chunkSize) {
           const chunkWords = words.slice(i, i + chunkSize);
@@ -249,7 +249,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
                   onSeek={handleSeek}
                   currentTime={currentTime}
                   thumbnailTitle={thumbnailTitle}
-                  clientChunks={transcriptChunks}
+                  // clientChunks={transcriptChunks}
                 />
               </div>
             </div>
