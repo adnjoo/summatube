@@ -9,9 +9,23 @@
   link.href = chrome.runtime.getURL('styles.css');
   document.head.appendChild(link);
 
-  const API_URL = 'https://www.summa.tube/api/summarize';
+  const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
   let currentVideoId = null;
   let summaryCache = null; // Cache summary per video
+  let openaiApiKey = null;
+
+  // API Key management
+  async function getApiKey() {
+    if (openaiApiKey) return openaiApiKey;
+    const result = await chrome.storage.sync.get(['openaiApiKey']);
+    openaiApiKey = result.openaiApiKey;
+    return openaiApiKey;
+  }
+
+  async function setApiKey(key) {
+    openaiApiKey = key;
+    await chrome.storage.sync.set({ openaiApiKey: key });
+  }
 
   function getVideoId() {
     return new URLSearchParams(window.location.search).get('v');
@@ -34,17 +48,18 @@
   }
 
   async function fetchTranscript() {
-    const button = document.querySelector('button[aria-label*="transcript" i], button[aria-label*="Transcript" i]');
-    if (!button) return null;
+    try {
+      const button = document.querySelector('button[aria-label*="transcript" i], button[aria-label*="Transcript" i]');
+      if (!button) return null;
 
-    button.click();
-    await new Promise(r => setTimeout(r, 2000));
+      button.click();
+      await new Promise(r => setTimeout(r, 2000));
 
-    const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
-    if (segments.length === 0) {
-      document.querySelector('button[aria-label*="Close transcript" i]')?.click();
-      return null;
-    }
+      const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+      if (segments.length === 0) {
+        document.querySelector('button[aria-label*="Close transcript" i]')?.click();
+        return null;
+      }
 
     const segmentData = Array.from(segments).map(segment => {
       const timeEl = segment.querySelector('[class*="timestamp"], .cue-group-start-offset');
@@ -70,9 +85,14 @@
       }
     });
 
-    const fullTranscript = segmentData.map(s => s.text).join(' ');
+      const fullTranscript = segmentData.map(s => s.text).join(' ');
 
-    return { chunks, fullTranscript };
+      return { chunks, fullTranscript };
+    } catch (error) {
+      // Silently handle transcript fetching errors
+      document.querySelector('button[aria-label*="Close transcript" i]')?.click();
+      return null;
+    }
   }
 
   function seekTo(seconds) {
@@ -87,30 +107,55 @@
     if (summaryCache && summaryCache.video_id === videoId) {
       return summaryCache;
     }
-  
+
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      return { error: 'Please set your OpenAI API key first.' };
+    }
+
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(OPENAI_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          transcript: transcript,
-          video_id: videoId
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful assistant that summarizes YouTube video transcripts. Provide a concise but comprehensive summary of the video content, highlighting the main points and key takeaways.'
+            },
+            {
+              role: 'user',
+              content: `Please summarize this YouTube video transcript:\n\n${transcript}`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.7
         })
       });
-  
+
       if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errText}`);
+        const errData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+        throw new Error(errData.error?.message || `HTTP ${response.status}`);
       }
-  
+
       const data = await response.json();
-      summaryCache = data;
-      return data;
+      const summary = data.choices[0]?.message?.content || 'No summary generated';
+
+      const result = {
+        title: `Video Summary`,
+        summary: summary,
+        video_id: videoId
+      };
+
+      summaryCache = result;
+      return result;
     } catch (err) {
-      console.error('SummaTube summary fetch failed:', err);
-      return { error: 'Failed to generate summary. Try again later.' };
+      console.error('OpenAI API error:', err);
+      return { error: `Failed to generate summary: ${err.message}` };
     }
   }
 
@@ -160,14 +205,31 @@
 
     // Summary section (only if transcript exists)
     const hasTranscript = data && data.fullTranscript;
-    const summarySection = hasTranscript ? `
-      <div class="summary-section">
-        <button id="summatube-summary-btn" class="summary-btn">
-          ✨ Generate AI Summary
-        </button>
-        <div id="summatube-summary-result" class="summary-result" style="display:none;"></div>
-      </div>
-    ` : '';
+    let summarySection = '';
+
+    if (hasTranscript) {
+      summarySection = `
+        <div class="summary-section">
+          <div id="summatube-api-key-section" class="api-key-section" style="display:none;">
+            <div class="api-key-input-group">
+              <input type="password" id="summatube-api-key-input" class="api-key-input"
+                     placeholder="Enter your OpenAI API key">
+              <button id="summatube-save-api-key-btn" class="save-api-key-btn">Save Key</button>
+            </div>
+            <div class="api-key-help">
+              Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" class="api-link">OpenAI Platform</a>
+            </div>
+          </div>
+          <div id="summatube-summary-controls">
+            <button id="summatube-summary-btn" class="summary-btn">
+              ✨ Generate AI Summary
+            </button>
+            <button id="summatube-api-key-btn" class="api-key-btn">🔑 Set API Key</button>
+          </div>
+          <div id="summatube-summary-result" class="summary-result" style="display:none;"></div>
+        </div>
+      `;
+    }
 
     panel.innerHTML = `
       <div class="summatube-header ${isDark ? 'dark' : 'light'}">
@@ -219,10 +281,9 @@
           summaryResult.innerHTML = `
             <div class="summary-card">
               <div class="summary-title">✨ AI Summary</div>
-              <div class="summary-quote">"${result.title}"</div>
               <div class="summary-body">${result.summary}</div>
               <div class="summary-footer">
-                Powered by <a href="https://summa.tube" target="_blank" class="summary-link">summa.tube</a>
+                Powered by OpenAI GPT-3.5
               </div>
             </div>
           `;
@@ -230,6 +291,50 @@
 
         summaryResult.style.display = 'block';
         summaryBtn.style.display = 'none';
+      });
+    }
+
+    // API Key Management
+    const apiKeyBtn = panel.querySelector('#summatube-api-key-btn');
+    const apiKeySection = panel.querySelector('#summatube-api-key-section');
+    const apiKeyInput = panel.querySelector('#summatube-api-key-input');
+    const saveApiKeyBtn = panel.querySelector('#summatube-save-api-key-btn');
+    const summaryControls = panel.querySelector('#summatube-summary-controls');
+
+    if (apiKeyBtn && apiKeySection && summaryControls) {
+      // Check if API key is already set
+      getApiKey().then(key => {
+        if (key) {
+          apiKeyBtn.style.display = 'none';
+        } else {
+          apiKeyBtn.style.display = 'inline-block';
+        }
+      });
+
+      apiKeyBtn.addEventListener('click', () => {
+        apiKeySection.style.display = 'block';
+        summaryControls.style.display = 'none';
+        apiKeyInput.focus();
+      });
+
+      saveApiKeyBtn.addEventListener('click', async () => {
+        const key = apiKeyInput.value.trim();
+        if (key) {
+          await setApiKey(key);
+          apiKeySection.style.display = 'none';
+          summaryControls.style.display = 'block';
+          apiKeyBtn.style.display = 'none';
+
+          // Clear input for security
+          apiKeyInput.value = '';
+        }
+      });
+
+      // Allow Enter key to save
+      apiKeyInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          saveApiKeyBtn.click();
+        }
       });
     }
 

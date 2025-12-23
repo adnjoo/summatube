@@ -1,14 +1,19 @@
 {
   "manifest_version": 3,
   "name": "SummaTube - YouTube Transcript & Summary",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Automatically extracts and displays YouTube video transcripts in sidebar",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "permissions": [
     "activeTab",
     "storage"
   ],
   "host_permissions": [
-    "http://localhost:3001/*"
+    "https://api.openai.com/*"
   ],
   "content_scripts": [
     {
@@ -17,5 +22,9 @@
       "css": ["styles.css"],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "content_scripts": "script-src 'self'; object-src 'self'; connect-src https://api.openai.com/"
+  }
 }
