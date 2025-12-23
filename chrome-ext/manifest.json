@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SummaTube - YouTube Transcript & Summary",
   "version": "1.0",
-  "description": "Automatically extracts and displays YouTube video transcripts with AI summaries in sidebar",
+  "description": "Automatically extracts and displays YouTube video transcripts in sidebar",
   "permissions": [
     "activeTab",
     "storage"

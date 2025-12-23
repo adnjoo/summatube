@@ -1,12 +1,11 @@
 # SummaTube Chrome Extension
 
-A Chrome extension that extracts YouTube video transcripts and generates AI-powered summaries using the SummaTube API.
+A Chrome extension that extracts and displays YouTube video transcripts.
 
 ## Features
 
 - **Transcript Extraction**: Automatically extracts transcripts from YouTube videos
-- **AI Summarization**: Generates concise summaries using OpenAI's GPT models
-- **Modal Display**: Shows both transcript and summary in a clean, responsive modal
+- **Sidebar Display**: Shows transcripts in a clean panel within YouTube's sidebar
 - **YouTube Integration**: Seamlessly integrates with YouTube's interface
 
 ## Files
@@ -33,7 +32,7 @@ A Chrome extension that extracts YouTube video transcripts and generates AI-powe
 ## Usage
 
 1. Navigate to any YouTube video with captions/transcripts available
-2. The SummaTube panel will automatically appear in the sidebar showing the transcript and AI summary
+2. The SummaTube panel will automatically appear in the sidebar showing the transcript
 3. No button clicking required - it displays automatically when you visit a video
 4. Click the "✕" button in the panel header to close it
 
