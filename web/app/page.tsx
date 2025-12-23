@@ -1,30 +1,68 @@
 import { AppConfig } from '@/lib/constants';
 
 export default async function Home() {
-  return (
-    <main className='flex flex-col py-4 sm:py-12'>
-      <h1 className='text-center text-4xl font-bold'>SummaTube</h1>
-      <p className='text-center text-lg mt-4 mb-8 text-gray-600'>
-        AI-powered YouTube video summaries and transcripts with clickable timestamps
-      </p>
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: AppConfig.APP_NAME,
+    applicationCategory: 'BrowserExtension',
+    operatingSystem: 'Chrome',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '5',
+      ratingCount: '10000',
+    },
+    description: AppConfig.META.DESCRIPTION,
+    url: AppConfig.CHROME_STORE_URL,
+    screenshot: [
+      `${AppConfig.SITE_URL}/screen-20251223.png`,
+      `${AppConfig.SITE_URL}/screen-2-20251223.png`,
+    ],
+    featureList: [
+      'AI-powered video summaries',
+      'Interactive transcripts',
+      'Clickable timestamps',
+      'YouTube integration',
+      'Free to use',
+    ],
+  };
 
-      <div className='flex justify-center mb-12'>
+  return (
+    <>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <main className='flex flex-col py-4 sm:py-12'>
+        <header className='text-center mb-8'>
+          <h1 className='text-4xl font-bold'>SummaTube</h1>
+          <p className='text-lg mt-4 mb-8 text-gray-600'>
+            AI-powered YouTube video summaries and transcripts with clickable timestamps
+          </p>
+        </header>
+
+        <section aria-label='Social proof' className='flex justify-center mb-12'>
         <div className='flex items-center gap-4 px-6 py-4 bg-gray-50 rounded-full border border-gray-200'>
-          <div className='flex -space-x-3'>
-            <div className='w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold border-2 border-white'>
-              A
+          <div className='flex -space-x-3' aria-label='User avatars'>
+            <div className='w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold border-2 border-white' aria-label='User avatar'>
+              <span aria-hidden='true'>A</span>
             </div>
-            <div className='w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-semibold border-2 border-white'>
-              S
+            <div className='w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-semibold border-2 border-white' aria-label='User avatar'>
+              <span aria-hidden='true'>S</span>
             </div>
-            <div className='w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-700 font-semibold border-2 border-gray-300'>
-              M
+            <div className='w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-700 font-semibold border-2 border-gray-300' aria-label='User avatar'>
+              <span aria-hidden='true'>M</span>
             </div>
           </div>
           <div className='flex flex-col'>
-            <div className='flex items-center gap-1 mb-1'>
+            <div className='flex items-center gap-1 mb-1' aria-label='5 out of 5 stars rating'>
               {[...Array(5)].map((_, i) => (
-                <svg key={i} className='w-4 h-4 text-yellow-400' fill='currentColor' viewBox='0 0 20 20'>
+                <svg key={i} className='w-4 h-4 text-yellow-400' fill='currentColor' viewBox='0 0 20 20' aria-hidden='true'>
                   <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
                 </svg>
               ))}
@@ -32,9 +70,9 @@ export default async function Home() {
             <span className='text-sm font-medium text-gray-700'>Used by 10K+ YouTube Creators</span>
           </div>
         </div>
-      </div>
+        </section>
 
-      <div className='mb-12'>
+        <section aria-label='Features showcase' className='mb-12'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto px-4'>
           <div className='text-center'>
             <img
@@ -53,9 +91,9 @@ export default async function Home() {
             <p className='text-sm text-gray-600 mt-3'>AI-Powered Video Summaries</p>
           </div>
         </div>
-      </div>
+        </section>
 
-      <div className='text-center'>
+        <section aria-label='Call to action' className='text-center'>
         <a
           href={AppConfig.CHROME_STORE_URL}
           target="_blank"
@@ -70,7 +108,8 @@ export default async function Home() {
         <p className='text-sm text-gray-500 mt-4 max-w-md mx-auto'>
           Get AI-powered video summaries and transcripts instantly. Works with any YouTube video that has captions.
         </p>
-      </div>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
