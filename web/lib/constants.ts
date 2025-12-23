@@ -12,8 +12,6 @@ export const AppConfig = {
     HOME: '/',
     PRIVACY: '/policies/privacy',
     TERMS: '/policies/terms',
-    HISTORY: '/history',
-    BLOG: '/blog',
     PRICING: '/pricing',
     API: {
       SUMMARIZE: '/api/summarize',

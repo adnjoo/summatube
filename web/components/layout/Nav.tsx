@@ -68,17 +68,6 @@ export const Nav = async () => {
                   Home
                 </Link>
               </SheetClose>
-              {user && (
-                <SheetClose asChild>
-                  <Link
-                    href={AppConfig.SITE_MAP.HISTORY}
-                    className='flex items-center py-2 text-lg font-semibold'
-                    prefetch={false}
-                  >
-                    History
-                  </Link>
-                </SheetClose>
-              )}
               <SheetClose asChild>
                 <Link
                   href={AppConfig.SITE_MAP.PRICING}
@@ -88,12 +77,6 @@ export const Nav = async () => {
                 </Link>
               </SheetClose>
               <SheetClose asChild>
-                <Link
-                  href={AppConfig.SITE_MAP.BLOG}
-                  className='flex items-center py-2 text-lg font-semibold'
-                >
-                  Blog
-                </Link>
               </SheetClose>
             </div>
           </SheetContent>
@@ -101,25 +84,11 @@ export const Nav = async () => {
 
         {/* Desktop Navigation */}
         <nav className='hidden gap-6 lg:flex'>
-          {user && (
-            <Link
-              href={AppConfig.SITE_MAP.HISTORY}
-              className='flex items-center text-sm font-medium transition-colors hover:underline'
-            >
-              History
-            </Link>
-          )}
           <Link
             href={AppConfig.SITE_MAP.PRICING}
             className='flex items-center text-sm font-medium transition-colors hover:underline'
           >
             Pricing
-          </Link>
-          <Link
-            href={AppConfig.SITE_MAP.BLOG}
-            className='flex items-center text-sm font-medium transition-colors hover:underline'
-          >
-            Blog
           </Link>
         </nav>
 
@@ -132,7 +101,6 @@ export const Nav = async () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 <DropdownMenuItem asChild>
-                  <Link href='/settings'>Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <form action={signOut}>

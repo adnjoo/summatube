@@ -1,22 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
-import { fetchTranscript } from '@/app/api/summarize/fetchTranscript';
 import { summarizeTranscript } from '@/app/api/summarize/summarizeTranscript';
 import { createClient } from '@/utils/supabase/server';
 
-async function getYouTubeTranscript(video_id: string) {
-  if (!video_id) {
-    throw new Error('Invalid video URL or missing video ID');
-  }
-
-  const { title, transcript } = await fetchTranscript(video_id);
-
-  return {
-    title: title || 'Title not available',
-    transcript: transcript?.join(' ') || 'Transcript not available',
-  };
-}
+// Removed getYouTubeTranscript - server-side transcript fetching not supported
 
 // OPTIONS request for CORS
 export async function OPTIONS() {
@@ -80,7 +68,8 @@ export async function GET(request: NextRequest) {
     let videoIdInDb = videoData?.id;
 
     if (!videoIdInDb) {
-      const { title } = await getYouTubeTranscript(video_id);
+      // Extract title from transcript or use default
+      const title = 'Title not available (server-side transcript fetching removed)';
       const { data: newVideo, error: insertVideoError } = await supabase
         .from('videos')
         .insert({ video_id, title })
@@ -103,11 +92,13 @@ export async function GET(request: NextRequest) {
 
     // if (summaryError) throw summaryError;
 
+    const title = videoData?.title || 'Title not available';
+
     // Return existing summary if found
     if (existingSummary) {
       return new Response(
         JSON.stringify({
-          title: videoData?.title,
+          title,
           summary: existingSummary.content,
           id: existingSummary.id,
         }),
@@ -123,8 +114,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Step 3: Generate a new summary if not found
-    const { title, transcript } = await getYouTubeTranscript(video_id);
-    const summaryContent = await summarizeTranscript(transcript);
+    return new Response(
+      JSON.stringify({
+        error: 'Server-side transcript fetching has been removed. Please use client-side transcript fetching with the POST endpoint.'
+      }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
     // Step 4: Save the new summary in `summaries` if `save` is true
     let newSummary;
@@ -132,7 +130,7 @@ export async function GET(request: NextRequest) {
     const insertData = {
       video_id: videoIdInDb,
       user_id: userId || null,
-      content: summaryContent,
+      content: newSummary?.content,
     };
 
     const { data, error: insertError } = await supabase
@@ -149,7 +147,7 @@ export async function GET(request: NextRequest) {
 
     // Return the newly generated summary
     return new Response(
-      JSON.stringify({ title, summary: summaryContent, id: newSummary?.id }),
+      JSON.stringify({ title, summary: newSummary?.content, id: newSummary?.id }),
       {
         headers: {
           'Content-Type': 'application/json',

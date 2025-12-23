@@ -156,6 +156,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           endTime: g.endTime,
           text: g.text.join(' ').replace(/\s+/g, ' ').trim(),
         }));
+        console.log('chunks', chunks);
 
         setTranscriptChunks(chunks);
 
