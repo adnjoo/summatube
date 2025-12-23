@@ -1,151 +1,133 @@
-// content.js - SummaTube: Sidebar Transcript Display with Tailwind CSS v4 via Browser CDN (Dec 2025)
+// SummaTube - Simple Transcript Panel (December 2025)
 
 (function () {
   'use strict';
 
-  function getYouTubeVideoId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('v');
+  // Get video ID from URL
+  function getVideoId() {
+    return new URLSearchParams(window.location.search).get('v');
   }
 
-  async function getTranscript() {
-    try {
-      const transcriptSelectors = [
-        "ytd-video-description-transcript-section-renderer button",
-        "button[aria-label*='transcript']",
-        "button[aria-label*='Transcript']",
-        "button[aria-label*='transcrição']",
-        "button[aria-label*='transcripción']",
-        "[aria-label*='Show transcript']",
-        "[aria-label*='Mostrar transcrição']",
-        "[aria-label*='Mostrar transcripción']"
-      ];
+  // Try to open transcript and extract text
+  async function fetchTranscript() {
+    // Find and click the transcript button
+    const button = document.querySelector('button[aria-label*="transcript" i], button[aria-label*="Transcript" i]');
+    if (!button) return null;
 
-      let transcriptButton = null;
-      for (const selector of transcriptSelectors) {
-        transcriptButton = document.querySelector(selector);
-        if (transcriptButton) break;
-      }
+    button.click();
+    await new Promise(r => setTimeout(r, 1500)); // Wait for panel to open
 
-      if (!transcriptButton) {
-        return null;
-      }
+    // Get all transcript lines
+    const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+    if (segments.length === 0) return null;
 
-      transcriptButton.click();
-      await new Promise(r => setTimeout(r, 1500));
+    const lines = Array.from(segments).map(segment => {
+      const time = segment.querySelector('[class*="timestamp"]')?.textContent.trim() || '';
+      const text = segment.querySelector('[class*="text"]')?.textContent.trim() || '';
+      return time ? `[${time}] ${text}` : text;
+    }).filter(line => line);
 
-      const segmentSelectors = ["ytd-transcript-segment-renderer", ".ytd-transcript-segment-renderer"];
-      let segments = [];
-      for (const selector of segmentSelectors) {
-        segments = document.querySelectorAll(selector);
-        if (segments.length > 0) break;
-      }
+    // Close the transcript panel
+    document.querySelector('button[aria-label*="Close transcript" i]')?.click();
 
-      if (segments.length === 0) {
-        return null;
-      }
-
-      const lines = Array.from(segments).map(segment => {
-        const textEl = segment.querySelector("[class*='segment-text'], .cue, .cue-group__cue, #content, #text");
-        const timeEl = segment.querySelector("[class*='segment-timestamp'], [class*='cue-group-start-offset'], #timestamp");
-
-        const text = textEl ? textEl.textContent.trim() : '';
-        const time = timeEl ? timeEl.textContent.trim() : '';
-
-        return time ? `[${time}] ${text}` : text;
-      }).filter(line => line.length > 0);
-
-      const transcript = lines.join('\n\n');
-
-      const closeBtn = document.querySelector('button[aria-label*="Close transcript"], button[aria-label*="Fechar"], button[aria-label*="Cerrar"]');
-      if (closeBtn) closeBtn.click();
-
-      return transcript;
-
-    } catch (error) {
-      console.error('SummaTube: Error getting transcript', error);
-      return null;
-    }
+    return lines.join('\n\n');
   }
 
-  function createPanel(transcript) {
-    document.querySelector('.summatube-panel')?.remove();
+  // Create or update the panel
+  function showPanel(transcriptText) {
+    // Remove old panel if exists
+    document.getElementById('summatube-panel')?.remove();
 
-    const sidebar = document.getElementById('secondary') || document.querySelector('#related, [id*="secondary"]');
-    if (!sidebar) {
-      console.error('SummaTube: Sidebar not found');
-      return;
-    }
+    const sidebar = document.getElementById('secondary') || document.querySelector('#related');
+    if (!sidebar) return;
 
-    // Create shadow container to isolate Tailwind styles
-    const shadowHost = document.createElement('div');
-    shadowHost.className = 'summatube-panel-host';
-    const shadow = shadowHost.attachShadow({ mode: 'open' });
-
-    // Inject Tailwind Browser CDN script
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4';
-    script.type = 'module';
-    shadow.appendChild(script);
-
-    // Panel HTML using Tailwind classes
-    const panelHTML = `
-      <div class="max-w-md mx-auto">
-        <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-t-xl flex justify-between items-center">
-          <div>
-            <h3 class="text-lg font-semibold">📝 SummaTube</h3>
-            <p class="text-sm opacity-90">Video Transcript</p>
-          </div>
-          <button id="summatube-close" class="text-white hover:opacity-80 text-2xl">✕</button>
-        </div>
-        <div class="bg-white p-4 rounded-b-xl max-h-96 overflow-y-auto shadow-lg">
-          ${transcript ? 
-            `<pre class="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm">${transcript}</pre>` :
-            `<div class="text-center py-12 text-gray-500">
-              <div class="text-5xl mb-4">📭</div>
-              <h4 class="text-lg font-medium mb-2">No Transcript Available</h4>
-              <p class="text-sm">This video does not have captions or auto-generated subtitles enabled.</p>
-            </div>`
-          }
-        </div>
-      </div>
+    const panel = document.createElement('div');
+    panel.id = 'summatube-panel';
+    panel.style.cssText = `
+      margin: 16px 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     `;
 
-    const container = document.createElement('div');
-    container.innerHTML = panelHTML;
-    shadow.appendChild(container);
+    const headerStyle = `
+      background: linear-gradient(to right, #c00, #f00);
+      color: white;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    `;
 
-    // Close button
-    const closeBtn = shadow.getElementById('summatube-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => shadowHost.remove());
+    const contentStyle = `
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      color: #333;
+    `;
+
+    let content;
+    if (!transcriptText) {
+      content = `<em style="color:#666; text-align:center; display:block; padding:40px 0;">
+                 No transcript available for this video.
+               </em>`;
+    } else if (transcriptText === 'loading') {
+      content = `<div style="text-align:center; padding:40px 0; color:#666;">
+                 Loading transcript...
+               </div>`;
+    } else {
+      content = transcriptText;
     }
 
-    sidebar.insertBefore(shadowHost, sidebar.firstChild);
+    panel.innerHTML = `
+      <div style="${headerStyle}">
+        <div>
+          📝 SummaTube<br>
+          <small style="opacity:0.9; font-weight:normal;">Video Transcript</small>
+        </div>
+        <button style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">×</button>
+      </div>
+      <div style="${contentStyle}">${content}</div>
+    `;
+
+    // Close button
+    panel.querySelector('button').onclick = () => panel.remove();
+
+    // Add to top of sidebar
+    sidebar.insertBefore(panel, sidebar.firstChild);
   }
 
-  async function main() {
-    if (!getYouTubeVideoId()) return;
+  // Main function
+  async function run() {
+    if (!getVideoId()) return;
 
-    createPanel('Loading transcript...');
+    showPanel('loading'); // Show loading state
 
-    const transcript = await getTranscript();
+    const transcript = await fetchTranscript();
 
-    createPanel(transcript);
+    showPanel(transcript || null); // Show final result
   }
 
+  // Wait for YouTube page to load the sidebar
   const observer = new MutationObserver(() => {
-    const sidebar = document.getElementById('secondary') || document.querySelector('#related');
-    if (sidebar) {
+    if (document.getElementById('secondary') || document.querySelector('#related')) {
       observer.disconnect();
-      setTimeout(main, 1500);
+      setTimeout(run, 1000);
     }
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
 
-  setTimeout(() => {
-    observer.disconnect();
-    if (!document.querySelector('.summatube-panel-host')) main();
-  }, 20000);
+  // Fallback if page is already loaded
+  if (document.getElementById('secondary') || document.querySelector('#related')) {
+    setTimeout(run, 1000);
+  }
 })();
