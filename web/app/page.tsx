@@ -49,15 +49,24 @@ export default async function Home() {
         <section aria-label='Social proof' className='flex justify-center mb-12'>
         <div className='flex items-center gap-4 px-6 py-4 bg-gray-50 rounded-full border border-gray-200'>
           <div className='flex -space-x-3' aria-label='User avatars'>
-            <div className='w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold border-2 border-white' aria-label='User avatar'>
-              <span aria-hidden='true'>A</span>
-            </div>
-            <div className='w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-semibold border-2 border-white' aria-label='User avatar'>
-              <span aria-hidden='true'>S</span>
-            </div>
-            <div className='w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-700 font-semibold border-2 border-gray-300' aria-label='User avatar'>
-              <span aria-hidden='true'>M</span>
-            </div>
+            <img
+              src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format&q=80'
+              alt='Student user'
+              className='w-10 h-10 rounded-full border-2 border-white object-cover'
+              aria-label='Student user avatar'
+            />
+            <img
+              src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format&q=80'
+              alt='Learner user'
+              className='w-10 h-10 rounded-full border-2 border-white object-cover'
+              aria-label='Learner user avatar'
+            />
+            <img
+              src='https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces&auto=format&q=80'
+              alt='Student user'
+              className='w-10 h-10 rounded-full border-2 border-white object-cover'
+              aria-label='Student user avatar'
+            />
           </div>
           <div className='flex flex-col'>
             <div className='flex items-center gap-1 mb-1' aria-label='5 out of 5 stars rating'>
@@ -67,7 +76,7 @@ export default async function Home() {
                 </svg>
               ))}
             </div>
-            <span className='text-sm font-medium text-gray-700'>Used by 10K+ YouTube Creators</span>
+            <span className='text-sm font-medium text-gray-700'>Used by thousands of students and curious learners</span>
           </div>
         </div>
         </section>
