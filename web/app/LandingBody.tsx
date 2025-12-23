@@ -11,7 +11,7 @@ import { TimestampsPanel } from '@/components/TimestampsPanel';
 import { YouTubePlayer } from '@/components/YoutubePlayer';
 import { Marquee } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
-import { AppConfig } from '@/lib/constants';
+// import { AppConfig } from '@/lib/constants';
 import {
   extractVideoId,
   getYouTubeURL,
@@ -99,68 +99,41 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        // Fetch watch page
-        const pageRes = await fetch(`https://www.youtube.com/watch?v=${video_id}&hl=en`);
-        if (!pageRes.ok) throw new Error('Failed to load video page');
-        const html = await pageRes.text();
+        // Fetch transcript from server API
+        const transcriptRes = await fetch('/api/fetch-transcript', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ video_id }),
+        });
 
-        // Extract player response
-        const match = html.match(/ytInitialPlayerResponse\s*=\s*({.+?});/s);
-        if (!match) throw new Error('Player response not found');
-        const playerResponse = JSON.parse(match[1]);
-
-        // Title
-        const title = playerResponse.videoDetails?.title || 'Unknown Title';
-        setThumbnailTitle(title);
-
-        // Captions
-        const captionTracks = playerResponse.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-        if (!captionTracks?.length) throw new Error('No captions available');
-
-        let track = captionTracks.find((t: any) => t.languageCode === 'en' && t.kind !== 'asr') ||
-                    captionTracks.find((t: any) => t.languageCode === 'en');
-        if (!track) throw new Error('English captions not available');
-
-        let captionUrl = track.baseUrl.replace(/&fmt=srv\d*/g, '').replace(/&fmt=\w+$/, '');
-
-        // Fetch transcript XML
-        const captionRes = await fetch(captionUrl);
-        if (!captionRes.ok) throw new Error('Failed to fetch captions');
-        const xml = await captionRes.text();
-
-        if (!xml.includes('<text')) throw new Error('Empty transcript');
-
-        // Parse segments
-        const regex = /<text start="([^"]+)" dur="([^"]+)">([^<]+)<\/text>/g;
-        const segments: { text: string; start: number }[] = [];
-        let m;
-        while ((m = regex.exec(xml)) !== null) {
-          segments.push({
-            text: m[3].replace(/&amp;#39;/g, "'").trim(),
-            start: parseFloat(m[1]),
-          });
+        if (!transcriptRes.ok) {
+          const errorData = await transcriptRes.json();
+          throw new Error(errorData.error || 'Failed to fetch transcript');
         }
 
-        if (segments.length === 0) throw new Error('No transcript segments');
+        const transcriptData = await transcriptRes.json();
+        const { title, transcript: fullText } = transcriptData;
 
-        // Group into 30s chunks
-        const grouped = segments.reduce((acc: any, seg) => {
-          const idx = Math.floor(seg.start / 30);
-          if (!acc[idx]) acc[idx] = { startTime: idx * 30, endTime: (idx + 1) * 30, text: [] };
-          acc[idx].text.push(seg.text);
-          return acc;
-        }, {});
+        setThumbnailTitle(title);
 
-        const chunks = Object.values(grouped).map((g: any) => ({
-          startTime: g.startTime,
-          endTime: g.endTime,
-          text: g.text.join(' ').replace(/\s+/g, ' ').trim(),
-        }));
+        // Create basic chunks from the full text (since server doesn't provide timing)
+        // Split into roughly equal chunks for display purposes
+        const words = fullText.split(' ');
+        const chunkSize = Math.ceil(words.length / 10); // Split into ~10 chunks
+        const chunks = [];
+
+        for (let i = 0; i < words.length; i += chunkSize) {
+          const chunkWords = words.slice(i, i + chunkSize);
+          chunks.push({
+            startTime: Math.floor(i / words.length * 300), // Approximate timing
+            endTime: Math.floor((i + chunkSize) / words.length * 300),
+            text: chunkWords.join(' ').trim(),
+          });
+        }
 
         setTranscriptChunks(chunks);
 
         // Send to server for AI summary
-        const fullText = segments.map(s => s.text).join(' ');
         const summaryRes = await fetch('/api/summarize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -171,7 +144,11 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
           }),
         });
 
-        if (!summaryRes.ok) throw new Error('Summary failed');
+        if (!summaryRes.ok) {
+          const errorData = await summaryRes.json();
+          throw new Error(errorData.error || 'Summary failed');
+        }
+
         const data = await summaryRes.json();
         setSummary(data);
       } catch (err: any) {

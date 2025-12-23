@@ -170,3 +170,120 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const { transcript, video_id, save } = await request.json();
+
+    if (!transcript || !video_id) {
+      return new Response(
+        JSON.stringify({ error: 'Missing transcript or video_id' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    const supabase = await createClient();
+
+    // Get authenticated user if available
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user ? user.id : null;
+
+    // Check if video exists, create if not
+    const { data: videoData, error: videoError } = await supabase
+      .from('videos')
+      .select('id, title')
+      .eq('video_id', video_id)
+      .single();
+
+    let videoIdInDb = videoData?.id;
+
+    if (!videoIdInDb) {
+      // Extract title from transcript or use default
+      const title = transcript.split(' ').slice(0, 10).join(' ') + '...';
+      const { data: newVideo, error: insertVideoError } = await supabase
+        .from('videos')
+        .insert({ video_id, title })
+        .select()
+        .single();
+
+      if (insertVideoError) throw insertVideoError;
+      videoIdInDb = newVideo.id;
+    }
+
+    // Check for existing summary if save is true
+    if (save && userId) {
+      const { data: existingSummary } = await supabase
+        .from('summaries')
+        .select('id, content, created_at')
+        .eq('video_id', videoIdInDb)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existingSummary) {
+        return new Response(
+          JSON.stringify({
+            title: videoData?.title || 'Title not available',
+            summary: existingSummary.content,
+            id: existingSummary.id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // Generate new summary
+    const summaryContent = await summarizeTranscript(transcript);
+
+    if (!summaryContent) {
+      throw new Error('Failed to generate summary');
+    }
+
+    // Save summary if requested and user is logged in
+    let summaryId = null;
+    if (save && userId) {
+      const { data: newSummary, error: insertError } = await supabase
+        .from('summaries')
+        .insert({
+          video_id: videoIdInDb,
+          user_id: userId,
+          content: summaryContent,
+        })
+        .select('id')
+        .single();
+
+      if (!insertError) {
+        summaryId = newSummary.id;
+      }
+    }
+
+    return new Response(
+      JSON.stringify({
+        title: videoData?.title || 'Title not available',
+        summary: summaryContent,
+        id: summaryId,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+
+  } catch (err: any) {
+    console.error('Error in POST /api/summarize:', err);
+    return new Response(
+      JSON.stringify({ error: err.message || 'Failed to generate summary' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+}
