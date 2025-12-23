@@ -16,6 +16,7 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
 }
 
 .summatube-header.light {
@@ -64,6 +65,14 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
+.header-icon-btn.disabled {
+  opacity: 0.4;
+}
+
+.header-icon-btn.disabled:hover {
+  opacity: 0.6;
+}
+
 .summatube-tabs {
   display: flex;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -105,6 +114,26 @@
   overflow-y: auto;
   font-size: 14px;
   line-height: 1.6;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Minimized state */
+#summatube-panel.minimized .summatube-tabs,
+#summatube-panel.minimized .summatube-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+}
+
+#summatube-panel.minimized {
+  margin: 8px 0;
+}
+
+#summatube-panel.minimized .summatube-header {
+  border-bottom: none;
+  padding: 8px 16px;
 }
 
 .summatube-content.light {
