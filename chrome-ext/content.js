@@ -1,4 +1,4 @@
-// SummaTube - Beautiful Transcript Panel (Cool Edition - December 2025)
+// SummaTube - FIXED & WORKING Clickable Chunked Transcript (December 2025)
 
 (function () {
   'use strict';
@@ -7,12 +7,28 @@
     return new URLSearchParams(window.location.search).get('v');
   }
 
+  function timestampToSeconds(ts) {
+    if (!ts) return 0;
+    const parts = ts.split(':').map(Number);
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+  }
+
+  function secondsToTimestamp(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
   async function fetchTranscript() {
     const button = document.querySelector('button[aria-label*="transcript" i], button[aria-label*="Transcript" i]');
     if (!button) return null;
 
     button.click();
-    await new Promise(r => setTimeout(r, 1800));
+    await new Promise(r => setTimeout(r, 2000));
 
     const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
     if (segments.length === 0) {
@@ -20,18 +36,52 @@
       return null;
     }
 
-    const lines = Array.from(segments).map(segment => {
-      const time = segment.querySelector('[class*="timestamp"]')?.textContent.trim() || '';
-      const text = segment.querySelector('[class*="text"]')?.textContent.trim() || '';
-      return time ? `[${time}] ${text}` : text;
-    }).filter(line => line);
+    const segmentData = Array.from(segments).map(segment => {
+      const timeEl = segment.querySelector('[class*="timestamp"], .cue-group-start-offset');
+      const textEl = segment.querySelector('[class*="text"], .cue, yt-formatted-string');
+      const time = timeEl?.textContent.trim() || '';
+      const text = textEl?.textContent.trim() || '';
+      return { time, text, seconds: timestampToSeconds(time) };
+    }).filter(s => s.text);
 
     document.querySelector('button[aria-label*="Close transcript" i]')?.click();
 
-    return lines.join('\n\n');
+    // Group into ~30s chunks
+    const chunks = [];
+    let currentChunk = { startSeconds: 0, endSeconds: 0, texts: [] };
+
+    segmentData.forEach((seg, i) => {
+      if (currentChunk.texts.length === 0) currentChunk.startSeconds = seg.seconds;
+
+      currentChunk.texts.push(seg.text);
+      currentChunk.endSeconds = seg.seconds;
+
+      if (currentChunk.endSeconds - currentChunk.startSeconds >= 30 || i === segmentData.length - 1) {
+        chunks.push({ ...currentChunk });
+        currentChunk = { startSeconds: seg.seconds, endSeconds: seg.seconds, texts: [] };
+      }
+    });
+
+    return chunks;
   }
 
-  function showPanel(transcriptText) {
+  // The REAL working seek function
+  function seekTo(seconds) {
+    const player = document.querySelector('video');
+    if (player) {
+      player.currentTime = seconds; // Direct seek — fastest and most reliable
+      return;
+    }
+
+    // Fallback: use YouTube's native parameter
+    const url = new URL(window.location);
+    url.searchParams.set('t', Math.floor(seconds) + 's');
+    window.history.replaceState(null, '', url); // No reload
+    const video = document.querySelector('video');
+    if (video) video.currentTime = seconds; // Force it anyway
+  }
+
+  function showPanel(chunks) {
     document.getElementById('summatube-panel')?.remove();
 
     const sidebar = document.getElementById('secondary') || document.querySelector('#related');
@@ -43,24 +93,21 @@
       margin: 20px 0;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.1);
       font-family: "Roboto", "YouTube Sans", sans-serif;
       animation: slideUp 0.4s ease-out;
       max-width: 400px;
     `;
 
-    // Detect dark mode
-    const isDark = document.documentElement.getAttribute('dark') !== null ||
+    const isDark = document.documentElement.hasAttribute('dark') ||
                    document.body.classList.contains('ytd-watch-flexy--dark-theme');
 
-    const bgColor = isDark ? 'rgba(15, 15, 15, 0.85)' : 'rgba(255, 255, 255, 0.92)';
+    const bgColor = isDark ? 'rgba(15,15,15,0.85)' : 'rgba(255,255,255,0.92)';
     const textColor = isDark ? '#e0e0e0' : '#0f0f0f';
     const secondaryText = isDark ? '#aaaaaa' : '#606060';
-    const headerGradient = isDark
-      ? 'linear-gradient(135deg, #8B00FF, #FF006E)'  // Vibrant purple to pink
-      : 'linear-gradient(135deg, #A100FF, #FF3578)'; // Slightly lighter for light mode
+    const headerGradient = isDark ? 'linear-gradient(135deg, #8B00FF, #FF006E)' : 'linear-gradient(135deg, #A100FF, #FF3578)';
 
     const headerStyle = `
       background: ${headerGradient};
@@ -69,19 +116,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 15px rgba(139, 0, 255, 0.3);
-    `;
-
-    const titleStyle = `
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    `;
-
-    const subtitleStyle = `
-      font-size: 13px;
-      opacity: 0.9;
-      margin-top: 2px;
+      box-shadow: 0 4px 15px rgba(139,0,255,0.3);
     `;
 
     const contentStyle = `
@@ -92,75 +127,67 @@
       color: ${textColor};
       font-size: 14.5px;
       line-height: 1.7;
-      white-space: pre-wrap;
       scrollbar-width: thin;
       scrollbar-color: #888 transparent;
     `;
 
     let contentHTML;
-    if (!transcriptText) {
-      contentHTML = `
-        <div style="text-align:center; padding:60px 20px; color:${secondaryText}; font-style:italic;">
-          <div style="font-size:48px; margin-bottom:16px; opacity:0.3;">📜</div>
-          <div>No transcript available for this video.</div>
-        </div>`;
-    } else if (transcriptText === 'loading') {
-      contentHTML = `
-        <div style="text-align:center; padding:60px 20px; color:${secondaryText};">
-          <div style="font-size:48px; margin-bottom:16px;">⏳</div>
-          <div>Loading transcript...</div>
-        </div>`;
+    if (!chunks) {
+      contentHTML = `<div style="text-align:center; padding:60px 20px; color:${secondaryText}; font-style:italic;">
+        <div style="font-size:48px; margin-bottom:16px; opacity:0.3;">📜</div>
+        <div>No transcript available.</div>
+      </div>`;
+    } else if (chunks === 'loading') {
+      contentHTML = `<div style="text-align:center; padding:60px 20px; color:${secondaryText};">
+        <div style="font-size:48px; margin-bottom:16px;">⏳</div>
+        <div>Loading transcript...</div>
+      </div>`;
     } else {
-      contentHTML = transcriptText.replace(
-        /\[(\d{1,2}:\d{2}(?::\d{2})?)\]/g,
-        '<span style="color:#A100FF; font-weight:600; margin-right:8px;">[$1]</span>'
-      );
+      contentHTML = chunks.map(chunk => {
+        const startTs = secondsToTimestamp(chunk.startSeconds);
+        const endTs = secondsToTimestamp(chunk.endSeconds);
+        const paragraph = chunk.texts.join(' ');
+        return `
+          <div style="margin-bottom: 24px; padding: 16px; background: rgba(139,0,255,0.08); border-radius: 12px; border-left: 4px solid #A100FF;">
+            <div style="font-weight: 600; color: #A100FF; cursor: pointer; margin-bottom: 8px;"
+                 class="summatube-seek"
+                 data-seconds="${chunk.startSeconds}">
+              [${startTs} – ${endTs}]
+            </div>
+            <div>${paragraph}</div>
+          </div>`;
+      }).join('');
     }
 
     panel.innerHTML = `
       <style>
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        #summatube-panel::-webkit-scrollbar {
-          width: 6px;
-        }
-        #summatube-panel::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        #summatube-panel::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 3px;
-        }
-        #summatube-panel::-webkit-scrollbar-thumb:hover {
-          background: #aaa;
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #summatube-panel::-webkit-scrollbar { width: 6px; }
+        #summatube-panel::-webkit-scrollbar-track { background: transparent; }
+        #summatube-panel::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        #summatube-panel::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        .summatube-seek:hover { text-decoration: underline; }
       </style>
 
       <div style="${headerStyle}">
         <div>
-          <div style="${titleStyle}">SummaTube</div>
-          <div style="${subtitleStyle}">Video Transcript</div>
+          <div style="font-size:20px; font-weight:600;">SummaTube</div>
+          <div style="font-size:13px; opacity:0.9; margin-top:2px;">Chunked Transcript (30s)</div>
         </div>
-        <button style="
-          background:none;
-          border:none;
-          color:white;
-          font-size:32px;
-          cursor:pointer;
-          width:40px;
-          height:40px;
-          border-radius:50%;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          transition: background 0.2s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.2)'"
-          onmouseout="this.style.background='none'">×</button>
+        <button style="background:none; border:none; color:white; font-size:32px; cursor:pointer; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.2)'"
+                onmouseout="this.style.background='none'">×</button>
       </div>
       <div style="${contentStyle}">${contentHTML}</div>
     `;
+
+    // Add click listeners AFTER rendering
+    panel.querySelectorAll('.summatube-seek').forEach(el => {
+      el.addEventListener('click', () => {
+        const seconds = parseInt(el.dataset.seconds, 10);
+        seekTo(seconds);
+      });
+    });
 
     panel.querySelector('button').onclick = () => {
       panel.style.animation = 'slideDown 0.3s ease-in';
@@ -169,13 +196,8 @@
 
     sidebar.insertBefore(panel, sidebar.firstChild);
 
-    // Add fade-out animation for removal
     const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideDown {
-        to { opacity: 0; transform: translateY(20px); }
-      }
-    `;
+    style.textContent = `@keyframes slideDown { to { opacity: 0; transform: translateY(20px); } }`;
     document.head.appendChild(style);
   }
 
@@ -184,8 +206,8 @@
 
     showPanel('loading');
 
-    const transcript = await fetchTranscript();
-    showPanel(transcript || null);
+    const chunks = await fetchTranscript();
+    showPanel(chunks || null);
   }
 
   const observer = new MutationObserver(() => {
