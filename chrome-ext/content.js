@@ -34,17 +34,18 @@
   }
 
   async function fetchTranscript() {
-    const button = document.querySelector('button[aria-label*="transcript" i], button[aria-label*="Transcript" i]');
-    if (!button) return null;
+    try {
+      const button = document.querySelector('button[aria-label*="transcript" i], button[aria-label*="Transcript" i]');
+      if (!button) return null;
 
-    button.click();
-    await new Promise(r => setTimeout(r, 2000));
+      button.click();
+      await new Promise(r => setTimeout(r, 2000));
 
-    const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
-    if (segments.length === 0) {
-      document.querySelector('button[aria-label*="Close transcript" i]')?.click();
-      return null;
-    }
+      const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+      if (segments.length === 0) {
+        document.querySelector('button[aria-label*="Close transcript" i]')?.click();
+        return null;
+      }
 
     const segmentData = Array.from(segments).map(segment => {
       const timeEl = segment.querySelector('[class*="timestamp"], .cue-group-start-offset');
@@ -70,9 +71,14 @@
       }
     });
 
-    const fullTranscript = segmentData.map(s => s.text).join(' ');
+      const fullTranscript = segmentData.map(s => s.text).join(' ');
 
-    return { chunks, fullTranscript };
+      return { chunks, fullTranscript };
+    } catch (error) {
+      // Silently handle transcript fetching errors
+      document.querySelector('button[aria-label*="Close transcript" i]')?.click();
+      return null;
+    }
   }
 
   function seekTo(seconds) {
@@ -109,7 +115,7 @@
       summaryCache = data;
       return data;
     } catch (err) {
-      console.error('SummaTube summary fetch failed:', err);
+      // Silently handle API errors - extension should work without summaries
       return { error: 'Failed to generate summary. Try again later.' };
     }
   }

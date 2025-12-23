@@ -1,125 +1,139 @@
 # SummaTube Chrome Extension
 
-A Chrome extension that extracts and displays YouTube video transcripts.
+AI-powered YouTube video summaries and transcripts with clickable timestamps.
 
 ## Features
 
-- **Transcript Extraction**: Automatically extracts transcripts from YouTube videos
-- **Sidebar Display**: Shows transcripts in a clean panel within YouTube's sidebar
-- **YouTube Integration**: Seamlessly integrates with YouTube's interface
-
-## Files
-
-- `manifest.json` - Extension manifest with permissions and content script configuration
-- `content.js` - Main content script that handles transcript fetching and UI
+- **🎯 Automatic Transcript Extraction**: Extracts YouTube video transcripts in real-time
+- **🤖 AI-Powered Summaries**: Generate concise video summaries with one click
+- **⏰ Clickable Timestamps**: Jump to specific parts of videos instantly
+- **📱 30-Second Chunks**: Transcripts organized in easy-to-navigate segments
+- **🌙 Dark Mode Support**: Seamless integration with YouTube's light/dark themes
+- **📱 Responsive Design**: Clean, modern UI that works on all screen sizes
 
 ## Installation
 
-1. **Start the SummaTube web server:**
-   ```bash
-   cd web
-   npm install
-   npm run dev
-   ```
-   The server should run on `http://localhost:3000`
+### From Chrome Web Store (Recommended)
+1. Visit the [SummaTube Chrome Extension page](https://chrome.google.com/webstore) on the Chrome Web Store
+2. Click "Add to Chrome"
+3. Confirm the installation when prompted
 
-2. **Load the Chrome extension:**
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode" in the top right
-   - Click "Load unpacked" and select the `chrome-ext` folder
-   - The extension should now be loaded and active
+### Manual Installation (Development)
+1. Download or clone this repository
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode" in the top right corner
+4. Click "Load unpacked" and select the `chrome-ext/` folder
+5. The extension will be loaded and ready to use
 
 ## Usage
 
-1. Navigate to any YouTube video with captions/transcripts available
-2. The SummaTube panel will automatically appear in the sidebar showing the transcript
-3. No button clicking required - it displays automatically when you visit a video
-4. Click the "✕" button in the panel header to close it
+1. **Visit any YouTube video** with captions/transcripts available
+2. **SummaTube automatically appears** in the right sidebar showing the transcript
+3. **Click timestamps** to jump to specific parts of the video
+4. **Generate AI summaries** with the "✨ Generate AI Summary" button
+5. **Minimize/expand** the panel using the toggle button in the header
 
-## Current Status
+## How It Works
 
-**Transcript Fetching**: Currently uses mock data for demonstration
-**AI Summarization**: Falls back to mock summaries if API server is unavailable
-**Sidebar Integration**: ✅ Panel appears in YouTube's secondary sidebar areang - shows transcripts and summaries in a clean interface
+### Transcript Extraction
+The extension automatically:
+- Detects when you're watching a YouTube video
+- Extracts available transcripts using YouTube's native interface
+- Organizes content into 30-second chunks for easy navigation
 
-## Troubleshooting
+### AI Summarization
+- Click "✨ Generate AI Summary" to get AI-powered video summaries
+- Summaries are cached per video for faster subsequent loads
+- Powered by advanced language models for accurate, concise summaries
 
-### Stuck on "Loading transcript..."?
-
-1. **Check Browser Console**: Open Developer Tools (F12) → Console tab to see error messages
-2. **API Server Not Running**: The extension will show mock data if the API server isn't available
-3. **Modal Not Updating**: If stuck on loading, try refreshing the page and clicking the button again
-
-### API Server Issues
-
-To enable real AI summaries:
-
-1. **Start the server**:
-   ```bash
-   cd web
-   npm install
-   npm run dev
-   ```
-
-2. **Check server status**: Visit `http://localhost:3000` (or `http://localhost:3001` if port 3000 is busy)
-
-3. **Environment setup**: Make sure you have an OpenAI API key in your environment variables
-
-### Getting Real YouTube Transcripts
-
-The current implementation uses mock transcripts. For real YouTube transcripts, you would need to:
-
-1. **YouTube Data API v3**: Requires API key and handles official transcript access
-2. **Third-party services**: Use transcript extraction services
-3. **Browser extension permissions**: May need additional permissions for YouTube API access
+### User Interface
+- **Minimizable Panel**: Collapse when not needed, expand when you want to read
+- **Responsive Design**: Adapts to YouTube's changing layout
+- **Smooth Animations**: Modern transitions and hover effects
+- **Error Handling**: Graceful fallbacks when transcripts aren't available
 
 ## Permissions
 
-- `activeTab` - Allows interaction with the current YouTube tab
-- `storage` - For storing extension preferences
-- `host_permissions` - Allows API calls to `localhost:3000` for summarization
+SummaTube requires the following permissions:
 
-## API Integration
+- **`activeTab`**: Interact with YouTube pages to extract transcripts
+- **`storage`**: Cache summaries and user preferences
+- **`host_permissions`**: Connect to `https://www.summa.tube/` for AI summarization
 
-The extension communicates with the SummaTube API at `http://localhost:3000/api/summarize` to:
+## Privacy & Security
 
-- Send video transcripts for processing
-- Receive AI-generated summaries
-- Handle error responses gracefully
-
-## Current Limitations
-
-- **Transcript Fetching**: Currently uses a placeholder for transcript extraction. Real YouTube transcript fetching requires YouTube Data API v3 integration or handling YouTube's internal transcript endpoints.
-- **Local Server**: Requires the web server to be running locally for API calls.
-- **CORS**: API calls are restricted to localhost for development.
-
-## Development
-
-### Transcript Fetching Implementation
-
-To implement real YouTube transcript fetching, you have several options:
-
-1. **YouTube Data API v3**: Requires API key and handles official transcript access
-2. **Internal YouTube API**: Parse YouTube's internal transcript endpoints (more complex)
-3. **Third-party services**: Use services that provide transcript extraction
-
-### Environment Setup
-
-Make sure you have:
-- Node.js installed for the web server
-- OpenAI API key configured in the web app's environment variables
-- Chrome extension reloaded after any code changes
-
-### Making Changes
-
-1. Edit `content.js` to modify UI behavior or transcript fetching logic
-2. Update `manifest.json` for new permissions or host patterns
-3. Reload the extension in `chrome://extensions/` after changes
-4. Restart the web server if API changes are made
+- **No Data Collection**: Transcripts are processed locally when possible
+- **Secure API Calls**: All external communication uses HTTPS
+- **Privacy Policy**: Available at [summa.tube/policies/privacy](https://summa.tube/policies/privacy)
+- **Content Security Policy**: Implemented to prevent cross-site scripting attacks
 
 ## Troubleshooting
 
-- **Button not appearing**: Wait a few seconds for YouTube to load, or refresh the page
-- **API errors**: Ensure the web server is running on localhost:3000
-- **Transcript not loading**: The video may not have captions available, or transcript fetching needs implementation
-- **Modal not showing**: Check browser console for JavaScript errors
+### Extension Not Appearing
+- **Refresh the page**: Sometimes YouTube's dynamic loading requires a refresh
+- **Check video compatibility**: Make sure the video has captions/transcripts available
+- **Verify installation**: Ensure the extension is enabled in `chrome://extensions/`
+
+### Transcript Not Loading
+- **Wait a moment**: Transcript extraction takes 1-2 seconds
+- **Check video language**: Currently supports videos with available captions
+- **Try refreshing**: YouTube's interface may have changed
+
+### AI Summary Issues
+- **Check internet connection**: Summaries require API access
+- **Wait for processing**: AI summarization takes a few seconds
+- **Retry if failed**: Network issues can cause temporary failures
+
+### Performance Issues
+- **Close other tabs**: Multiple YouTube tabs may impact performance
+- **Clear browser cache**: Old cached data can cause issues
+- **Restart browser**: Sometimes a fresh start resolves problems
+
+## Browser Compatibility
+
+- **Chrome**: 88+ (Manifest V3 support required)
+- **Edge**: 88+ (Chromium-based)
+- **Opera**: 74+ (Chromium-based)
+- **Brave**: Compatible with Chromium version 88+
+
+## Support
+
+- **Issues**: Report bugs on [GitHub Issues](https://github.com/your-repo/summatube/issues)
+- **Feature Requests**: Suggest improvements via GitHub Issues
+- **Contact**: Reach out through the Chrome Web Store reviews
+
+## Development
+
+This extension is built with:
+- **Manifest V3**: Modern Chrome extension standard
+- **Vanilla JavaScript**: No heavy frameworks for maximum compatibility
+- **CSS**: Custom styling with dark mode support
+- **MutationObserver**: Reactive UI updates for dynamic content
+
+### Files Structure
+```
+chrome-ext/
+├── manifest.json    # Extension configuration
+├── content.js       # Main content script
+├── styles.css       # UI styling
+└── icons/          # Extension icons
+    ├── icon16.png
+    ├── icon48.png
+    └── icon128.png
+```
+
+## Changelog
+
+### v1.0.0
+- Initial release with transcript extraction and AI summarization
+- Minimizable sidebar panel with dark mode support
+- Clickable timestamps and 30-second chunking
+- Production-ready API integration
+
+## License
+
+This project is licensed under the MIT License - see the main repository's LICENSE file for details.
+
+---
+
+**Made with ❤️ for YouTube creators and viewers**
