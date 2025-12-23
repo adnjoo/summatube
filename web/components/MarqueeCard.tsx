@@ -5,7 +5,7 @@ export type MarqueeCardProps = {
   handleThumbnailClick: any;
 };
 
-export const MarqueeCard = ({
+export const VideoCard = ({
   example,
   handleThumbnailClick,
 }: MarqueeCardProps) => {
@@ -16,7 +16,7 @@ export const MarqueeCard = ({
       onClick={() => handleThumbnailClick(example.video_id, example.title)}
     >
       <img
-        className='z-50 max-w-[120px] cursor-pointer rounded-sm shadow-md sm:max-w-[180px]'
+        className='z-50 w-full cursor-pointer rounded-sm shadow-md transition-transform group-hover:scale-105'
         src={example.thumbnail}
         alt='thumbnail'
       />

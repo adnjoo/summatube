@@ -112,17 +112,6 @@ body {
   padding-right: calc(0 - var(--removed-body-scroll-bar-size)) !important;
 }
 
-/* Marquee effect */
-.marquee-container {
-  overflow: hidden;
-  width: 100%;
-  white-space: nowrap;
-}
-
-.marquee-content {
-  display: inline-flex;
-  animation: scroll 120s linear infinite; /* Slower animation duration */
-}
 
 @keyframes scroll {
   0% {

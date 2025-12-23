@@ -51,17 +51,7 @@ export const SummaryCard = ({
                 >
                   <FiShare2 size={18} />
                 </button>
-                {/* External Link */}
-                <a
-                  href={`https://www.youtube.com/watch?v=${video_id}`}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='ml-2 text-blue-500 hover:text-blue-700'
-                >
-                  <FiExternalLink size={18} />
-                </a>
-                {/* Like Button */}
-                <LikeButton summaryId={summary?.id} />
+
               </div>
               {/* Summary Text */}
               <p className='text-gray-700'>

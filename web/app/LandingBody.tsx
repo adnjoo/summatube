@@ -5,11 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import { type Example } from '@/app/page';
-import { MarqueeCard } from '@/components/MarqueeCard';
+import { VideoCard } from '@/components/MarqueeCard';
 import { SummaryCard } from '@/components/SummaryCard';
 import { TimestampsPanel } from '@/components/TimestampsPanel';
 import { YouTubePlayer } from '@/components/YoutubePlayer';
-import { Marquee } from '@/components/layout/Marquee';
+import { VideoGrid } from '@/components/layout/Marquee';
 import { Button, Input, Switch } from '@/components/ui';
 // import { AppConfig } from '@/lib/constants';
 import {
@@ -230,9 +230,9 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
       </div>
 
       {showExamples && (
-        <Marquee>
-          {examples.map((example) => (
-            <MarqueeCard
+        <VideoGrid>
+          {examples.slice(0, 8).map((example) => (
+            <VideoCard
               key={example.video_id}
               example={example}
               handleThumbnailClick={(id, title) => {
@@ -241,7 +241,7 @@ export default function LandingBody({ examples }: { examples: Example[] }) {
               }}
             />
           ))}
-        </Marquee>
+        </VideoGrid>
       )}
 
       <form onSubmit={(e) => e.preventDefault()} className='mx-auto flex w-full max-w-md flex-row items-center gap-2'>

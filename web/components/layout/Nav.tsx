@@ -77,30 +77,6 @@ export const Nav = async () => {
         {/* Desktop Navigation */}
         <nav className='hidden gap-6 lg:flex'>
         </nav>
-
-        {/* Authentication Button */}
-        <div className='-mr-4 flex items-center gap-4 sm:-mr-2'>
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='default'>Account</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuItem asChild>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <form action={signOut}>
-                    <button type='submit' className='w-full text-left'>
-                      Logout
-                    </button>
-                  </form>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <LoginDialog />
-          )}
-        </div>
       </div>
     </header>
   );
