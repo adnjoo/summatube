@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import { Footer } from '@/components/layout/Footer';
-import { Nav } from '@/components/layout/Nav';
+// import { Nav } from '@/components/layout/Nav';
 import { AppConfig } from '@/lib/constants';
 import Providers from '@/utils/rq/queryClient';
 
@@ -48,7 +48,7 @@ export default function RootLayout({ children }) {
     <html lang='en'>
       <body className={inter.className}>
         <Providers>
-          <Nav />
+          {/* <Nav /> */}
           <main className='my-container min-h-[80vh] pt-16 sm:pt-8'>
             {children}
           </main>

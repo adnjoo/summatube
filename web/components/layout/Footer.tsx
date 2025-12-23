@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { FaGithub, FaXTwitter } from 'react-icons/fa6';
 
-import { Separator } from '@/components/ui/separator';
+// import { Separator } from '@/components/ui/separator';
 import { AppConfig } from '@/lib/constants';
 
 export function Footer() {
@@ -32,7 +32,7 @@ export function Footer() {
           >
             <FaGithub className='h-5 w-5' />
           </Link>
-          <Separator orientation='vertical' className='h-4' />
+
           <Link
             href={AppConfig.SOCIAL.X}
             target='_blank'
@@ -40,14 +40,12 @@ export function Footer() {
           >
             <FaXTwitter className='h-5 w-5' />
           </Link>
-          <Separator orientation='vertical' className='h-4' />
           <Link
             href={AppConfig.SITE_MAP.PRIVACY}
             className='text-muted-foreground hover:text-foreground'
           >
             Privacy
           </Link>
-          <Separator orientation='vertical' className='h-4' />
           <Link
             href={AppConfig.SITE_MAP.TERMS}
             className='text-muted-foreground hover:text-foreground'

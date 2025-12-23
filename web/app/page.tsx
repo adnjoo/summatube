@@ -17,9 +17,7 @@ export default async function Home() {
     <main className='flex flex-col py-4 sm:py-12'>
       <h1 className='text-center text-4xl font-bold'>SummaTube</h1>
 
-      <Suspense fallback={null}>
-        <LandingBody examples={[]} />
-      </Suspense>
+      chrome extension coming
     </main>
   );
 }
