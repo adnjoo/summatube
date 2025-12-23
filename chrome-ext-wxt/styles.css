@@ -1,0 +1,291 @@
+/* styles.css - SummaTube Styles */
+
+#summatube-panel {
+    margin: 20px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: "Roboto", "YouTube Sans", sans-serif;
+    max-width: 400px;
+    transition: all 0.3s ease;
+  }
+  
+  .summatube-header {
+    padding: 18px 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(139, 0, 255, 0.3);
+    cursor: pointer;
+  }
+  
+  .summatube-header.light {
+    background: linear-gradient(135deg, #A100FF, #FF3578);
+  }
+  
+  .summatube-header.dark {
+    background: linear-gradient(135deg, #8B00FF, #FF006E);
+  }
+  
+  .summatube-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    font-size: 14.5px;
+    line-height: 1.7;
+    transition: max-height 0.4s ease, padding 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .summatube-content.light {
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f0f0f;
+  }
+  
+  .summatube-content.dark {
+    background: rgba(15, 15, 15, 0.85);
+    color: #e0e0e0;
+  }
+  
+  .chunk {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(139, 0, 255, 0.08);
+    border-radius: 12px;
+    border-left: 4px solid #A100FF;
+  }
+  
+  .timestamp {
+    font-weight: 600;
+    color: #A100FF;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  
+  .timestamp:hover {
+    text-decoration: underline;
+  }
+  
+  .status-text {
+    text-align: center;
+    padding: 60px 20px;
+    color: #aaaaaa;
+    font-style: italic;
+  }
+  
+  .status-text .emoji {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+  
+  #summatube-toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.3s;
+  }
+  
+  #summatube-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Minimize animation */
+  #summatube-panel.minimized .summatube-content {
+    max-height: 0;
+    padding: 0 20px;
+    opacity: 0;
+    overflow: hidden;
+  }
+  
+  /* Custom scrollbar */
+  #summatube-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  #summatube-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  #summatube-panel::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+  
+  #summatube-panel::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .header-subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+  
+  .summary-section {
+    margin: 32px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid rgba(161, 0, 255, 0.2);
+  }
+  
+  .summary-btn {
+    background: #A100FF;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(161, 0, 255, 0.3);
+    transition: all 0.2s;
+  }
+  
+  .summary-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(161, 0, 255, 0.4);
+  }
+  
+  .summary-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .summary-result {
+    margin-top: 20px;
+  }
+  
+  .summary-card {
+    padding: 20px;
+    background: rgba(161, 0, 255, 0.12);
+    border-radius: 16px;
+    border-left: 4px solid #A100FF;
+  }
+  
+  .summary-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #A100FF;
+    margin-bottom: 12px;
+  }
+  
+  .summary-quote {
+    font-style: italic;
+    opacity: 0.8;
+    margin-bottom: 12px;
+  }
+  
+  .summary-footer {
+    margin-top: 16px;
+    font-size: 12px;
+    opacity: 0.7;
+    text-align: right;
+  }
+  
+  .summary-link {
+    color: #A100FF;
+    text-decoration: underline;
+  }
+  
+  .error-text {
+    color: #ff6b6b;
+    font-style: italic;
+    padding: 16px;
+    text-align: center;
+  }
+
+  /* API Key Management Styles */
+  .api-key-section {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: rgba(161, 0, 255, 0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(161, 0, 255, 0.2);
+  }
+
+  .api-key-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .api-key-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(161, 0, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f0f0f;
+    font-size: 14px;
+  }
+
+  .api-key-input:focus {
+    outline: none;
+    border-color: #A100FF;
+    box-shadow: 0 0 0 2px rgba(161, 0, 255, 0.2);
+  }
+
+  .dark .api-key-input {
+    background: rgba(31, 31, 31, 0.9);
+    color: #e0e0e0;
+    border-color: rgba(161, 0, 255, 0.4);
+  }
+
+  .save-api-key-btn {
+    background: #A100FF;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .save-api-key-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(161, 0, 255, 0.3);
+  }
+
+  .api-key-help {
+    font-size: 12px;
+    opacity: 0.8;
+    text-align: center;
+  }
+
+  .api-link {
+    color: #A100FF;
+    text-decoration: underline;
+  }
+
+  .api-key-btn {
+    background: rgba(161, 0, 255, 0.1);
+    color: #A100FF;
+    border: 1px solid rgba(161, 0, 255, 0.3);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+  }
+
+  .api-key-btn:hover {
+    background: rgba(161, 0, 255, 0.2);
+  }
