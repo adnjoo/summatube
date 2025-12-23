@@ -1,6 +1,6 @@
 # SummaTube
 
-AI-powered YouTube video summaries and transcripts with clickable timestamps.
+YouTube transcript and AI video summaries with clickable timestamps.
 
 ## Features
 
@@ -9,7 +9,7 @@ AI-powered YouTube video summaries and transcripts with clickable timestamps.
 
 ## Screenshot
 
-![SummaTube Chrome Extension](web/public/screen.png)
+![SummaTube Chrome Extension](web/public/screen-20251223.png)
 
 ## Installation
 
