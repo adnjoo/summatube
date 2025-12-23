@@ -1,5 +1,5 @@
 import { AppConfig } from '@/lib/constants';
-import { formatISOToHumanReadable } from '@/lib/helpers';
+// import { formatISOToHumanReadable } from '@/lib/helpers';
 
 export default function Terms() {
   return (
@@ -82,17 +82,6 @@ export default function Terms() {
             </p>
           </div>
           <hr className='border-gray-200' />
-
-          <ul className='list-disc pl-6 text-sm text-gray-700'>
-            <li>
-              <strong>Effective Date:</strong>{' '}
-              {formatISOToHumanReadable(AppConfig.ADMIN.TERMS_DATE)}
-            </li>
-            <li>
-              <strong>Last Updated:</strong>{' '}
-              {formatISOToHumanReadable(AppConfig.ADMIN.TERMS_DATE)}
-            </li>
-          </ul>
         </div>
       </div>
     </div>
