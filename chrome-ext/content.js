@@ -1,4 +1,4 @@
-// SummaTube - FIXED & WORKING Clickable Chunked Transcript (December 2025)
+// SummaTube - Minimizable Chunked Transcript Panel (December 2025)
 
 (function () {
   'use strict';
@@ -46,13 +46,11 @@
 
     document.querySelector('button[aria-label*="Close transcript" i]')?.click();
 
-    // Group into ~30s chunks
     const chunks = [];
     let currentChunk = { startSeconds: 0, endSeconds: 0, texts: [] };
 
     segmentData.forEach((seg, i) => {
       if (currentChunk.texts.length === 0) currentChunk.startSeconds = seg.seconds;
-
       currentChunk.texts.push(seg.text);
       currentChunk.endSeconds = seg.seconds;
 
@@ -65,23 +63,22 @@
     return chunks;
   }
 
-  // The REAL working seek function
   function seekTo(seconds) {
     const player = document.querySelector('video');
     if (player) {
-      player.currentTime = seconds; // Direct seek — fastest and most reliable
+      player.currentTime = seconds;
+      player.play(); // Optional: auto-play after seek
       return;
     }
-
-    // Fallback: use YouTube's native parameter
     const url = new URL(window.location);
     url.searchParams.set('t', Math.floor(seconds) + 's');
-    window.history.replaceState(null, '', url); // No reload
+    window.history.replaceState(null, '', url);
     const video = document.querySelector('video');
-    if (video) video.currentTime = seconds; // Force it anyway
+    if (video) video.currentTime = seconds;
   }
 
-  function showPanel(chunks) {
+  function createPanel(chunks) {
+    // Remove existing panel if any
     document.getElementById('summatube-panel')?.remove();
 
     const sidebar = document.getElementById('secondary') || document.querySelector('#related');
@@ -97,8 +94,8 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.1);
       font-family: "Roboto", "YouTube Sans", sans-serif;
-      animation: slideUp 0.4s ease-out;
       max-width: 400px;
+      transition: all 0.3s ease;
     `;
 
     const isDark = document.documentElement.hasAttribute('dark') ||
@@ -107,7 +104,9 @@
     const bgColor = isDark ? 'rgba(15,15,15,0.85)' : 'rgba(255,255,255,0.92)';
     const textColor = isDark ? '#e0e0e0' : '#0f0f0f';
     const secondaryText = isDark ? '#aaaaaa' : '#606060';
-    const headerGradient = isDark ? 'linear-gradient(135deg, #8B00FF, #FF006E)' : 'linear-gradient(135deg, #A100FF, #FF3578)';
+    const headerGradient = isDark 
+      ? 'linear-gradient(135deg, #8B00FF, #FF006E)' 
+      : 'linear-gradient(135deg, #A100FF, #FF3578)';
 
     const headerStyle = `
       background: ${headerGradient};
@@ -117,6 +116,7 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 15px rgba(139,0,255,0.3);
+      cursor: pointer;
     `;
 
     const contentStyle = `
@@ -127,11 +127,12 @@
       color: ${textColor};
       font-size: 14.5px;
       line-height: 1.7;
+      transition: max-height 0.4s ease, padding 0.3s ease, opacity 0.3s ease;
       scrollbar-width: thin;
       scrollbar-color: #888 transparent;
     `;
 
-    let contentHTML;
+    let contentHTML = '';
     if (!chunks) {
       contentHTML = `<div style="text-align:center; padding:60px 20px; color:${secondaryText}; font-style:italic;">
         <div style="font-size:48px; margin-bottom:16px; opacity:0.3;">📜</div>
@@ -150,8 +151,7 @@
         return `
           <div style="margin-bottom: 24px; padding: 16px; background: rgba(139,0,255,0.08); border-radius: 12px; border-left: 4px solid #A100FF;">
             <div style="font-weight: 600; color: #A100FF; cursor: pointer; margin-bottom: 8px;"
-                 class="summatube-seek"
-                 data-seconds="${chunk.startSeconds}">
+                 class="summatube-seek" data-seconds="${chunk.startSeconds}">
               [${startTs} – ${endTs}]
             </div>
             <div>${paragraph}</div>
@@ -161,27 +161,55 @@
 
     panel.innerHTML = `
       <style>
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #summatube-panel.minimized .summatube-content { max-height: 0; padding: 0 20px; opacity: 0; }
+        #summatube-panel.minimized { border-radius: 16px; }
+        .summatube-seek:hover { text-decoration: underline; }
         #summatube-panel::-webkit-scrollbar { width: 6px; }
         #summatube-panel::-webkit-scrollbar-track { background: transparent; }
         #summatube-panel::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
         #summatube-panel::-webkit-scrollbar-thumb:hover { background: #aaa; }
-        .summatube-seek:hover { text-decoration: underline; }
       </style>
 
-      <div style="${headerStyle}">
+      <div class="summatube-header" style="${headerStyle}">
         <div>
           <div style="font-size:20px; font-weight:600;">SummaTube</div>
           <div style="font-size:13px; opacity:0.9; margin-top:2px;">Chunked Transcript (30s)</div>
         </div>
-        <button style="background:none; border:none; color:white; font-size:32px; cursor:pointer; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background 0.2s;"
-                onmouseover="this.style.background='rgba(255,255,255,0.2)'"
-                onmouseout="this.style.background='none'">×</button>
+        <button id="summatube-toggle-btn" style="
+          background:none; border:none; color:white; font-size:32px; cursor:pointer;
+          width:40px; height:40px; border-radius:50%; display:flex; align-items:center;
+          justify-content:center; transition: background 0.2s, transform 0.3s;">
+          −
+        </button>
       </div>
-      <div style="${contentStyle}">${contentHTML}</div>
+      <div class="summatube-content" style="${contentStyle}">${contentHTML}</div>
     `;
 
-    // Add click listeners AFTER rendering
+    // Toggle minimize / expand
+    const toggleBtn = panel.querySelector('#summatube-toggle-btn');
+    const contentDiv = panel.querySelector('.summatube-content');
+    const headerDiv = panel.querySelector('.summatube-header');
+
+    function togglePanel() {
+      panel.classList.toggle('minimized');
+      if (panel.classList.contains('minimized')) {
+        toggleBtn.textContent = '+';
+        toggleBtn.style.transform = 'rotate(0deg)';
+      } else {
+        toggleBtn.textContent = '−';
+        toggleBtn.style.transform = 'rotate(180deg)';
+        contentDiv.scrollTop = 0; // Optional: scroll to top when expanding
+      }
+    }
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePanel();
+    });
+
+    headerDiv.addEventListener('click', togglePanel); // Click header to expand too
+
+    // Seek functionality
     panel.querySelectorAll('.summatube-seek').forEach(el => {
       el.addEventListener('click', () => {
         const seconds = parseInt(el.dataset.seconds, 10);
@@ -189,25 +217,16 @@
       });
     });
 
-    panel.querySelector('button').onclick = () => {
-      panel.style.animation = 'slideDown 0.3s ease-in';
-      setTimeout(() => panel.remove(), 300);
-    };
-
     sidebar.insertBefore(panel, sidebar.firstChild);
-
-    const style = document.createElement('style');
-    style.textContent = `@keyframes slideDown { to { opacity: 0; transform: translateY(20px); } }`;
-    document.head.appendChild(style);
   }
 
   async function run() {
     if (!getVideoId()) return;
 
-    showPanel('loading');
+    createPanel('loading');
 
     const chunks = await fetchTranscript();
-    showPanel(chunks || null);
+    createPanel(chunks || null);
   }
 
   const observer = new MutationObserver(() => {
