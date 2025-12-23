@@ -16,6 +16,9 @@ export default defineContentScript({
     let currentVideoId: string | null = null;
     let summaryCache: any = null;
     let openaiApiKey: string | null = null;
+    let transcriptSegments: TranscriptSegment[] = [];
+    let playbackTrackingInterval: number | null = null;
+    let currentActiveIndex: number = -1;
 
     // Types
     interface TranscriptSegment {
@@ -24,14 +27,8 @@ export default defineContentScript({
       seconds: number;
     }
 
-    interface TranscriptChunk {
-      startSeconds: number;
-      endSeconds: number;
-      texts: string[];
-    }
-
     interface TranscriptData {
-      chunks: TranscriptChunk[];
+      segments: TranscriptSegment[];
       fullTranscript: string;
     }
 
@@ -99,23 +96,9 @@ export default defineContentScript({
 
         document.querySelector('button[aria-label*="Close transcript" i]')?.click();
 
-        const chunks: TranscriptChunk[] = [];
-        let currentChunk: TranscriptChunk = { startSeconds: 0, endSeconds: 0, texts: [] };
-
-        segmentData.forEach((seg, i) => {
-          if (currentChunk.texts.length === 0) currentChunk.startSeconds = seg.seconds;
-          currentChunk.texts.push(seg.text);
-          currentChunk.endSeconds = seg.seconds;
-
-          if (currentChunk.endSeconds - currentChunk.startSeconds >= 30 || i === segmentData.length - 1) {
-            chunks.push({ ...currentChunk });
-            currentChunk = { startSeconds: seg.seconds, endSeconds: seg.seconds, texts: [] };
-          }
-        });
-
         const fullTranscript = segmentData.map(s => s.text).join(' ');
 
-        return { chunks, fullTranscript };
+        return { segments: segmentData, fullTranscript };
       } catch (error) {
         document.querySelector('button[aria-label*="Close transcript" i]')?.click();
         return null;
@@ -128,6 +111,56 @@ export default defineContentScript({
         player.currentTime = seconds;
         player.play();
       }
+    }
+
+    function startPlaybackTracking(): void {
+      if (playbackTrackingInterval) {
+        clearInterval(playbackTrackingInterval);
+      }
+
+      playbackTrackingInterval = window.setInterval(() => {
+        const player = document.querySelector('video') as HTMLVideoElement;
+        if (!player || transcriptSegments.length === 0) return;
+
+        const currentTime = player.currentTime;
+        
+        // Find the active segment
+        let activeIndex = -1;
+        for (let i = transcriptSegments.length - 1; i >= 0; i--) {
+          if (currentTime >= transcriptSegments[i].seconds) {
+            activeIndex = i;
+            break;
+          }
+        }
+
+        // Update active segment if changed
+        if (activeIndex !== currentActiveIndex) {
+          currentActiveIndex = activeIndex;
+          updateActiveSegment(activeIndex);
+        }
+      }, 100);
+    }
+
+    function stopPlaybackTracking(): void {
+      if (playbackTrackingInterval) {
+        clearInterval(playbackTrackingInterval);
+        playbackTrackingInterval = null;
+      }
+    }
+
+    function updateActiveSegment(index: number): void {
+      const transcriptList = document.getElementById('summatube-transcript-list');
+      if (!transcriptList) return;
+
+      // Remove previous active class
+      transcriptList.querySelectorAll('.transcript-line').forEach((line, i) => {
+        line.classList.remove('active');
+        if (i === index) {
+          line.classList.add('active');
+          // Auto-scroll to active line
+          line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
     }
 
     async function getSummary(videoId: string, transcript: string): Promise<SummaryResult> {
@@ -193,6 +226,7 @@ export default defineContentScript({
 
     function createPanel(data: TranscriptData | 'loading' | null): void {
       document.getElementById('summatube-panel')?.remove();
+      stopPlaybackTracking();
 
       const sidebar = document.getElementById('secondary') || document.querySelector('#related');
       if (!sidebar) return;
@@ -206,7 +240,14 @@ export default defineContentScript({
                      document.body.classList.contains('ytd-watch-flexy--dark-theme');
       panel.classList.add(isDark ? 'dark' : 'light');
 
-      // Transcript chunks
+      // Store segments for playback tracking
+      if (data && data !== 'loading') {
+        transcriptSegments = data.segments;
+      } else {
+        transcriptSegments = [];
+      }
+
+      // Transcript list - line by line
       let transcriptHTML = '';
       if (!data) {
         transcriptHTML = `
@@ -221,16 +262,13 @@ export default defineContentScript({
             <div>Loading transcript...</div>
           </div>`;
       } else {
-        transcriptHTML = data.chunks.map(chunk => {
-          const startTs = secondsToTimestamp(chunk.startSeconds);
-          const endTs = secondsToTimestamp(chunk.endSeconds);
-          const paragraph = chunk.texts.join(' ');
+        transcriptHTML = data.segments.map((segment, index) => {
           return `
-            <div class="chunk">
-              <div class="timestamp summatube-seek" data-seconds="${chunk.startSeconds}">
-                [${startTs} – ${endTs}]
+            <div class="transcript-line" data-index="${index}" data-seconds="${segment.seconds}">
+              <div class="transcript-line-content">
+                <span class="play-icon">▶</span>
+                <span class="transcript-text">${segment.text}</span>
               </div>
-              <div>${paragraph}</div>
             </div>`;
         }).join('');
       }
@@ -265,41 +303,68 @@ export default defineContentScript({
 
       panel.innerHTML = `
         <div class="summatube-header ${isDark ? 'dark' : 'light'}">
-          <div>
+          <div class="header-left">
             <div class="header-title">SummaTube</div>
-            <div class="header-subtitle">Transcript + AI Summary</div>
           </div>
-          <button id="summatube-toggle-btn">−</button>
+          <div class="header-right">
+            <button id="summatube-settings-btn" class="header-icon-btn" title="Settings">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+              </svg>
+            </button>
+            <button id="summatube-close-btn" class="header-icon-btn" title="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="summatube-tabs">
+          <button class="tab-button active" data-tab="subtitles">Subtitles</button>
         </div>
         <div class="summatube-content ${isDark ? 'dark' : 'light'}">
-          ${transcriptHTML}
+          <div id="summatube-transcript-list" class="transcript-list">
+            ${transcriptHTML}
+          </div>
           ${summarySection}
         </div>
       `;
 
-      // Toggle minimize
-      const toggleBtn = panel.querySelector('#summatube-toggle-btn') as HTMLButtonElement;
-      const contentDiv = panel.querySelector('.summatube-content') as HTMLElement;
-      const headerDiv = panel.querySelector('.summatube-header') as HTMLElement;
-
-      function togglePanel(): void {
-        panel.classList.toggle('minimized');
-        toggleBtn.textContent = panel.classList.contains('minimized') ? '+' : '−';
-        if (!panel.classList.contains('minimized')) contentDiv.scrollTop = 0;
-      }
-
-      toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePanel(); });
-      headerDiv.addEventListener('click', togglePanel);
-
-      // Timestamp seek
-      panel.querySelectorAll('.summatube-seek').forEach(el => {
-        el.addEventListener('click', () => seekTo(parseInt((el as HTMLElement).dataset.seconds!, 10)));
+      // Close button
+      const closeBtn = panel.querySelector('#summatube-close-btn') as HTMLButtonElement;
+      closeBtn.addEventListener('click', () => {
+        stopPlaybackTracking();
+        panel.remove();
       });
 
-      // AI Summary Button
+      // Get all elements once
+      const settingsBtn = panel.querySelector('#summatube-settings-btn') as HTMLButtonElement;
+      const apiKeySection = panel.querySelector('#summatube-api-key-section') as HTMLElement;
+      const summaryControls = panel.querySelector('#summatube-summary-controls') as HTMLElement;
+      const apiKeyBtn = panel.querySelector('#summatube-api-key-btn') as HTMLButtonElement;
+      const apiKeyInput = panel.querySelector('#summatube-api-key-input') as HTMLInputElement;
+      const saveApiKeyBtn = panel.querySelector('#summatube-save-api-key-btn') as HTMLButtonElement;
       const summaryBtn = panel.querySelector('#summatube-summary-btn') as HTMLButtonElement;
       const summaryResult = panel.querySelector('#summatube-summary-result') as HTMLElement;
 
+      // Settings button (show API key management)
+      if (settingsBtn && apiKeySection && summaryControls) {
+        settingsBtn.addEventListener('click', () => {
+          const isVisible = apiKeySection.style.display === 'block';
+          apiKeySection.style.display = isVisible ? 'none' : 'block';
+          summaryControls.style.display = isVisible ? 'block' : 'none';
+        });
+      }
+
+      // Timestamp seek - click on transcript line
+      panel.querySelectorAll('.transcript-line').forEach(el => {
+        el.addEventListener('click', () => {
+          const seconds = parseFloat((el as HTMLElement).dataset.seconds || '0');
+          seekTo(seconds);
+        });
+      });
+
+      // AI Summary Button
       if (summaryBtn && hasTranscript) {
         summaryBtn.addEventListener('click', async () => {
           summaryBtn.disabled = true;
@@ -327,11 +392,6 @@ export default defineContentScript({
       }
 
       // API Key Management
-      const apiKeyBtn = panel.querySelector('#summatube-api-key-btn') as HTMLButtonElement;
-      const apiKeySection = panel.querySelector('#summatube-api-key-section') as HTMLElement;
-      const apiKeyInput = panel.querySelector('#summatube-api-key-input') as HTMLInputElement;
-      const saveApiKeyBtn = panel.querySelector('#summatube-save-api-key-btn') as HTMLButtonElement;
-      const summaryControls = panel.querySelector('#summatube-summary-controls') as HTMLElement;
 
       if (apiKeyBtn && apiKeySection && summaryControls) {
         // Check if API key is already set
@@ -371,6 +431,11 @@ export default defineContentScript({
       }
 
       sidebar.insertBefore(panel, sidebar.firstChild);
+
+      // Start playback tracking if transcript is loaded
+      if (data && data !== 'loading' && transcriptSegments.length > 0) {
+        startPlaybackTracking();
+      }
     }
 
     async function run(): Promise<void> {
