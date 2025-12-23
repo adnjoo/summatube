@@ -54,13 +54,13 @@ npm run zip
 
 3. **Load Extension**:
    - Click "Load unpacked"
-   - Select `chrome-ext-wxt/dist/chrome-mv3`
+   - Select `chrome-ext/dist/chrome-mv3`
    - The extension will be loaded!
 
 ## 📁 Project Structure
 
 ```
-chrome-ext-wxt/
+chrome-ext/
 ├── entrypoints/
 │   └── content.ts          # Main content script (TypeScript)
 ├── public/                 # Static assets
