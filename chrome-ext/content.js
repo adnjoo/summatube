@@ -9,7 +9,7 @@
   link.href = chrome.runtime.getURL('styles.css');
   document.head.appendChild(link);
 
-  const API_URL = 'https://summa.tube/api/summarize';
+  const API_URL = 'https://www.summa.tube/api/summarize';
   let currentVideoId = null;
   let summaryCache = null; // Cache summary per video
 
