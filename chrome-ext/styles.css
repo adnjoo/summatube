@@ -125,3 +125,86 @@
   #summatube-panel::-webkit-scrollbar-thumb:hover {
     background: #aaa;
   }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .header-subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+  
+  .summary-section {
+    margin: 32px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid rgba(161, 0, 255, 0.2);
+  }
+  
+  .summary-btn {
+    background: #A100FF;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(161, 0, 255, 0.3);
+    transition: all 0.2s;
+  }
+  
+  .summary-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(161, 0, 255, 0.4);
+  }
+  
+  .summary-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .summary-result {
+    margin-top: 20px;
+  }
+  
+  .summary-card {
+    padding: 20px;
+    background: rgba(161, 0, 255, 0.12);
+    border-radius: 16px;
+    border-left: 4px solid #A100FF;
+  }
+  
+  .summary-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #A100FF;
+    margin-bottom: 12px;
+  }
+  
+  .summary-quote {
+    font-style: italic;
+    opacity: 0.8;
+    margin-bottom: 12px;
+  }
+  
+  .summary-footer {
+    margin-top: 16px;
+    font-size: 12px;
+    opacity: 0.7;
+    text-align: right;
+  }
+  
+  .summary-link {
+    color: #A100FF;
+    text-decoration: underline;
+  }
+  
+  .error-text {
+    color: #ff6b6b;
+    font-style: italic;
+    padding: 16px;
+    text-align: center;
+  }

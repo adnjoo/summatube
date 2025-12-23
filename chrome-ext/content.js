@@ -1,4 +1,4 @@
-// SummaTube - External styles.css version (Clean & Professional)
+// SummaTube - With AI Summary Button (External styles.css)
 
 (function () {
   'use strict';
@@ -8,6 +8,10 @@
   link.rel = 'stylesheet';
   link.href = chrome.runtime.getURL('styles.css');
   document.head.appendChild(link);
+
+  const API_URL = 'https://summa.tube/api/summarize';
+  let currentVideoId = null;
+  let summaryCache = null; // Cache summary per video
 
   function getVideoId() {
     return new URLSearchParams(window.location.search).get('v');
@@ -66,7 +70,9 @@
       }
     });
 
-    return chunks;
+    const fullTranscript = segmentData.map(s => s.text).join(' ');
+
+    return { chunks, fullTranscript };
   }
 
   function seekTo(seconds) {
@@ -77,36 +83,68 @@
     }
   }
 
-  function createPanel(chunks) {
+  async function getSummary(videoId, transcript) {
+    if (summaryCache && summaryCache.video_id === videoId) {
+      return summaryCache;
+    }
+  
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcript: transcript,
+          video_id: videoId
+        })
+      });
+  
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errText}`);
+      }
+  
+      const data = await response.json();
+      summaryCache = data;
+      return data;
+    } catch (err) {
+      console.error('SummaTube summary fetch failed:', err);
+      return { error: 'Failed to generate summary. Try again later.' };
+    }
+  }
+
+  function createPanel(data) {
     document.getElementById('summatube-panel')?.remove();
 
     const sidebar = document.getElementById('secondary') || document.querySelector('#related');
     if (!sidebar) return;
+
+    currentVideoId = getVideoId();
 
     const panel = document.createElement('div');
     panel.id = 'summatube-panel';
 
     const isDark = document.documentElement.hasAttribute('dark') ||
                    document.body.classList.contains('ytd-watch-flexy--dark-theme');
-
-    // Apply theme class
     panel.classList.add(isDark ? 'dark' : 'light');
 
-    let contentHTML = '';
-    if (!chunks) {
-      contentHTML = `
+    // Transcript chunks
+    let transcriptHTML = '';
+    if (!data) {
+      transcriptHTML = `
         <div class="status-text">
           <div class="emoji">📜</div>
           <div>No transcript available.</div>
         </div>`;
-    } else if (chunks === 'loading') {
-      contentHTML = `
+    } else if (data === 'loading') {
+      transcriptHTML = `
         <div class="status-text">
           <div class="emoji">⏳</div>
           <div>Loading transcript...</div>
         </div>`;
     } else {
-      contentHTML = chunks.map(chunk => {
+      transcriptHTML = data.chunks.map(chunk => {
         const startTs = secondsToTimestamp(chunk.startSeconds);
         const endTs = secondsToTimestamp(chunk.endSeconds);
         const paragraph = chunk.texts.join(' ');
@@ -120,19 +158,32 @@
       }).join('');
     }
 
+    // Summary section (only if transcript exists)
+    const hasTranscript = data && data.fullTranscript;
+    const summarySection = hasTranscript ? `
+      <div class="summary-section">
+        <button id="summatube-summary-btn" class="summary-btn">
+          ✨ Generate AI Summary
+        </button>
+        <div id="summatube-summary-result" class="summary-result" style="display:none;"></div>
+      </div>
+    ` : '';
+
     panel.innerHTML = `
       <div class="summatube-header ${isDark ? 'dark' : 'light'}">
         <div>
-          <div style="font-size:20px; font-weight:600;">SummaTube</div>
-          <div style="font-size:13px; opacity:0.9; margin-top:2px;">Chunked Transcript (30s)</div>
+          <div class="header-title">SummaTube</div>
+          <div class="header-subtitle">Transcript + AI Summary</div>
         </div>
         <button id="summatube-toggle-btn">−</button>
       </div>
       <div class="summatube-content ${isDark ? 'dark' : 'light'}">
-        ${contentHTML}
+        ${transcriptHTML}
+        ${summarySection}
       </div>
     `;
 
+    // Toggle minimize
     const toggleBtn = panel.querySelector('#summatube-toggle-btn');
     const contentDiv = panel.querySelector('.summatube-content');
     const headerDiv = panel.querySelector('.summatube-header');
@@ -140,30 +191,59 @@
     function togglePanel() {
       panel.classList.toggle('minimized');
       toggleBtn.textContent = panel.classList.contains('minimized') ? '+' : '−';
-      if (!panel.classList.contains('minimized')) {
-        contentDiv.scrollTop = 0;
-      }
+      if (!panel.classList.contains('minimized')) contentDiv.scrollTop = 0;
     }
 
     toggleBtn.addEventListener('click', e => { e.stopPropagation(); togglePanel(); });
     headerDiv.addEventListener('click', togglePanel);
 
+    // Timestamp seek
     panel.querySelectorAll('.summatube-seek').forEach(el => {
-      el.addEventListener('click', () => {
-        seekTo(parseInt(el.dataset.seconds, 10));
-      });
+      el.addEventListener('click', () => seekTo(parseInt(el.dataset.seconds, 10)));
     });
+
+    // AI Summary Button
+    const summaryBtn = panel.querySelector('#summatube-summary-btn');
+    const summaryResult = panel.querySelector('#summatube-summary-result');
+
+    if (summaryBtn && hasTranscript) {
+      summaryBtn.addEventListener('click', async () => {
+        summaryBtn.disabled = true;
+        summaryBtn.innerHTML = '⏳ Generating...';
+
+        const result = await getSummary(currentVideoId, data.fullTranscript);
+
+        if (result.error) {
+          summaryResult.innerHTML = `<div class="error-text">⚠️ ${result.error}</div>`;
+        } else {
+          summaryResult.innerHTML = `
+            <div class="summary-card">
+              <div class="summary-title">✨ AI Summary</div>
+              <div class="summary-quote">"${result.title}"</div>
+              <div class="summary-body">${result.summary}</div>
+              <div class="summary-footer">
+                Powered by <a href="https://summa.tube" target="_blank" class="summary-link">summa.tube</a>
+              </div>
+            </div>
+          `;
+        }
+
+        summaryResult.style.display = 'block';
+        summaryBtn.style.display = 'none';
+      });
+    }
 
     sidebar.insertBefore(panel, sidebar.firstChild);
   }
 
   async function run() {
-    if (!getVideoId()) return;
+    const videoId = getVideoId();
+    if (!videoId) return;
 
     createPanel('loading');
 
-    const chunks = await fetchTranscript();
-    createPanel(chunks || null);
+    const result = await fetchTranscript();
+    createPanel(result || null);
   }
 
   const observer = new MutationObserver(() => {
