@@ -3,104 +3,113 @@ import { summarizeTranscript } from '@/app/api/summarize/summarizeTranscript';
 
 const MAX_TRANSCRIPT_LENGTH = 50000; // ~15 minutes of speech – safe for most LLMs
 
-// Helper to extract and validate transcript + video_id from either GET or POST
-function extractParams(request: NextRequest) {
-  if (request.method === 'GET') {
-    const { searchParams } = new URL(request.url);
-    const transcript = searchParams.get('transcript');
-    const video_id = searchParams.get('video_id');
-    return { transcript, video_id };
-  }
+// Define CORS headers once to avoid repetition
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
-  // POST
-  return request.json().then(body => ({
-    transcript: body.transcript,
-    video_id: body.video_id,
-  }));
-}
-
-// CORS Preflight
+// CORS Preflight Handler
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
+    headers: corsHeaders,
   });
 }
 
-// Shared handler logic for both GET and POST
-async function handleSummarize(request: NextRequest) {
-  let transcript: string | null = null;
-  let video_id: string | null = null;
-
-  try {
-    const params = await extractParams(request);
-    transcript = params.transcript;
-    video_id = params.video_id;
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
-    );
+// Helper to extract transcript + video_id from GET or POST
+async function extractParams(request: NextRequest): Promise<{ transcript: string | null; video_id: string | null }> {
+  if (request.method === 'GET') {
+    const { searchParams } = new URL(request.url);
+    return {
+      transcript: searchParams.get('transcript'),
+      video_id: searchParams.get('video_id'),
+    };
   }
 
+  // POST – parse JSON body
+  try {
+    const body = await request.json();
+    return {
+      transcript: body.transcript ?? null,
+      video_id: body.video_id ?? null,
+    };
+  } catch {
+    return { transcript: null, video_id: null };
+  }
+}
+
+// Shared handler for GET and POST
+async function handleSummarize(request: NextRequest) {
+  const { transcript, video_id } = await extractParams(request);
+
+  // Validation
   if (!transcript || !video_id) {
     return new Response(
       JSON.stringify({ error: 'Missing transcript or video_id' }),
-      { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
+      }
     );
   }
 
-  // Optional: Truncate very long transcripts to avoid token limits / high cost
+  // Truncate very long transcripts (prevents token overflow / high cost)
+  let processedTranscript = transcript;
   if (transcript.length > MAX_TRANSCRIPT_LENGTH) {
-    transcript = transcript.slice(0, MAX_TRANSCRIPT_LENGTH) + '\n\n... [transcript truncated for summary]';
+    processedTranscript = transcript.slice(0, MAX_TRANSCRIPT_LENGTH) + '\n\n... [transcript truncated for summary]';
   }
 
   try {
-    const summaryContent = await summarizeTranscript(transcript);
+    const summaryContent = await summarizeTranscript(processedTranscript);
 
-    if (!summaryContent) {
+    if (!summaryContent?.trim()) {
       throw new Error('Empty summary returned from LLM');
     }
 
-    // Better title: first sentence or first 10 words
-    const firstSentence = transcript.split(/[.!?]\s+/)[0];
+    // Improved title: use first full sentence if possible
+    const sentences = processedTranscript.split(/[.!?]\s+/);
+    const firstSentence = sentences[0] || '';
     const title = firstSentence
-      ? firstSentence.slice(0, 80) + (firstSentence.length > 80 ? '...' : '')
-      : transcript.trim().split(/\s+/).slice(0, 10).join(' ') + '...';
+      ? firstSentence.slice(0, 100) + (firstSentence.length > 100 ? '...' : '')
+      : processedTranscript.trim().split(/\s+/).slice(0, 12).join(' ') + '...';
 
     return new Response(
       JSON.stringify({
-        title,
-        summary: summaryContent,
+        title: title.trim(),
+        summary: summaryContent.trim(),
         video_id,
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          ...corsHeaders,
         },
       }
     );
   } catch (err: any) {
     console.error('Error in /api/summarize:', err);
+
     return new Response(
-      JSON.stringify({ error: err.message || 'Failed to generate summary' }),
+      JSON.stringify({
+        error: err.message || 'Failed to generate summary',
+      }),
       {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          ...corsHeaders,
         },
       }
     );
   }
 }
 
-// Now both GET and POST use the same logic
+// Export both methods using the same handler
 export { handleSummarize as GET };
 export { handleSummarize as POST };
