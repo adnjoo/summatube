@@ -31,7 +31,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className='text-muted-foreground hover:text-foreground underline'
             >
-              stacktosale
+              S2S
             </Link>
           </p>
         </div>
