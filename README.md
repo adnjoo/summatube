@@ -1,5 +1,23 @@
 # SummaTube
 
-~~Summarizes YouTube videos fast + free ⚡️~~
+AI-powered YouTube video summaries and transcripts with clickable timestamps.
 
-2025 update: chrome extension coming
+## Features
+
+- **Chrome Extension**: Automatically extracts and displays YouTube transcripts
+- **AI Summaries**: Generate concise video summaries with one click
+
+## Screenshot
+
+![SummaTube Chrome Extension](assets/screen.png)
+
+## Installation
+
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable "Developer mode" in the top right
+3. Click "Load unpacked" and select the `chrome-ext/` folder
+4. Visit any YouTube video to see the transcript panel automatically appear
+
+## License
+
+MIT License - see LICENSE file for details
