@@ -2,6 +2,8 @@
 
 YouTube transcript and AI video summaries with clickable timestamps.
 
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub-pink)](https://github.com/sponsors/adnjoo)
+
 ## Features
 
 - **Chrome Extension**: Automatically extracts and displays YouTube transcripts
